@@ -1,4 +1,4 @@
-package com.soulmap.server.common.response;
+package com.soulmap.server.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

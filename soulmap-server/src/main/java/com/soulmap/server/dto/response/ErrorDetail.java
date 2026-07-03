@@ -1,4 +1,4 @@
-package com.soulmap.server.common.response;
+package com.soulmap.server.dto.response;
 
 /**
  * Chi tiet loi con, thuong dung cho validation theo tung field.

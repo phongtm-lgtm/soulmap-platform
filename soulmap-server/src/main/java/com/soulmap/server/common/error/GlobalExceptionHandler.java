@@ -1,7 +1,7 @@
 package com.soulmap.server.common.error;
 
 import com.soulmap.server.common.enums.ErrorCode;
-import com.soulmap.server.common.response.ErrorDetail;
+import com.soulmap.server.dto.response.ErrorDetail;
 import com.soulmap.server.common.trace.TraceIdFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -57,6 +57,34 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(
                 exception.getErrorCode(),
+                Collections.emptyList(),
+                locale
+        );
+    }
+
+    /**
+     * Xu ly loi goi nguon du lieu ben ngoai.
+     */
+    @ExceptionHandler(TuViSourceException.class)
+    public ResponseEntity<ProblemDetail> handleTuViSourceException(TuViSourceException exception, Locale locale) {
+        log.error("Tu vi source exception", exception);
+
+        return buildErrorResponse(
+                ErrorCode.COMMON_ERROR_0003,
+                Collections.emptyList(),
+                locale
+        );
+    }
+
+    /**
+     * Fallback cho cac loi chua duoc xu ly rieng.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ProblemDetail> handleUnexpectedException(Exception exception, Locale locale) {
+        log.error("Unexpected exception", exception);
+
+        return buildErrorResponse(
+                ErrorCode.COMMON_ERROR_0003,
                 Collections.emptyList(),
                 locale
         );
