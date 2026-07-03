@@ -1,0 +1,34 @@
+server:
+  port: ${SERVER_PORT:8090}
+
+spring:
+  application:
+    name: soulmap-server
+
+  profiles:
+    default: dev
+
+  jpa:
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+logging:
+  level:
+    root: ${SOULMAP_LOG_LEVEL:INFO}
+    com.soulmap.server: ${SOULMAP_APP_LOG_LEVEL:INFO}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
