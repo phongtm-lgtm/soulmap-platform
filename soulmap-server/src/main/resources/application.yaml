@@ -12,9 +12,9 @@ spring:
     open-in-view: false
 
   messages:
-    basename: i18n/messages # Spring se doc cac file message*.properties
+    basename: i18n/messages
     encoding: UTF-8
-    fallback-to-system-locale: false # Tranh server tu fallback theo locale cua OS
+    fallback-to-system-locale: false
 
 management:
   endpoints:
@@ -28,6 +28,8 @@ management:
       show-details: never
 
 logging:
+  pattern:
+    level: "%5p [traceId=%X{traceId}]"
   level:
     root: ${SOULMAP_LOG_LEVEL:INFO}
     com.soulmap.server: ${SOULMAP_APP_LOG_LEVEL:INFO}
