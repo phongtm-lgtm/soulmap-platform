@@ -11,6 +11,11 @@ spring:
   jpa:
     open-in-view: false
 
+  messages:
+    basename: i18n/messages # Spring se doc cac file message*.properties
+    encoding: UTF-8
+    fallback-to-system-locale: false # Tranh server tu fallback theo locale cua OS
+
 management:
   endpoints:
     web:
