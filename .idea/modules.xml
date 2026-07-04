@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/soulmap-platform.iml" filepath="$PROJECT_DIR$/.idea/soulmap-platform.iml" />
+      <module fileurl="file://$PROJECT_DIR$/soulmap-server/soulmap-server/soulmap-server.iml" filepath="$PROJECT_DIR$/soulmap-server/soulmap-server/soulmap-server.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,2886 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOULMAP MBTI - Trắc Nghiệm Tính Cách</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-body: #f9fafb;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border: #e5e7eb;
+            --border-hover: #a5b4fc;
+            --bg-selected: #eef2ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        h1 span {
+            color: var(--primary);
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        main {
+            width: 100%;
+            max-width: 580px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .card-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px 25px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        /* Welcome screen */
+        .welcome-screen {
+            text-align: center;
+        }
+
+        .welcome-text {
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .mode-selection-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .mode-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .mode-card:hover {
+            border-color: var(--primary);
+            background-color: #fafafa;
+            transform: translateY(-1px);
+        }
+
+        .mode-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mode-desc {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .mode-tag {
+            font-size: 0.7rem;
+            background: #f3f4f6;
+            color: var(--text-sub);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* Quiz screen */
+        .quiz-screen {
+            display: none;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 4px;
+            background: #f3f4f6;
+            border-radius: 2px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .question-number {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px 18px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            background-color: #fafafa;
+        }
+
+        .option-card.selected {
+            background-color: var(--bg-selected);
+            border-color: var(--primary);
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .controls-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 25px;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            color: var(--text-main);
+            border-color: #9ca3af;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .result-mbti {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .result-eng {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-style: italic;
+        }
+
+        .dimension-charts {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dimension-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .dimension-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .dimension-label span.active {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .dimension-bar {
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .dimension-fill-left {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.4s ease;
+        }
+
+        .dimension-fill-right {
+            height: 100%;
+            background-color: #d1d5db;
+            flex-grow: 1;
+        }
+
+        .result-details {
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            line-height: 1.6;
+        }
+
+        .result-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .result-text {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+        }
+
+        .result-list {
+            margin-left: 18px;
+            margin-bottom: 12px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        .result-list li {
+            margin-bottom: 4px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .footer-action {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        footer {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SOULMAP <span>MBTI</span></h1>
+        <div class="subtitle">Trắc Nghiệm Tính Cách</div>
+    </header>
+
+    <main>
+        <div class="card-container">
+            <!-- Mode Selection Screen -->
+            <div id="welcomeScreen" class="welcome-screen">
+                <p class="welcome-text">
+                    Hệ thống trắc nghiệm tính cách Myers-Briggs (MBTI). Hãy chọn phiên bản làm bài test:
+                </p>
+                
+                <div class="mode-selection-container">
+                    <div class="mode-card" onclick="startQuiz('short')">
+                        <div class="mode-title">
+                            Bản rút gọn (40 câu)
+                            <span class="mode-tag">Nhanh (3 phút)</span>
+                        </div>
+                        <div class="mode-desc">
+                            10 câu mỗi nhóm xu hướng, độ chính xác đạt khoảng 90% so với bản gốc.
+                        </div>
+                    </div>
+                    
+                    <div class="mode-card" onclick="startQuiz('full')">
+                        <div class="mode-title">
+                            Bản đầy đủ (76 câu)
+                            <span class="mode-tag" style="background:#e0e7ff; color:var(--primary);">Chi tiết (8 phút)</span>
+                        </div>
+                        <div class="mode-desc">
+                            Đầy đủ 76 câu hỏi nguyên bản theo giải thuật của mbti.vn, chính xác 100%.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quizScreen" class="quiz-screen">
+                <div class="progress-bar-container">
+                    <div id="progressBarFill" class="progress-bar-fill"></div>
+                </div>
+                <div id="questionNumber" class="question-number">Câu số 1/...</div>
+                <div id="questionText" class="question-text">Loading...</div>
+                
+                <div class="options-container">
+                    <div id="optACard" class="option-card" onclick="selectOption('a')">
+                        <div id="optAText" class="option-text">Option A</div>
+                    </div>
+                    <div id="optBCard" class="option-card" onclick="selectOption('b')">
+                        <div id="optBText" class="option-text">Option B</div>
+                    </div>
+                </div>
+
+                <div class="controls-container">
+                    <button id="btnBack" class="btn-back" onclick="goBack()" style="visibility: hidden;">Quay lại</button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="resultScreen" class="result-screen">
+                <div class="result-header">
+                    <div id="resultMbti" class="result-mbti">INFP</div>
+                    <div id="resultTitle" class="result-title">Người Hòa Giải</div>
+                    <div id="resultEng" class="result-eng">The Mediator</div>
+                </div>
+
+                <div class="dimension-charts">
+                    <div class="dimension-row">
+                        <div class="dimension-label">
+                            <span id="lblLeft0">Hướng ngoại (E) <span id="valLeft0">50%</span></span>
+                            <span id="lblRight0"><span id="valRight0">50%</span> Hướng nội (I)</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <div id="bar0" class="dimension-fill-left"></div>
+                            <div class="dimension-fill-right"></div>
+                        </div>
+                    </div>
+                    <div class="dimension-row">
+                        <div class="dimension-label">
+                            <span id="lblLeft1">Giác quan (S) <span id="valLeft1">50%</span></span>
+                            <span id="lblRight1"><span id="valRight1">50%</span> Trực giác (N)</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <div id="bar1" class="dimension-fill-left"></div>
+                            <div class="dimension-fill-right"></div>
+                        </div>
+                    </div>
+                    <div class="dimension-row">
+                        <div class="dimension-label">
+                            <span id="lblLeft2">Lý trí (T) <span id="valLeft2">50%</span></span>
+                            <span id="lblRight2"><span id="valRight2">50%</span> Cảm xúc (F)</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <div id="bar2" class="dimension-fill-left"></div>
+                            <div class="dimension-fill-right"></div>
+                        </div>
+                    </div>
+                    <div class="dimension-row">
+                        <div class="dimension-label">
+                            <span id="lblLeft3">Nguyên tắc (J) <span id="valLeft3">50%</span></span>
+                            <span id="lblRight3"><span id="valRight3">50%</span> Linh hoạt (P)</span>
+                        </div>
+                        <div class="dimension-bar">
+                            <div id="bar3" class="dimension-fill-left"></div>
+                            <div class="dimension-fill-right"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="result-section-title">Tóm tắt tính cách</div>
+                    <div id="descSummary" class="result-text">Mô tả tóm tắt tính cách...</div>
+
+                    <div class="result-section-title">Điểm mạnh chính</div>
+                    <ul id="descStrengths" class="result-list"></ul>
+
+                    <div class="result-section-title">Điểm yếu cần lưu ý</div>
+                    <ul id="descWeaknesses" class="result-list"></ul>
+
+                    <div class="result-section-title">Nghề nghiệp gợi ý</div>
+                    <div id="descCareers" class="result-text">Gợi ý ngành nghề...</div>
+                </div>
+
+                <div class="footer-action">
+                    <button class="btn-primary" onclick="restartQuiz()">Về trang chủ chọn bài test</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Dựa trên dữ liệu giải thuật của <a href="https://mbti.vn" target="_blank">mbti.vn</a>
+    </footer>
+
+    <script>
+        const shortQuestions = [
+    {
+        "stt": 1,
+        "id": 301,
+        "group": 0,
+        "text": "Bạn thích công việc kiểu :",
+        "optA": {
+            "id": 601,
+            "text": "a. Xã hội, giao tiếp."
+        },
+        "optB": {
+            "id": 602,
+            "text": "b. Thiết kế, nghiên cứu."
+        }
+    },
+    {
+        "stt": 2,
+        "id": 302,
+        "group": 1,
+        "text": "Bạn tiếp xúc với một người theo xu hướng :",
+        "optA": {
+            "id": 603,
+            "text": "a. Khách quan."
+        },
+        "optB": {
+            "id": 604,
+            "text": "b. Chủ quan"
+        }
+    },
+    {
+        "stt": 3,
+        "id": 303,
+        "group": 2,
+        "text": "Bạn đánh giá sự việc dựa trên :",
+        "optA": {
+            "id": 605,
+            "text": "a. Ý nghĩa, giá trị."
+        },
+        "optB": {
+            "id": 606,
+            "text": "b. Tính logic."
+        }
+    },
+    {
+        "stt": 4,
+        "id": 304,
+        "group": 3,
+        "text": "Bạn là người có tác phong :",
+        "optA": {
+            "id": 607,
+            "text": "a. Thong thả, thoải mái."
+        },
+        "optB": {
+            "id": 608,
+            "text": "b. Nhanh nhẹn, đúng giờ."
+        }
+    },
+    {
+        "stt": 5,
+        "id": 305,
+        "group": 0,
+        "text": "Trong các cuộc giao tiếp, bạn là người:",
+        "optA": {
+            "id": 609,
+            "text": "a. Bắt đầu cho cuộc nói chuyện."
+        },
+        "optB": {
+            "id": 610,
+            "text": "b. Chỉ nói khi người khác bắt chuyện."
+        }
+    },
+    {
+        "stt": 6,
+        "id": 306,
+        "group": 2,
+        "text": "Bạn là người thế nào :",
+        "optA": {
+            "id": 611,
+            "text": "a. Là người có cái đầu lạnh."
+        },
+        "optB": {
+            "id": 612,
+            "text": "b. Là người có trái tim ấm."
+        }
+    },
+    {
+        "stt": 7,
+        "id": 307,
+        "group": 3,
+        "text": "Tính cách của bạn :",
+        "optA": {
+            "id": 613,
+            "text": "a. Dễ chịu, thoải mái."
+        },
+        "optB": {
+            "id": 614,
+            "text": "b. Nghiêm chỉnh, quả quyết."
+        }
+    },
+    {
+        "stt": 8,
+        "id": 308,
+        "group": 1,
+        "text": "Những người có tầm nhìn xa thường:",
+        "optA": {
+            "id": 615,
+            "text": "a. Khá thú vị"
+        },
+        "optB": {
+            "id": 616,
+            "text": "b. Khó hiểu."
+        }
+    },
+    {
+        "stt": 9,
+        "id": 309,
+        "group": 0,
+        "text": "Đối với những người mới gặp, bàn thường :",
+        "optA": {
+            "id": 617,
+            "text": "a. Dễ dàng bắt chuyện và trò chuyện nhiều điều cùng họ."
+        },
+        "optB": {
+            "id": 618,
+            "text": "b. Cảm thấy khó khăn và không biết nên nói gì."
+        }
+    },
+    {
+        "stt": 10,
+        "id": 310,
+        "group": 1,
+        "text": "Một công việc gây nhàm chán khi:",
+        "optA": {
+            "id": 619,
+            "text": "a. Không có quy trình cụ thể."
+        },
+        "optB": {
+            "id": 620,
+            "text": "b. Thiếu tính sáng tạo."
+        }
+    },
+    {
+        "stt": 11,
+        "id": 311,
+        "group": 2,
+        "text": "Bạn bị hấp dẫn bởi :",
+        "optA": {
+            "id": 621,
+            "text": "a. Sự hòa hợp với mọi người."
+        },
+        "optB": {
+            "id": 622,
+            "text": "b. Sự nhất quán trong suy nghĩ."
+        }
+    },
+    {
+        "stt": 12,
+        "id": 312,
+        "group": 1,
+        "text": "Bạn bị lôi cuốn bởi kiểu người :",
+        "optA": {
+            "id": 623,
+            "text": "a. Giàu trí tưởng tượng."
+        },
+        "optB": {
+            "id": 624,
+            "text": "b. Nắm bắt tình huống tốt."
+        }
+    },
+    {
+        "stt": 13,
+        "id": 313,
+        "group": 0,
+        "text": "Trong các cuộc trò chuyện bạn thường :",
+        "optA": {
+            "id": 625,
+            "text": "a. Dè dặt."
+        },
+        "optB": {
+            "id": 626,
+            "text": "b. Thoải mái."
+        }
+    },
+    {
+        "stt": 14,
+        "id": 314,
+        "group": 1,
+        "text": "Lựa chọn của bạn có xu hướng :",
+        "optA": {
+            "id": 627,
+            "text": "a. Tuân theo chuẩn mực."
+        },
+        "optB": {
+            "id": 628,
+            "text": "b. Đôi lúc không hiểu rõ nguyên nhân."
+        }
+    },
+    {
+        "stt": 15,
+        "id": 315,
+        "group": 2,
+        "text": "Trong hai điều sau, điều nào tồi tệ hơn:",
+        "optA": {
+            "id": 629,
+            "text": "a. Không công bằng."
+        },
+        "optB": {
+            "id": 630,
+            "text": "b. Tàn nhẫn."
+        }
+    },
+    {
+        "stt": 16,
+        "id": 316,
+        "group": 3,
+        "text": "Tính cách nào giống bạn hơn :",
+        "optA": {
+            "id": 631,
+            "text": "a. Kiên quyết."
+        },
+        "optB": {
+            "id": 632,
+            "text": "b. Nhẹ nhàng."
+        }
+    },
+    {
+        "stt": 17,
+        "id": 317,
+        "group": 0,
+        "text": "Đối với một vấn đề trong nhóm :",
+        "optA": {
+            "id": 633,
+            "text": "a. Độc lập giải quyết."
+        },
+        "optB": {
+            "id": 634,
+            "text": "b. Trao đổi với mọi người."
+        }
+    },
+    {
+        "stt": 18,
+        "id": 318,
+        "group": 3,
+        "text": "Trong cuộc sống, bạn cảm thấy hứng thú với :",
+        "optA": {
+            "id": 635,
+            "text": "a. Những điều bất ngờ không tính trước."
+        },
+        "optB": {
+            "id": 636,
+            "text": "b. Những điều có kế hoặch trước."
+        }
+    },
+    {
+        "stt": 19,
+        "id": 319,
+        "group": 2,
+        "text": "Bạn thấy tâm đắc với bản thân bởi sự ",
+        "optA": {
+            "id": 637,
+            "text": "a. Chắc chắn trong tư tưởng."
+        },
+        "optB": {
+            "id": 638,
+            "text": "b. Cống hiến hết mình."
+        }
+    },
+    {
+        "stt": 20,
+        "id": 320,
+        "group": 1,
+        "text": "Bạn nhìn nhận một vấn đề với :",
+        "optA": {
+            "id": 639,
+            "text": "a. Khả năng lý luận phân tích."
+        },
+        "optB": {
+            "id": 640,
+            "text": "b. Sự liên tưởng."
+        }
+    },
+    {
+        "stt": 21,
+        "id": 321,
+        "group": 0,
+        "text": "Trong các kỳ nghỉ lễ bạn có xu hướng :",
+        "optA": {
+            "id": 641,
+            "text": "a. Ở nhà cùng gia đình."
+        },
+        "optB": {
+            "id": 642,
+            "text": "b. Đi du lịch cùng bạn bè."
+        }
+    },
+    {
+        "stt": 22,
+        "id": 322,
+        "group": 1,
+        "text": "Bạn bị lôi cuốn bởi:",
+        "optA": {
+            "id": 643,
+            "text": "a. Các ngụ ý, hàm ý, ẩn ý."
+        },
+        "optB": {
+            "id": 644,
+            "text": "b. Các nguyên tắc, nguyên lý."
+        }
+    },
+    {
+        "stt": 23,
+        "id": 323,
+        "group": 2,
+        "text": "Khi quyết định việc gì bạn thường dựa vào :",
+        "optA": {
+            "id": 645,
+            "text": "a. Cảm nhận từ con tim."
+        },
+        "optB": {
+            "id": 646,
+            "text": "b. Những quy tắc chung."
+        }
+    },
+    {
+        "stt": 24,
+        "id": 324,
+        "group": 3,
+        "text": "Bạn thích làm việc với người Sếp :",
+        "optA": {
+            "id": 647,
+            "text": "a. Làm việc có phương pháp, tổ chức tốt."
+        },
+        "optB": {
+            "id": 648,
+            "text": "b. Ứng biến xoay trở tốt trước khó khăn."
+        }
+    },
+    {
+        "stt": 25,
+        "id": 325,
+        "group": 3,
+        "text": "Bạn nghiêng về :",
+        "optA": {
+            "id": 649,
+            "text": "a. Sự chắc chắn."
+        },
+        "optB": {
+            "id": 650,
+            "text": "b. Sự cởi mở."
+        }
+    },
+    {
+        "stt": 26,
+        "id": 326,
+        "group": 2,
+        "text": "Bạn là người có tư tưởng :",
+        "optA": {
+            "id": 651,
+            "text": "a. Công tư phân minh."
+        },
+        "optB": {
+            "id": 652,
+            "text": "b. Bị tình cảm chi phối."
+        }
+    },
+    {
+        "stt": 27,
+        "id": 327,
+        "group": 1,
+        "text": "Bạn thích học các môn :",
+        "optA": {
+            "id": 653,
+            "text": "a. Nghệ thuật."
+        },
+        "optB": {
+            "id": 654,
+            "text": "b. Khoa học."
+        }
+    },
+    {
+        "stt": 28,
+        "id": 328,
+        "group": 0,
+        "text": "Trong một nhóm bạn bè bạn thường :",
+        "optA": {
+            "id": 655,
+            "text": "a. Trầm lặng, ít nói."
+        },
+        "optB": {
+            "id": 656,
+            "text": "b. Hoạt bát, vui vẻ."
+        }
+    },
+    {
+        "stt": 29,
+        "id": 329,
+        "group": 1,
+        "text": "Khi đánh giá một người bạn thường :",
+        "optA": {
+            "id": 657,
+            "text": "a. Dựa vào vẻ ngoài của họ."
+        },
+        "optB": {
+            "id": 658,
+            "text": "b. Dựa vào cảm nhận của bạn."
+        }
+    },
+    {
+        "stt": 30,
+        "id": 330,
+        "group": 2,
+        "text": "Sẽ thật tai hại khi bạn :",
+        "optA": {
+            "id": 659,
+            "text": "a. Quá nồng nhiệt, mong chờ."
+        },
+        "optB": {
+            "id": 660,
+            "text": "b. Quá khách quan."
+        }
+    },
+    {
+        "stt": 31,
+        "id": 331,
+        "group": 0,
+        "text": "Phong cách của bạn :",
+        "optA": {
+            "id": 661,
+            "text": "a. Thích những thứ quen thuộc."
+        },
+        "optB": {
+            "id": 662,
+            "text": "b. Thích những điều mới mẻ."
+        }
+    },
+    {
+        "stt": 32,
+        "id": 332,
+        "group": 3,
+        "text": "Khi giải quyết một công việc thông thường, bạn sẽ :",
+        "optA": {
+            "id": 663,
+            "text": "a. Tìm kiếm một cách làm mới."
+        },
+        "optB": {
+            "id": 664,
+            "text": "b. Làm theo cách mọi người hay làm."
+        }
+    },
+    {
+        "stt": 33,
+        "id": 333,
+        "group": 0,
+        "text": "Bạn thích làm việc :",
+        "optA": {
+            "id": 665,
+            "text": "a. Độc lập."
+        },
+        "optB": {
+            "id": 666,
+            "text": "b. Theo nhóm."
+        }
+    },
+    {
+        "stt": 34,
+        "id": 334,
+        "group": 1,
+        "text": "Bạn có hành động theo bản năng :",
+        "optA": {
+            "id": 667,
+            "text": "a. Hiếm khi."
+        },
+        "optB": {
+            "id": 668,
+            "text": "b. Hay xảy ra."
+        }
+    },
+    {
+        "stt": 35,
+        "id": 335,
+        "group": 2,
+        "text": "Trong cuộc sống, một người sẽ tốt hơn nếu :",
+        "optA": {
+            "id": 669,
+            "text": "a. Giàu lý trí."
+        },
+        "optB": {
+            "id": 670,
+            "text": "b. Giàu cảm xúc."
+        }
+    },
+    {
+        "stt": 36,
+        "id": 336,
+        "group": 3,
+        "text": "Khi nghe một album nhạc mới, bạn thường nghe :",
+        "optA": {
+            "id": 671,
+            "text": "a. Theo thứ tự."
+        },
+        "optB": {
+            "id": 672,
+            "text": "b. Phát ngẫu nhiên."
+        }
+    },
+    {
+        "stt": 37,
+        "id": 337,
+        "group": 3,
+        "text": "Bạn là người :",
+        "optA": {
+            "id": 673,
+            "text": "a. Khéo léo, lanh lợi."
+        },
+        "optB": {
+            "id": 674,
+            "text": "b. Thẳng thắn, thực tế."
+        }
+    },
+    {
+        "stt": 38,
+        "id": 338,
+        "group": 2,
+        "text": "Sẽ khó khăn hơn khi bạn cố:",
+        "optA": {
+            "id": 675,
+            "text": "a. Sử dụng người khác."
+        },
+        "optB": {
+            "id": 676,
+            "text": "b. Hiểu và chia sẻ với người khác."
+        }
+    },
+    {
+        "stt": 39,
+        "id": 340,
+        "group": 0,
+        "text": "Khi cảm thấy buồn bạn thường :",
+        "optA": {
+            "id": 679,
+            "text": "a. Tìm bạn bè tâm sự hoặc đi chơi."
+        },
+        "optB": {
+            "id": 680,
+            "text": "b. Muốn ở một mình cho khuây khỏa."
+        }
+    },
+    {
+        "stt": 40,
+        "id": 345,
+        "group": 3,
+        "text": "Bạn muốn một sự kiện như thế nào :",
+        "optA": {
+            "id": 689,
+            "text": "a. Chuẩn bị chu toàn trước."
+        },
+        "optB": {
+            "id": 690,
+            "text": "b. Diễn ra tự nhiên."
+        }
+    }
+];
+        const fullQuestions = [
+    {
+        "stt": 1,
+        "id": 301,
+        "group": 0,
+        "text": "Bạn thích công việc kiểu :",
+        "optA": {
+            "id": 601,
+            "text": "a. Xã hội, giao tiếp."
+        },
+        "optB": {
+            "id": 602,
+            "text": "b. Thiết kế, nghiên cứu."
+        }
+    },
+    {
+        "stt": 2,
+        "id": 302,
+        "group": 1,
+        "text": "Bạn tiếp xúc với một người theo xu hướng :",
+        "optA": {
+            "id": 603,
+            "text": "a. Khách quan."
+        },
+        "optB": {
+            "id": 604,
+            "text": "b. Chủ quan"
+        }
+    },
+    {
+        "stt": 3,
+        "id": 303,
+        "group": 2,
+        "text": "Bạn đánh giá sự việc dựa trên :",
+        "optA": {
+            "id": 605,
+            "text": "a. Ý nghĩa, giá trị."
+        },
+        "optB": {
+            "id": 606,
+            "text": "b. Tính logic."
+        }
+    },
+    {
+        "stt": 4,
+        "id": 304,
+        "group": 3,
+        "text": "Bạn là người có tác phong :",
+        "optA": {
+            "id": 607,
+            "text": "a. Thong thả, thoải mái."
+        },
+        "optB": {
+            "id": 608,
+            "text": "b. Nhanh nhẹn, đúng giờ."
+        }
+    },
+    {
+        "stt": 5,
+        "id": 305,
+        "group": 0,
+        "text": "Trong các cuộc giao tiếp, bạn là người:",
+        "optA": {
+            "id": 609,
+            "text": "a. Bắt đầu cho cuộc nói chuyện."
+        },
+        "optB": {
+            "id": 610,
+            "text": "b. Chỉ nói khi người khác bắt chuyện."
+        }
+    },
+    {
+        "stt": 6,
+        "id": 306,
+        "group": 2,
+        "text": "Bạn là người thế nào :",
+        "optA": {
+            "id": 611,
+            "text": "a. Là người có cái đầu lạnh."
+        },
+        "optB": {
+            "id": 612,
+            "text": "b. Là người có trái tim ấm."
+        }
+    },
+    {
+        "stt": 7,
+        "id": 307,
+        "group": 3,
+        "text": "Tính cách của bạn :",
+        "optA": {
+            "id": 613,
+            "text": "a. Dễ chịu, thoải mái."
+        },
+        "optB": {
+            "id": 614,
+            "text": "b. Nghiêm chỉnh, quả quyết."
+        }
+    },
+    {
+        "stt": 8,
+        "id": 308,
+        "group": 1,
+        "text": "Những người có tầm nhìn xa thường:",
+        "optA": {
+            "id": 615,
+            "text": "a. Khá thú vị"
+        },
+        "optB": {
+            "id": 616,
+            "text": "b. Khó hiểu."
+        }
+    },
+    {
+        "stt": 9,
+        "id": 309,
+        "group": 0,
+        "text": "Đối với những người mới gặp, bàn thường :",
+        "optA": {
+            "id": 617,
+            "text": "a. Dễ dàng bắt chuyện và trò chuyện nhiều điều cùng họ."
+        },
+        "optB": {
+            "id": 618,
+            "text": "b. Cảm thấy khó khăn và không biết nên nói gì."
+        }
+    },
+    {
+        "stt": 10,
+        "id": 310,
+        "group": 1,
+        "text": "Một công việc gây nhàm chán khi:",
+        "optA": {
+            "id": 619,
+            "text": "a. Không có quy trình cụ thể."
+        },
+        "optB": {
+            "id": 620,
+            "text": "b. Thiếu tính sáng tạo."
+        }
+    },
+    {
+        "stt": 11,
+        "id": 311,
+        "group": 2,
+        "text": "Bạn bị hấp dẫn bởi :",
+        "optA": {
+            "id": 621,
+            "text": "a. Sự hòa hợp với mọi người."
+        },
+        "optB": {
+            "id": 622,
+            "text": "b. Sự nhất quán trong suy nghĩ."
+        }
+    },
+    {
+        "stt": 12,
+        "id": 312,
+        "group": 1,
+        "text": "Bạn bị lôi cuốn bởi kiểu người :",
+        "optA": {
+            "id": 623,
+            "text": "a. Giàu trí tưởng tượng."
+        },
+        "optB": {
+            "id": 624,
+            "text": "b. Nắm bắt tình huống tốt."
+        }
+    },
+    {
+        "stt": 13,
+        "id": 313,
+        "group": 0,
+        "text": "Trong các cuộc trò chuyện bạn thường :",
+        "optA": {
+            "id": 625,
+            "text": "a. Dè dặt."
+        },
+        "optB": {
+            "id": 626,
+            "text": "b. Thoải mái."
+        }
+    },
+    {
+        "stt": 14,
+        "id": 314,
+        "group": 1,
+        "text": "Lựa chọn của bạn có xu hướng :",
+        "optA": {
+            "id": 627,
+            "text": "a. Tuân theo chuẩn mực."
+        },
+        "optB": {
+            "id": 628,
+            "text": "b. Đôi lúc không hiểu rõ nguyên nhân."
+        }
+    },
+    {
+        "stt": 15,
+        "id": 315,
+        "group": 2,
+        "text": "Trong hai điều sau, điều nào tồi tệ hơn:",
+        "optA": {
+            "id": 629,
+            "text": "a. Không công bằng."
+        },
+        "optB": {
+            "id": 630,
+            "text": "b. Tàn nhẫn."
+        }
+    },
+    {
+        "stt": 16,
+        "id": 316,
+        "group": 3,
+        "text": "Tính cách nào giống bạn hơn :",
+        "optA": {
+            "id": 631,
+            "text": "a. Kiên quyết."
+        },
+        "optB": {
+            "id": 632,
+            "text": "b. Nhẹ nhàng."
+        }
+    },
+    {
+        "stt": 17,
+        "id": 317,
+        "group": 0,
+        "text": "Đối với một vấn đề trong nhóm :",
+        "optA": {
+            "id": 633,
+            "text": "a. Độc lập giải quyết."
+        },
+        "optB": {
+            "id": 634,
+            "text": "b. Trao đổi với mọi người."
+        }
+    },
+    {
+        "stt": 18,
+        "id": 318,
+        "group": 3,
+        "text": "Trong cuộc sống, bạn cảm thấy hứng thú với :",
+        "optA": {
+            "id": 635,
+            "text": "a. Những điều bất ngờ không tính trước."
+        },
+        "optB": {
+            "id": 636,
+            "text": "b. Những điều có kế hoặch trước."
+        }
+    },
+    {
+        "stt": 19,
+        "id": 319,
+        "group": 2,
+        "text": "Bạn thấy tâm đắc với bản thân bởi sự ",
+        "optA": {
+            "id": 637,
+            "text": "a. Chắc chắn trong tư tưởng."
+        },
+        "optB": {
+            "id": 638,
+            "text": "b. Cống hiến hết mình."
+        }
+    },
+    {
+        "stt": 20,
+        "id": 320,
+        "group": 1,
+        "text": "Bạn nhìn nhận một vấn đề với :",
+        "optA": {
+            "id": 639,
+            "text": "a. Khả năng lý luận phân tích."
+        },
+        "optB": {
+            "id": 640,
+            "text": "b. Sự liên tưởng."
+        }
+    },
+    {
+        "stt": 21,
+        "id": 321,
+        "group": 0,
+        "text": "Trong các kỳ nghỉ lễ bạn có xu hướng :",
+        "optA": {
+            "id": 641,
+            "text": "a. Ở nhà cùng gia đình."
+        },
+        "optB": {
+            "id": 642,
+            "text": "b. Đi du lịch cùng bạn bè."
+        }
+    },
+    {
+        "stt": 22,
+        "id": 322,
+        "group": 1,
+        "text": "Bạn bị lôi cuốn bởi:",
+        "optA": {
+            "id": 643,
+            "text": "a. Các ngụ ý, hàm ý, ẩn ý."
+        },
+        "optB": {
+            "id": 644,
+            "text": "b. Các nguyên tắc, nguyên lý."
+        }
+    },
+    {
+        "stt": 23,
+        "id": 323,
+        "group": 2,
+        "text": "Khi quyết định việc gì bạn thường dựa vào :",
+        "optA": {
+            "id": 645,
+            "text": "a. Cảm nhận từ con tim."
+        },
+        "optB": {
+            "id": 646,
+            "text": "b. Những quy tắc chung."
+        }
+    },
+    {
+        "stt": 24,
+        "id": 324,
+        "group": 3,
+        "text": "Bạn thích làm việc với người Sếp :",
+        "optA": {
+            "id": 647,
+            "text": "a. Làm việc có phương pháp, tổ chức tốt."
+        },
+        "optB": {
+            "id": 648,
+            "text": "b. Ứng biến xoay trở tốt trước khó khăn."
+        }
+    },
+    {
+        "stt": 25,
+        "id": 325,
+        "group": 3,
+        "text": "Bạn nghiêng về :",
+        "optA": {
+            "id": 649,
+            "text": "a. Sự chắc chắn."
+        },
+        "optB": {
+            "id": 650,
+            "text": "b. Sự cởi mở."
+        }
+    },
+    {
+        "stt": 26,
+        "id": 326,
+        "group": 2,
+        "text": "Bạn là người có tư tưởng :",
+        "optA": {
+            "id": 651,
+            "text": "a. Công tư phân minh."
+        },
+        "optB": {
+            "id": 652,
+            "text": "b. Bị tình cảm chi phối."
+        }
+    },
+    {
+        "stt": 27,
+        "id": 327,
+        "group": 1,
+        "text": "Bạn thích học các môn :",
+        "optA": {
+            "id": 653,
+            "text": "a. Nghệ thuật."
+        },
+        "optB": {
+            "id": 654,
+            "text": "b. Khoa học."
+        }
+    },
+    {
+        "stt": 28,
+        "id": 328,
+        "group": 0,
+        "text": "Trong một nhóm bạn bè bạn thường :",
+        "optA": {
+            "id": 655,
+            "text": "a. Trầm lặng, ít nói."
+        },
+        "optB": {
+            "id": 656,
+            "text": "b. Hoạt bát, vui vẻ."
+        }
+    },
+    {
+        "stt": 29,
+        "id": 329,
+        "group": 1,
+        "text": "Khi đánh giá một người bạn thường :",
+        "optA": {
+            "id": 657,
+            "text": "a. Dựa vào vẻ ngoài của họ."
+        },
+        "optB": {
+            "id": 658,
+            "text": "b. Dựa vào cảm nhận của bạn."
+        }
+    },
+    {
+        "stt": 30,
+        "id": 330,
+        "group": 2,
+        "text": "Sẽ thật tai hại khi bạn :",
+        "optA": {
+            "id": 659,
+            "text": "a. Quá nồng nhiệt, mong chờ."
+        },
+        "optB": {
+            "id": 660,
+            "text": "b. Quá khách quan."
+        }
+    },
+    {
+        "stt": 31,
+        "id": 331,
+        "group": 0,
+        "text": "Phong cách của bạn :",
+        "optA": {
+            "id": 661,
+            "text": "a. Thích những thứ quen thuộc."
+        },
+        "optB": {
+            "id": 662,
+            "text": "b. Thích những điều mới mẻ."
+        }
+    },
+    {
+        "stt": 32,
+        "id": 332,
+        "group": 3,
+        "text": "Khi giải quyết một công việc thông thường, bạn sẽ :",
+        "optA": {
+            "id": 663,
+            "text": "a. Tìm kiếm một cách làm mới."
+        },
+        "optB": {
+            "id": 664,
+            "text": "b. Làm theo cách mọi người hay làm."
+        }
+    },
+    {
+        "stt": 33,
+        "id": 333,
+        "group": 0,
+        "text": "Bạn thích làm việc :",
+        "optA": {
+            "id": 665,
+            "text": "a. Độc lập."
+        },
+        "optB": {
+            "id": 666,
+            "text": "b. Theo nhóm."
+        }
+    },
+    {
+        "stt": 34,
+        "id": 334,
+        "group": 1,
+        "text": "Bạn có hành động theo bản năng :",
+        "optA": {
+            "id": 667,
+            "text": "a. Hiếm khi."
+        },
+        "optB": {
+            "id": 668,
+            "text": "b. Hay xảy ra."
+        }
+    },
+    {
+        "stt": 35,
+        "id": 335,
+        "group": 2,
+        "text": "Trong cuộc sống, một người sẽ tốt hơn nếu :",
+        "optA": {
+            "id": 669,
+            "text": "a. Giàu lý trí."
+        },
+        "optB": {
+            "id": 670,
+            "text": "b. Giàu cảm xúc."
+        }
+    },
+    {
+        "stt": 36,
+        "id": 336,
+        "group": 3,
+        "text": "Khi nghe một album nhạc mới, bạn thường nghe :",
+        "optA": {
+            "id": 671,
+            "text": "a. Theo thứ tự."
+        },
+        "optB": {
+            "id": 672,
+            "text": "b. Phát ngẫu nhiên."
+        }
+    },
+    {
+        "stt": 37,
+        "id": 337,
+        "group": 3,
+        "text": "Bạn là người :",
+        "optA": {
+            "id": 673,
+            "text": "a. Khéo léo, lanh lợi."
+        },
+        "optB": {
+            "id": 674,
+            "text": "b. Thẳng thắn, thực tế."
+        }
+    },
+    {
+        "stt": 38,
+        "id": 338,
+        "group": 2,
+        "text": "Sẽ khó khăn hơn khi bạn cố:",
+        "optA": {
+            "id": 675,
+            "text": "a. Sử dụng người khác."
+        },
+        "optB": {
+            "id": 676,
+            "text": "b. Hiểu và chia sẻ với người khác."
+        }
+    },
+    {
+        "stt": 39,
+        "id": 339,
+        "group": 1,
+        "text": "Khi trình bày bạn thường :",
+        "optA": {
+            "id": 677,
+            "text": "a. Diễn đạt trực tiếp nhất có thể."
+        },
+        "optB": {
+            "id": 678,
+            "text": "b. Diễn đạt một cách gián tiếp."
+        }
+    },
+    {
+        "stt": 40,
+        "id": 340,
+        "group": 0,
+        "text": "Khi cảm thấy buồn bạn thường :",
+        "optA": {
+            "id": 679,
+            "text": "a. Tìm bạn bè tâm sự hoặc đi chơi."
+        },
+        "optB": {
+            "id": 680,
+            "text": "b. Muốn ở một mình cho khuây khỏa."
+        }
+    },
+    {
+        "stt": 41,
+        "id": 341,
+        "group": 0,
+        "text": "Đối với các hoạt động của cơ quan, lớp học :",
+        "optA": {
+            "id": 681,
+            "text": "a. Tham gia khi bị ép."
+        },
+        "optB": {
+            "id": 682,
+            "text": "b. Năng nổ, tích cực."
+        }
+    },
+    {
+        "stt": 42,
+        "id": 342,
+        "group": 1,
+        "text": "Bạn cảm thấy thoái mái với :",
+        "optA": {
+            "id": 683,
+            "text": "a. Những thứ không xác định."
+        },
+        "optB": {
+            "id": 684,
+            "text": "b. Những thứ có logic."
+        }
+    },
+    {
+        "stt": 43,
+        "id": 343,
+        "group": 2,
+        "text": "Cảm xúc của bạn thường được người khác :",
+        "optA": {
+            "id": 685,
+            "text": "a. Dễ dàng nắm bắt."
+        },
+        "optB": {
+            "id": 686,
+            "text": "b. Giấu kín, khó nhận biết."
+        }
+    },
+    {
+        "stt": 44,
+        "id": 344,
+        "group": 2,
+        "text": "Thật tồi tệ khi :",
+        "optA": {
+            "id": 687,
+            "text": "a. Hành xử thiếu cân nhắc."
+        },
+        "optB": {
+            "id": 688,
+            "text": "b. Chỉ trích, phê phán người khác."
+        }
+    },
+    {
+        "stt": 45,
+        "id": 345,
+        "group": 3,
+        "text": "Bạn muốn một sự kiện như thế nào :",
+        "optA": {
+            "id": 689,
+            "text": "a. Chuẩn bị chu toàn trước."
+        },
+        "optB": {
+            "id": 690,
+            "text": "b. Diễn ra tự nhiên."
+        }
+    },
+    {
+        "stt": 46,
+        "id": 346,
+        "group": 0,
+        "text": "Bạn là người có tình cách :",
+        "optA": {
+            "id": 691,
+            "text": "a. Dễ gần, hòa đồng."
+        },
+        "optB": {
+            "id": 692,
+            "text": "b. Thân thiện nhưng kín đáo."
+        }
+    },
+    {
+        "stt": 47,
+        "id": 347,
+        "group": 1,
+        "text": "Bạn có ưu điểm về :",
+        "optA": {
+            "id": 693,
+            "text": "a. Trí tưởng tượng phong phú."
+        },
+        "optB": {
+            "id": 694,
+            "text": "b. Sự quan sát thực tế."
+        }
+    },
+    {
+        "stt": 48,
+        "id": 348,
+        "group": 1,
+        "text": "Khi quyết định điều gì đó, bạn tin vào :",
+        "optA": {
+            "id": 695,
+            "text": "a. Linh cảm."
+        },
+        "optB": {
+            "id": 696,
+            "text": "b. Sự việc thực tế."
+        }
+    },
+    {
+        "stt": 49,
+        "id": 349,
+        "group": 2,
+        "text": "Bạn muốn được người khác khen ngợi như thế nào :",
+        "optA": {
+            "id": 697,
+            "text": "a. Bạn là người có đầu óc suy luận."
+        },
+        "optB": {
+            "id": 698,
+            "text": "b. Bạn là người giàu tình cảm và sự tinh tế."
+        }
+    },
+    {
+        "stt": 50,
+        "id": 350,
+        "group": 3,
+        "text": "Bạn thích các sự việc xảy ra :",
+        "optA": {
+            "id": 699,
+            "text": "a. Có chọn lựa và suy tính."
+        },
+        "optB": {
+            "id": 700,
+            "text": "b. Một cách tự nhiên."
+        }
+    },
+    {
+        "stt": 51,
+        "id": 351,
+        "group": 3,
+        "text": "Bạn hay hành động một cách :",
+        "optA": {
+            "id": 701,
+            "text": "a. Bộc phát, linh hoạt."
+        },
+        "optB": {
+            "id": 702,
+            "text": "b. Kỹ lưỡng, cẩn thận."
+        }
+    },
+    {
+        "stt": 52,
+        "id": 352,
+        "group": 2,
+        "text": "Bạn muốn bổ sung thêm điều gì ở bản thân :",
+        "optA": {
+            "id": 703,
+            "text": "a. Tình cảm dồi dào."
+        },
+        "optB": {
+            "id": 704,
+            "text": "b. Lý trí mạnh mẽ."
+        }
+    },
+    {
+        "stt": 53,
+        "id": 353,
+        "group": 1,
+        "text": "Bạn là người :",
+        "optA": {
+            "id": 705,
+            "text": "a. Mơ mộng và tưởng tượng."
+        },
+        "optB": {
+            "id": 706,
+            "text": "b. Thực tế và thực dụng."
+        }
+    },
+    {
+        "stt": 54,
+        "id": 354,
+        "group": 0,
+        "text": "Khi điện thoại bàn trong văn phòng công ty đổ chuông :",
+        "optA": {
+            "id": 707,
+            "text": "a. Nhấc máy trước để nghe."
+        },
+        "optB": {
+            "id": 708,
+            "text": "b. Để cho đồng nghiệp nhấc máy."
+        }
+    },
+    {
+        "stt": 55,
+        "id": 355,
+        "group": 0,
+        "text": "Bạn mới tham gia một lớp Ngoại ngữ :",
+        "optA": {
+            "id": 709,
+            "text": "a. Cố làm quen với nhiều người."
+        },
+        "optB": {
+            "id": 710,
+            "text": "b. Chỉ nói chuyện với vài người."
+        }
+    },
+    {
+        "stt": 56,
+        "id": 356,
+        "group": 1,
+        "text": "Theo bạn, các sự việc, sự kiện :",
+        "optA": {
+            "id": 711,
+            "text": "a. Bản thân nó giải thích cho chính nó."
+        },
+        "optB": {
+            "id": 712,
+            "text": "b. Là bằng chứng giải thích cho các quy tắc, quy luật."
+        }
+    },
+    {
+        "stt": 57,
+        "id": 357,
+        "group": 2,
+        "text": "Bạn là người :",
+        "optA": {
+            "id": 713,
+            "text": "a. Đa sầu đa cảm."
+        },
+        "optB": {
+            "id": 714,
+            "text": "b. Thực dụng, không bị chi phối bởi tình cảm."
+        }
+    },
+    {
+        "stt": 58,
+        "id": 358,
+        "group": 2,
+        "text": "Bạn thường quan tâm tới người khác thông qua :",
+        "optA": {
+            "id": 715,
+            "text": "a. Những suy nghĩ của họ."
+        },
+        "optB": {
+            "id": 716,
+            "text": "b. Những gì họ làm được."
+        }
+    },
+    {
+        "stt": 59,
+        "id": 359,
+        "group": 3,
+        "text": "Bạn nghiêng về điều nào sau đây :",
+        "optA": {
+            "id": 717,
+            "text": "a. Thói quen."
+        },
+        "optB": {
+            "id": 718,
+            "text": "b. Những điều mới mẻ."
+        }
+    },
+    {
+        "stt": 60,
+        "id": 360,
+        "group": 3,
+        "text": "Mọi việc sẽ tôt hơn nếu :",
+        "optA": {
+            "id": 719,
+            "text": "a. Luôn được chuẩn bị kỹ lưỡng."
+        },
+        "optB": {
+            "id": 720,
+            "text": "b. Tùy cơ ứng biến."
+        }
+    },
+    {
+        "stt": 61,
+        "id": 361,
+        "group": 0,
+        "text": "Bạn thích mối quan hệ :",
+        "optA": {
+            "id": 721,
+            "text": "a. Ít bạn nhưng chơi rất thân."
+        },
+        "optB": {
+            "id": 722,
+            "text": "b. Nhiều bạn nhưng không thân thiết lắm."
+        }
+    },
+    {
+        "stt": 62,
+        "id": 362,
+        "group": 1,
+        "text": "Nếu bạn là nhà văn, bạn sẽ viết bài theo cách :",
+        "optA": {
+            "id": 723,
+            "text": "a. Diễn đạt lời văn qua các phép so sánh, ẩn dụ."
+        },
+        "optB": {
+            "id": 724,
+            "text": "b. Nghĩ sao viết vậy, diễn đạt rõ ràng."
+        }
+    },
+    {
+        "stt": 63,
+        "id": 363,
+        "group": 2,
+        "text": "Khi quyết định một việc :",
+        "optA": {
+            "id": 725,
+            "text": "a. Phụ thuộc vào tâm trạng."
+        },
+        "optB": {
+            "id": 726,
+            "text": "b. Suy tính cẩn trọng."
+        }
+    },
+    {
+        "stt": 64,
+        "id": 364,
+        "group": 3,
+        "text": "Bạn thường hay đưa ra quyết định :",
+        "optA": {
+            "id": 727,
+            "text": "a. Một cách chắn chắn."
+        },
+        "optB": {
+            "id": 728,
+            "text": "b. Không chắc lắm, có thể thay đổi sau."
+        }
+    },
+    {
+        "stt": 65,
+        "id": 365,
+        "group": 2,
+        "text": "Bạn là người sống thiên về :",
+        "optA": {
+            "id": 729,
+            "text": "a. Nguyên tắc, lý trí."
+        },
+        "optB": {
+            "id": 730,
+            "text": "b. Cảm xúc, tình cảm."
+        }
+    },
+    {
+        "stt": 66,
+        "id": 366,
+        "group": 1,
+        "text": "Bạn thích thú với sự việc :",
+        "optA": {
+            "id": 731,
+            "text": "a. Thực tế."
+        },
+        "optB": {
+            "id": 732,
+            "text": "b. Bất ngờ, mới mẻ"
+        }
+    },
+    {
+        "stt": 67,
+        "id": 367,
+        "group": 0,
+        "text": "Khi nói về một chủ đề mới lạ chưa gặp, bạn cảm thấy :",
+        "optA": {
+            "id": 733,
+            "text": "a. Không hứng thú."
+        },
+        "optB": {
+            "id": 734,
+            "text": "b. Hào hứng."
+        }
+    },
+    {
+        "stt": 68,
+        "id": 368,
+        "group": 3,
+        "text": "Đối với một suy luận được nhiều người tin dùng, bạn sẽ :",
+        "optA": {
+            "id": 735,
+            "text": "a. Kiểm tra lại trước khi áp dụng."
+        },
+        "optB": {
+            "id": 736,
+            "text": "b. Tin tưởng và áp dụng theo."
+        }
+    },
+    {
+        "stt": 69,
+        "id": 369,
+        "group": 2,
+        "text": "Điều gì làm cho bạn ấn tượng :",
+        "optA": {
+            "id": 737,
+            "text": "a. Những thứ có tính logic cao."
+        },
+        "optB": {
+            "id": 738,
+            "text": "b. Những thứ gây cảm động."
+        }
+    },
+    {
+        "stt": 70,
+        "id": 370,
+        "group": 1,
+        "text": "Bạn là người có xu hướng thiên về :",
+        "optA": {
+            "id": 739,
+            "text": "a. Những thứ thực tế và rõ ràng."
+        },
+        "optB": {
+            "id": 740,
+            "text": "b. Những suy đoán."
+        }
+    },
+    {
+        "stt": 71,
+        "id": 371,
+        "group": 0,
+        "text": "Ở một nơi đông người làm bạn :",
+        "optA": {
+            "id": 741,
+            "text": "a. Không thoải mái."
+        },
+        "optB": {
+            "id": 742,
+            "text": "b. Thích thú."
+        }
+    },
+    {
+        "stt": 72,
+        "id": 372,
+        "group": 3,
+        "text": "Bạn đánh giá một người dựa trên :",
+        "optA": {
+            "id": 743,
+            "text": "a. Hoàn cảnh nhất định."
+        },
+        "optB": {
+            "id": 744,
+            "text": "b. Nguyên tắc chung."
+        }
+    },
+    {
+        "stt": 73,
+        "id": 373,
+        "group": 0,
+        "text": "Bạn được mời tới bữa tiệc của công ty :",
+        "optA": {
+            "id": 745,
+            "text": "a. Ra về sớm vì không hào hứng lắm."
+        },
+        "optB": {
+            "id": 746,
+            "text": "b. Vui chơi hết mình cho đến khi tàn tiệc."
+        }
+    },
+    {
+        "stt": 74,
+        "id": 374,
+        "group": 3,
+        "text": "Khi làm việc bạn sẽ : ",
+        "optA": {
+            "id": 747,
+            "text": "a. Tuân thủ thời gian."
+        },
+        "optB": {
+            "id": 748,
+            "text": "b. Làm việc tùy hứng."
+        }
+    },
+    {
+        "stt": 75,
+        "id": 375,
+        "group": 0,
+        "text": "Khi đi tham dự một buổi liên hoan/tiệc tùng, bạn sẽ :",
+        "optA": {
+            "id": 749,
+            "text": "a. Trò chuyện cùng nhiều người, quen hoặc không quen."
+        },
+        "optB": {
+            "id": 750,
+            "text": "b. Chỉ trò chuyện với một số người quen."
+        }
+    },
+    {
+        "stt": 76,
+        "id": 376,
+        "group": 3,
+        "text": "Điều gì làm bạn cảm thấy tồi tệ : ",
+        "optA": {
+            "id": 751,
+            "text": "a. Những thứ mơ hồ, không rõ ràng."
+        },
+        "optB": {
+            "id": 752,
+            "text": "b. Những thứ nhàm chán, tẻ nhạt."
+        }
+    }
+];
+        const dapan = [
+    {
+        "IDQues": 301,
+        "IDAns": 601,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 302,
+        "IDAns": 603,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 303,
+        "IDAns": 606,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 304,
+        "IDAns": 608,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 305,
+        "IDAns": 609,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 306,
+        "IDAns": 611,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 307,
+        "IDAns": 614,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 308,
+        "IDAns": 616,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 309,
+        "IDAns": 617,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 310,
+        "IDAns": 619,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 311,
+        "IDAns": 622,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 312,
+        "IDAns": 624,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 313,
+        "IDAns": 626,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 314,
+        "IDAns": 627,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 315,
+        "IDAns": 629,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 316,
+        "IDAns": 631,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 317,
+        "IDAns": 634,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 318,
+        "IDAns": 636,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 319,
+        "IDAns": 637,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 320,
+        "IDAns": 639,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 321,
+        "IDAns": 642,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 322,
+        "IDAns": 644,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 323,
+        "IDAns": 646,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 324,
+        "IDAns": 647,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 325,
+        "IDAns": 649,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 326,
+        "IDAns": 651,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 327,
+        "IDAns": 654,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 328,
+        "IDAns": 656,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 329,
+        "IDAns": 657,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 330,
+        "IDAns": 659,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 331,
+        "IDAns": 662,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 332,
+        "IDAns": 664,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 333,
+        "IDAns": 666,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 334,
+        "IDAns": 667,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 335,
+        "IDAns": 669,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 336,
+        "IDAns": 671,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 337,
+        "IDAns": 674,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 338,
+        "IDAns": 676,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 339,
+        "IDAns": 677,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 340,
+        "IDAns": 679,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 341,
+        "IDAns": 682,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 342,
+        "IDAns": 684,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 343,
+        "IDAns": 686,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 344,
+        "IDAns": 687,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 345,
+        "IDAns": 689,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 346,
+        "IDAns": 691,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 347,
+        "IDAns": 694,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 348,
+        "IDAns": 696,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 349,
+        "IDAns": 697,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 350,
+        "IDAns": 699,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 351,
+        "IDAns": 702,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 352,
+        "IDAns": 704,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 353,
+        "IDAns": 706,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 355,
+        "IDAns": 707,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 355,
+        "IDAns": 709,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 356,
+        "IDAns": 711,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 357,
+        "IDAns": 714,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 358,
+        "IDAns": 716,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 359,
+        "IDAns": 717,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 360,
+        "IDAns": 719,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 361,
+        "IDAns": 722,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 362,
+        "IDAns": 724,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 363,
+        "IDAns": 726,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 364,
+        "IDAns": 727,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 365,
+        "IDAns": 729,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 366,
+        "IDAns": 731,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 367,
+        "IDAns": 734,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 368,
+        "IDAns": 736,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 369,
+        "IDAns": 737,
+        "AnswerType": 2,
+        "Group": 2
+    },
+    {
+        "IDQues": 370,
+        "IDAns": 739,
+        "AnswerType": 2,
+        "Group": 1
+    },
+    {
+        "IDQues": 371,
+        "IDAns": 742,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 372,
+        "IDAns": 744,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 373,
+        "IDAns": 746,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 374,
+        "IDAns": 747,
+        "AnswerType": 2,
+        "Group": 3
+    },
+    {
+        "IDQues": 375,
+        "IDAns": 749,
+        "AnswerType": 2,
+        "Group": 0
+    },
+    {
+        "IDQues": 376,
+        "IDAns": 751,
+        "AnswerType": 2,
+        "Group": 0
+    }
+];
+        
+        let questions = [];
+        let questionsPerGroup = 10;
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let quizMode = 'short';
+
+        const mbtiDetails = {
+            "INFP": {
+                name: "Người Hòa Giải", eng: "The Mediator",
+                summary: "INFP là những người lý tưởng hóa, luôn tìm kiếm những tia hy vọng và sự hòa hợp ngay cả trong những hoàn cảnh khó khăn nhất. Họ có vẻ ngoài trầm lặng, kín đáo nhưng bên trong lại là ngọn lửa đam mê và sự nhân văn sâu sắc.",
+                strengths: ["Cực kỳ sáng tạo và giàu trí tưởng tượng phong phú.", "Đồng cảm sâu sắc, thấu hiểu cảm xúc của người khác.", "Sống chân thành, trung thành với các giá trị đạo đức cá nhân.", "Linh hoạt và cởi mở với những ý tưởng mới."],
+                weaknesses: ["Dễ lý tưởng hóa quá mức dẫn đến thất vọng.", "Dễ bị tổn thương bởi các lời chỉ trích.", "Có xu hướng ôm đồm quá nhiều cảm xúc tiêu cực và tự cô lập.", "Gặp khó khăn khi làm việc với các số liệu khô khan."],
+                careers: "Nhà văn, nghệ sĩ, nhà tâm lý học trị liệu, nhà giáo dục, công tác xã hội, nhà thiết kế đồ họa."
+            },
+            "INFJ": {
+                name: "Nhà Kiến Tạo / Người Bảo Vệ", eng: "The Advocate",
+                summary: "INFJ là nhóm tính cách hiếm nhất thế giới. Họ là những người có tầm nhìn xa trông rộng, có lý tưởng đạo đức mạnh mẽ và quyết tâm biến giấc mơ của mình thành hiện thực. Họ không chỉ mơ mộng mà còn hành động một cách chiến lược.",
+                strengths: ["Sáng tạo và có trực giác cực tốt về con người.", "Quyết đoán, có khả năng biến lý tưởng thành hành động thực tế.", "Sống sâu sắc, tận tâm và có tính truyền cảm hứng cao.", "Lắng nghe tuyệt vời."],
+                weaknesses: ["Dễ kiệt sức do làm việc và lo lắng quá mức.", "Cực kỳ nhạy cảm với các xung đột và chỉ trích.", "Quá cầu toàn và đôi khi đặt tiêu chuẩn phi thực tế.", "Rất khép kín, khó để người khác thực sự hiểu rõ."],
+                careers: "Nhà tâm lý học, nhà văn, cố vấn định hướng, giáo sư, nghệ thuật sáng tác, hoạt động nhân quyền."
+            },
+            "INTJ": {
+                name: "Nhà Kiến Thiết", eng: "The Architect",
+                summary: "INTJ là những nhà tư duy chiến lược xuất sắc, có tư duy logic sắc bén và động lực học hỏi không ngừng. Họ luôn tìm kiếm các mô hình cải tiến hiệu suất và cực kỳ độc lập trong suy nghĩ.",
+                strengths: ["Tầm nhìn chiến lược vĩ mô, khả năng quản trị xuất sắc.", "Quyết đoán, kiên định và mạnh mẽ.", "Tự tin cao độ.", "Logic sắc bén, giải quyết vấn đề hiệu quả."],
+                weaknesses: ["Có thể tỏ ra kiêu ngạo hoặc quá khô khan.", "Dễ thiếu kiên nhẫn với các quy định cũ kỹ hoặc người không theo kịp.", "Quá lý trí, đôi khi phớt lờ khía cạnh cảm xúc của người khác.", "Dễ rơi vào bẫy phân tích quá mức."],
+                careers: "Lập trình viên, kỹ sư hệ thống, nhà phân tích tài chính, quản trị chiến lược, nghiên cứu khoa học."
+            },
+            "INTP": {
+                name: "Nhà Tư Duy", eng: "The Logician",
+                summary: "INTP là những bộ óc triết học và khoa học, luôn bị thu hút bởi các giả thuyết, nguyên lý và cấu trúc logic. Họ thích phân tích mọi thứ xung quanh và tìm kiếm các giải pháp sáng tạo cho các vấn đề phức tạp.",
+                strengths: ["Tư duy khách quan, phân tích logic sâu sắc.", "Sáng tạo, độc đáo và thích thử thách trí tuệ.", "Thẳng thắn, chân thật trong tư tưởng.", "Tự do và không định kiến."],
+                weaknesses: ["Thường xuyên hoài nghi và thiếu quyết đoán.", "Dễ mất tập trung vào thực tế do mải mê suy nghĩ giả thuyết.", "Gặp khó khăn trong giao tiếp xã hội hoặc thể hiện cảm xúc.", "Ghét các công việc lặp đi lặp lại."],
+                careers: "Nhà nghiên cứu khoa học, lập trình viên máy tính, nhà toán học, kỹ sư, nhà phân tích dữ liệu."
+            },
+            "ISFP": {
+                name: "Nghệ Sĩ / Người Phiêu Lưu", eng: "The Adventurer",
+                summary: "ISFP là những người sống trong hiện tại, yêu thích cái đẹp và nghệ thuật. Họ là những tâm hồn tự do, thích trải nghiệm cuộc sống bằng mọi giác quan và không muốn bị ràng buộc bởi các quy tắc gò bó.",
+                strengths: ["Nhạy cảm với cái đẹp và có năng khiếu nghệ thuật.", "Thực tế và thích ứng nhanh với hoàn cảnh.", "Ấn tượng, ấm áp và dễ cảm thông.", "Sống phóng khoáng và cởi mở."],
+                weaknesses: ["Dễ bị căng thẳng khi đối mặt với kế hoạch dài hạn.", "Cực kỳ độc lập, đôi khi từ chối sự giúp đỡ.", "Dễ gặp khó khăn trong việc tuân thủ các quy tắc khô khan.", "Dễ hành động bộc phát thiếu tính toán trước."],
+                careers: "Nghệ sĩ, nhà thiết kế thời trang, đầu bếp, kiến trúc sư cảnh quan, bác sĩ thú y, nhiếp ảnh gia."
+            },
+            "ISFJ": {
+                name: "Người Nuôi Dưỡng / Người Bảo Vệ", eng: "The Defender",
+                summary: "ISFJ là những người ấm áp, tận tụy và có trách nhiệm cao. Họ luôn lặng lẽ chăm sóc và bảo vệ những người xung quanh, trân trọng các giá trị truyền thống và luôn thực hiện nhiệm vụ một cách chu toàn.",
+                strengths: ["Cực kỳ đáng tin cậy và có tinh thần trách nhiệm cao.", "Ấn áp, chu đáo và biết quan tâm sâu sắc.", "Thực tế, tỉ mỉ và ngăn nắp.", "Lắng nghe và hỗ trợ tốt cho người khác."],
+                weaknesses: ["Quá khiêm tốn dẫn đến việc bị người khác lợi dụng công sức.", "Dễ ôm đồm công việc và tự tạo áp lực lớn.", "Khó thích ứng với sự thay đổi quá nhanh đột ngột.", "Dễ né tránh các cuộc xung đột trực diện."],
+                careers: "Y tá, giáo viên mầm non, quản trị hành chính, chăm sóc khách hàng, nhân sự, thủ thư."
+            },
+            "ISTJ": {
+                name: "Người Thực Thi", eng: "The Logistician",
+                summary: "ISTJ là những người thực tế, tôn trọng sự thật và kỷ luật. Họ là chỗ dựa đáng tin cậy nhất trong gia đình và tổ chức nhờ lối làm việc có phương pháp, kiên định và luôn tuân thủ nguyên tắc.",
+                strengths: ["Kỷ luật thép, đáng tin cậy và kiên định.", "Tập trung vào chi tiết thực tế, logic rõ ràng.", "Rất có trách nhiệm và trung thực.", "Khả năng tổ chức công việc ngăn nắp."],
+                weaknesses: ["Đôi khi quá cứng nhắc và bướng bỉnh.", "Khó chấp nhận những ý tưởng phi truyền thống hoặc thiếu thực tế.", "Dễ phán xét người khác dựa trên hiệu suất công việc.", "Khó bộc lộ cảm xúc cá nhân."],
+                careers: "Nhà quản lý tài chính, kiểm toán viên, cảnh sát/quân đội, kỹ sư xây dựng, quản lý vận hành."
+            },
+            "ISTP": {
+                name: "Nhà Kỹ Thuật", eng: "The Virtuoso",
+                summary: "ISTP là những người thực tế, thích khám phá thế giới bằng đôi tay và tư duy logic. Họ là những người giải quyết vấn đề xuất sắc nhờ khả năng quan sát nhạy bén và bình tĩnh trước mọi tình huống khẩn cấp.",
+                strengths: ["Khả năng xử lý khủng hoảng và giải quyết vấn đề thực tế cực tốt.", "Tự tin, bình tĩnh và thực tế.", "Linh hoạt và sẵn sàng trải nghiệm cái mới.", "Khéo léo với các công cụ cơ khí hoặc máy móc."],
+                weaknesses: ["Dễ xa lánh xã hội và khép kín.", "Dễ chán nản nếu bị gò bó vào các quy định và lịch trình cứng nhắc.", "Dễ chấp nhận rủi ro nguy hiểm mà không lường trước.", "Thiếu nhạy cảm trước cảm xúc tinh tế."],
+                careers: "Kỹ sư cơ khí, cảnh sát điều tra, phi công, lập trình viên hệ thống, chuyên gia cấp cứu, kỹ thuật viên."
+            },
+            "ENFP": {
+                name: "Người Truyền Cảm Hứng", eng: "The Campaigner",
+                summary: "ENFP là những người năng động, đầy nhiệt huyết và giàu trí tưởng tượng. Họ luôn tìm thấy ý nghĩa và tiềm năng tốt đẹp ở mọi người và mọi việc xung quanh, mang lại năng lượng tích cực cho tập thể.",
+                strengths: ["Trực giác tuyệt vời, sáng tạo không giới hạn.", "Giao tiếp xuất sắc, truyền cảm hứng và nhiệt huyết lớn.", "Ấn tượng, cởi mở và linh hoạt.", "Khả năng kết nối mọi người xung quanh tốt."],
+                weaknesses: ["Dễ mất tập trung và khó hoàn thành công việc đến cùng.", "Dễ cả thèm chóng chán.", "Nhạy cảm quá mức và dễ suy nghĩ quá nhiều.", "Ghét các công việc mang tính thủ tục hành chính."],
+                careers: "Chuyên viên Marketing, nhà báo, đạo diễn, nhà hoạt động xã hội, nhân sự, tổ chức sự kiện."
+            },
+            "ENFJ": {
+                name: "Người Chỉ Huy / Người Đồng Hành", eng: "The Protagonist",
+                summary: "ENFJ là những nhà lãnh đạo bẩm sinh, đầy sức hút và lòng trắc ẩn. Họ có khả năng thấu hiểu tâm lý sâu sắc và luôn nỗ lực hướng dẫn, giúp đỡ người khác phát triển tối đa tiềm năng của bản thân.",
+                strengths: ["Sức hút lãnh đạo tự nhiên, tạo niềm tin lớn.", "Lòng bao dung, thấu cảm sâu sắc.", "Đáng tin cậy và có trách nhiệm cao.", "Kỹ năng truyền thông thuyết phục tuyệt vời."],
+                weaknesses: ["Dễ tự trách bản thân khi không giúp được người khác.", "Dễ lý tưởng hóa mọi người quá mức.", "Nhạy cảm với các ý kiến trái chiều hoặc chỉ trích.", "Có xu hướng can thiệp quá sâu vào chuyện người khác."],
+                careers: "Nhà đào tạo, giáo viên, cố vấn nhân sự, chính trị gia, nhà ngoại giao, quản lý dự án xã hội."
+            },
+            "ENTJ": {
+                name: "Nhà Điều Hành", eng: "The Commander",
+                summary: "ENTJ là những nhà lãnh đạo chiến lược kiên quyết, có tầm nhìn xa trông rộng và động lực thành công cực kỳ lớn. Họ thích đối mặt với các thử thách và có khả năng tổ chức con người để đạt mục tiêu chung.",
+                strengths: ["Tầm nhìn chiến lược vĩ mô, khả năng quản trị xuất sắc.", "Quyết đoán, kiên định và mạnh mẽ.", "Tự tin cao độ.", "Logic sắc bén, giải quyết vấn đề hiệu quả."],
+                weaknesses: ["Dễ tỏ ra độc đoán hoặc thiếu kiên nhẫn với người khác.", "Có phần lạnh lùng và tàn nhẫn khi tập trung vào mục tiêu.", "Khó chấp nhận và thấu hiểu cảm xúc của mọi người.", "Dễ bị coi là kiêu căng."],
+                careers: "Giám đốc điều hành (CEO), nhà tư vấn quản trị, luật sư doanh nghiệp, nhà đầu tư mạo hiểm, quản lý dự án."
+            },
+            "ENTP": {
+                name: "Người Tranh Biện", eng: "The Debater",
+                summary: "ENTP là những bộ óc nhanh nhẹn, thích tranh luận và tìm kiếm các ý tưởng độc đáo mới mẻ. Họ thích phá vỡ các quy tắc cũ và xây dựng các hệ thống giải pháp thông minh hơn.",
+                strengths: ["Cực kỳ nhạy bén, tư duy logic phản biện tốt.", "Giàu ý tưởng đột phá sáng tạo.", "Năng động và thích học hỏi cái mới.", "Giao tiếp linh hoạt đầy sức hút."],
+                weaknesses: ["Dễ gây tranh cãi và làm mất lòng người khác vì thích phản biện.", "Dễ bỏ dở công việc khi ý tưởng đã được hình thành xong.", "Ghét các chi tiết thực tế nhỏ nhặt.", "Thiếu kiên nhẫn với quy trình lặp đi lặp lại."],
+                careers: "Nhà sáng lập khởi nghiệp, luật sư tranh tụng, chuyên gia tư vấn chiến lược, phát triển sản phẩm mới."
+            },
+            "ESFP": {
+                name: "Người Trình Diễn", eng: "The Entertainer",
+                summary: "ESFP là những người hướng ngoại, nhiệt huyết và yêu đời. Họ thích là trung tâm của sự chú ý, luôn mang lại niềm vui, sự hài hước và tính ngẫu hứng cho mọi cuộc gặp gỡ.",
+                strengths: ["Sức hút giao tiếp tuyệt vời, hòa đồng vui vẻ.", "Thực tế, nhạy cảm với môi trường xung quanh.", "Sáng tạo trong nghệ thuật biểu diễn/ẩm thực.", "Tinh thần lạc quan cao."],
+                weaknesses: ["Khó tập trung vào các kế hoạch dài hạn.", "Né tránh xung đột bằng mọi giá.", "Dễ bị lôi kéo vào các thú vui nhất thời.", "Khó chịu được sự cô đơn tĩnh lặng."],
+                careers: "Diễn viên, ca sĩ, hướng dẫn viên du lịch, chuyên viên bán hàng, tổ chức sự kiện, PR."
+            },
+            "ESFJ": {
+                name: "Người Quan Tâm", eng: "The Consul",
+                summary: "ESFJ là những người ấm áp, có tinh thần cộng đồng cao và thích chăm sóc mọi người. Họ trân trọng các mối quan hệ xã hội, giữ gìn sự hòa hợp và luôn sẵn sàng đóng góp cho tập thể.",
+                strengths: ["Cực kỳ chu đáo, tận tụy và thích giúp đỡ.", "Khả năng kết nối cộng đồng tuyệt vời.", "Có trách nhiệm cao và trung thực.", "Thực tế và ngăn nắp."],
+                weaknesses: ["Quá chú trọng đến việc người khác nghĩ gì về mình.", "Né tránh sự thay đổi hoặc các ý tưởng phi truyền thống.", "Dễ bị tổn thương khi lòng tốt không được công nhận.", "Có xu hướng kiểm soát hành vi của người thân."],
+                careers: "Quản lý khách sạn, giáo viên, chuyên viên quan hệ công chúng (PR), y tá, trợ lý hành chính."
+            },
+            "ESTJ": {
+                name: "Người Giám Sát", eng: "The Executive",
+                summary: "ESTJ là những người ngăn nắp, thực tế và luôn đề cao trật tự. Họ có khả năng quản lý con người và công việc xuất sắc nhờ tính rõ ràng, thẳng thắn và sự tôn trọng kỷ luật tuyệt đối.",
+                strengths: ["Khả năng tổ chức, điều hành công việc xuất sắc.", "Thẳng thắn, trung thực và đáng tin cậy.", "Kỷ luật cao, kiên định với mục tiêu.", "Thực tế và có óc quan sát sắc bén."],
+                weaknesses: ["Quá cứng nhắc, bướng bỉnh.", "Khó chấp nhận sự sai lệch quy chuẩn hoặc sự kém hiệu quả.", "Thiếu nhạy cảm trước cảm xúc của người khác.", "Dễ bị cuốn vào công việc quá mức."],
+                careers: "Quản lý sản xuất, giám đốc kinh doanh, sĩ quan quân đội, cảnh sát, thẩm phán, quản trị viên."
+            },
+            "ESTP": {
+                name: "Người Thách Thức", eng: "The Entrepreneur",
+                summary: "ESTP là những người thực tế, hành động nhanh và đầy năng lượng. Họ thích đối mặt trực tiếp với các thử thách, thích trải nghiệm thực tế hơn là các lý thuyết trừu tượng và có khả năng thuyết phục người khác rất tốt.",
+                strengths: ["Quyết đoán, hành động nhanh chóng và hiệu quả.", "Thuyết phục, giao tiếp linh hoạt.", "Thực tế và có óc quan sát sắc bén.", "Thích ứng nhanh với thay đổi."],
+                weaknesses: ["Dễ thiếu kiên nhẫn với các lý thuyết trừu tượng.", "Chấp nhận rủi ro quá lớn mà thiếu suy tính kỹ.", "Thiếu nhạy cảm trước cảm xúc tinh tế.", "Khó tuân thủ các quy tắc kỷ luật nghiêm ngặt."],
+                careers: "Doanh nhân, nhà môi giới chứng khoán, cảnh sát hình sự, vận động viên chuyên nghiệp, quản lý bán hàng."
+            }
+        };
+
+        function startQuiz(mode) {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            document.getElementById('resultScreen').style.display = 'none';
+            
+            quizMode = mode;
+            if (mode === 'short') {
+                questions = shortQuestions;
+                questionsPerGroup = 10;
+            } else {
+                questions = fullQuestions;
+                questionsPerGroup = 19;
+            }
+            
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestionIndex];
+            const percent = (currentQuestionIndex / questions.length) * 100;
+            document.getElementById('progressBarFill').style.width = `${percent}%`;
+
+            document.getElementById('questionNumber').innerText = `Câu số ${currentQuestionIndex + 1}/${questions.length}`;
+            document.getElementById('questionText').innerText = q.text;
+            document.getElementById('optAText').innerText = q.optA.text;
+            document.getElementById('optBText').innerText = q.optB.text;
+
+            document.getElementById('optACard').classList.remove('selected');
+            document.getElementById('optBCard').classList.remove('selected');
+
+            if (userAnswers[q.id]) {
+                if (userAnswers[q.id] === q.optA.id) {
+                    document.getElementById('optACard').classList.add('selected');
+                } else {
+                    document.getElementById('optBCard').classList.add('selected');
+                }
+            }
+
+            if (currentQuestionIndex > 0) {
+                document.getElementById('btnBack').style.visibility = 'visible';
+            } else {
+                document.getElementById('btnBack').style.visibility = 'hidden';
+            }
+        }
+
+        function selectOption(option) {
+            const q = questions[currentQuestionIndex];
+            const selectedAnsId = option === 'a' ? q.optA.id : q.optB.id;
+            userAnswers[q.id] = selectedAnsId;
+
+            if (option === 'a') {
+                document.getElementById('optACard').classList.add('selected');
+                document.getElementById('optBCard').classList.remove('selected');
+            } else {
+                document.getElementById('optBCard').classList.add('selected');
+                document.getElementById('optACard').classList.remove('selected');
+            }
+
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                } else {
+                    calculateAndShowResult();
+                }
+            }, 250);
+        }
+
+        function goBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function calculateAndShowResult() {
+            let scores = { 0: 0, 1: 0, 2: 0, 3: 0 };
+            
+            dapan.forEach(item => {
+                if (userAnswers[item.IDQues] === item.IDAns) {
+                    scores[item.Group]++;
+                }
+            });
+
+            let letter1, letter2, letter3, letter4;
+            
+            if (quizMode === 'short') {
+                letter1 = scores[0] < 5 ? 'I' : 'E';
+                letter2 = scores[1] < 6 ? 'N' : 'S';
+                letter3 = scores[2] < 6 ? 'F' : 'T';
+                letter4 = scores[3] < 6 ? 'P' : 'J';
+            } else {
+                letter1 = scores[0] < 10 ? 'I' : 'E';
+                letter2 = scores[1] < 12 ? 'N' : 'S';
+                letter3 = scores[2] < 12 ? 'F' : 'T';
+                letter4 = scores[3] < 12 ? 'P' : 'J';
+            }
+
+            const mbtiCode = letter1 + letter2 + letter3 + letter4;
+
+            document.getElementById('resultMbti').innerText = mbtiCode;
+            const details = mbtiDetails[mbtiCode] || {
+                name: "Chưa xác định", eng: "Unknown",
+                summary: "Dữ liệu phân tích nhóm tính cách này đang được cập nhật.",
+                strengths: [], weaknesses: [], careers: "Không có thông tin."
+            };
+
+            document.getElementById('resultTitle').innerText = details.name;
+            document.getElementById('resultEng').innerText = details.eng;
+            document.getElementById('descSummary').innerText = details.summary;
+            document.getElementById('descCareers').innerText = details.careers;
+
+            const strengthsUl = document.getElementById('descStrengths');
+            strengthsUl.innerHTML = '';
+            details.strengths.forEach(s => {
+                const li = document.createElement('li');
+                li.innerText = s;
+                strengthsUl.appendChild(li);
+            });
+
+            const weaknessesUl = document.getElementById('descWeaknesses');
+            weaknessesUl.innerHTML = '';
+            details.weaknesses.forEach(w => {
+                const li = document.createElement('li');
+                li.innerText = w;
+                weaknessesUl.appendChild(li);
+            });
+
+            updateBar(0, scores[0]);
+            updateBar(1, scores[1]);
+            updateBar(2, scores[2]);
+            updateBar(3, scores[3]);
+
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+        }
+
+        function updateBar(index, score) {
+            const percentLeft = Math.round((score / questionsPerGroup) * 100);
+            const percentRight = 100 - percentLeft;
+
+            document.getElementById(`bar${index}`).style.width = `${percentLeft}%`;
+            
+            const spanLeft = document.getElementById(`lblLeft${index}`);
+            const spanRight = document.getElementById(`lblRight${index}`);
+            
+            if (percentLeft >= 50) {
+                spanLeft.className = "active";
+                spanRight.className = "";
+            } else {
+                spanRight.className = "active";
+                spanLeft.className = "";
+            }
+
+            document.getElementById(`valLeft${index}`).innerText = `${percentLeft}%`;
+            document.getElementById(`valRight${index}`).innerText = `${percentRight}%`;
+        }
+
+        function restartQuiz() {
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

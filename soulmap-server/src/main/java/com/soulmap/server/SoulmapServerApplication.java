@@ -24,8 +24,9 @@ public class SoulmapServerApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void logSwaggerUrls() {
 		String port = environment.getProperty("local.server.port", environment.getProperty("server.port", "8080"));
-		log.info("Swagger UI: http://localhost:{}/swagger-ui/index.html", port);
-		log.info("OpenAPI Docs: http://localhost:{}/v3/api-docs", port);
+		String prefix = environment.getProperty("local.server.servlet.context-path", environment.getProperty("servlet.context-path", "/api/v1"));
+		log.info("Swagger UI: http://localhost:{}{}/swagger-ui/index.html", port,prefix);
+		log.info("OpenAPI Docs: http://localhost:{}{}/v3/api-docs", port,prefix);
 	}
 
 }
