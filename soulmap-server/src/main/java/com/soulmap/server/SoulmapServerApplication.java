@@ -11,22 +11,21 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 public class SoulmapServerApplication {
 
-	private final Environment environment;
+    private final Environment environment;
 
-	public SoulmapServerApplication(Environment environment) {
-		this.environment = environment;
-	}
+    public SoulmapServerApplication(Environment environment) {
+        this.environment = environment;
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(SoulmapServerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SoulmapServerApplication.class, args);
+    }
 
-	@EventListener(ApplicationReadyEvent.class)
-	public void logSwaggerUrls() {
-		String port = environment.getProperty("local.server.port", environment.getProperty("server.port", "8080"));
-		String prefix = environment.getProperty("local.server.servlet.context-path", environment.getProperty("servlet.context-path", "/api/v1"));
-		log.info("Swagger UI: http://localhost:{}{}/swagger-ui/index.html", port,prefix);
-		log.info("OpenAPI Docs: http://localhost:{}{}/v3/api-docs", port,prefix);
-	}
-
+    @EventListener(ApplicationReadyEvent.class)
+    public void logSwaggerUrls() {
+        String port = environment.getProperty("local.server.port", environment.getProperty("server.port", "8080"));
+        String prefix = environment.getProperty("local.server.servlet.context-path", environment.getProperty("servlet.context-path", "/api/v1"));
+        log.info("Swagger UI: http://localhost:{}{}/swagger-ui/index.html", port, prefix);
+        log.info("OpenAPI Docs: http://localhost:{}{}/v3/api-docs", port, prefix);
+    }
 }
