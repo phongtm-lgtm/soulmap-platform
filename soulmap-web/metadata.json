@@ -1,0 +1,6 @@
+{
+  "name": "SoulMap",
+  "description": "Bản đồ nội tâm - Trải nghiệm khám phá bản thân cao cấp kết hợp MBTI, Tử Vi và Trí tuệ Nhân tạo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
