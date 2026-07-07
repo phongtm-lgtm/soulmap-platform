@@ -10,9 +10,12 @@ import AuthScreen from './components/AuthScreen';
 import MbtiStartScreen from './components/MbtiStartScreen';
 import AssessmentScreen from './components/AssessmentScreen';
 import ResultScreen from './components/ResultScreen';
+import FourJourneysScreen from './components/FourJourneysScreen';
+import { buildMockJourneys } from './data/mockJourneys';
+import type { SoulMapJourney } from './types/journey';
 
 export default function App() {
-  type Screen = 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth';
+  type Screen = 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth' | 'four_journeys';
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [transitionDirection, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
 
@@ -216,6 +219,16 @@ export default function App() {
     setCurrentScreen('landing');
   };
 
+  const navigateToFourJourneys = () => {
+    setTransitionDirection('push');
+    setCurrentScreen('four_journeys');
+  };
+
+  const handleExploreJourney = (journey: SoulMapJourney) => {
+    // Future: navigate to JourneyDetailScreen
+    console.log('Explore journey:', journey.slug);
+  };
+
   const buildAnswersFromMbtiType = (mbtiType: string): Record<number, 'A' | 'B'> => {
     const letters = new Set(mbtiType.split(''));
     return SOULMAP_QUESTIONS.reduce<Record<number, 'A' | 'B'>>((acc, question) => {
@@ -361,6 +374,7 @@ export default function App() {
           navigateToLanding={navigateToLanding}
           navigateToAssessment={navigateToAssessment}
           navigateToTestIntro={navigateToTestIntro}
+          onOpenJourneys={navigateToFourJourneys}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -459,6 +473,25 @@ export default function App() {
           navigateToAssessment={navigateToAssessment}
           navigateToLanding={navigateToLanding}
           handleSendMessage={handleSendMessage}
+        />
+      )}
+
+      {currentScreen === 'four_journeys' && (
+        <FourJourneysScreen
+          journeys={profile ? buildMockJourneys(profile) : buildMockJourneys({
+            type: 'INFJ', name: 'Người Bảo Hộ', title: 'The Advocate',
+            element: 'Mộc', zodiac: 'Xử Nữ', mbtiMatch: 'INFJ',
+            description: '',
+            pillars: {
+              identity: 'Khám phá bản sắc và nội tâm để hiểu rõ con người thật của bạn.',
+              career: 'Định hướng và phát triển con đường sự nghiệp phù hợp với bản thân.',
+              love: 'Thấu hiểu tình yêu và kết nối để xây dựng mối quan hệ bền vững.',
+              life: 'Hiểu vận mệnh và sống trọn vẹn hành trình của chính bạn.',
+            },
+            advice: [],
+          })}
+          onExplore={handleExploreJourney}
+          userName={currentUser?.name}
         />
       )}
     </div>

@@ -22,7 +22,7 @@ interface NavbarProps {
   navigateToAssessment: (direction?: 'push' | 'none') => void;
   navigateToTestIntro?: (direction?: 'push' | 'none') => void;
   onOpenJourneys?: () => void;
-  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth') => void;
+  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth' | 'four_journeys') => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
 }
 

@@ -1055,14 +1055,14 @@ h1, h2, h3, .font-display {
 .pillar-title {
   font-family: "Cormorant Garamond", "EB Garamond", serif;
   font-weight: 600;
-  font-size: 1.6rem;
+  font-size: 1.76rem;
   color: #214d3b;
   margin-bottom: 0.55rem;
 }
 
 .pillar-desc {
   font-family: "Noto Serif", "Georgia", serif;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   line-height: 1.7;
   color: #5e625f;
   max-width: 15rem;

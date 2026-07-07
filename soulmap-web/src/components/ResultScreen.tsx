@@ -13,15 +13,24 @@ import {
   Mountain, 
   Quote, 
   Send, 
+  ArrowRight,
   Compass, 
+  CheckCircle2,
+  Lock,
+  HelpCircle,
+  Grid2X2,
+  BarChart3,
+  Bot,
+  Leaf,
 } from 'lucide-react';
 import { PersonalityProfile } from '../types';
 import Navbar from './Navbar';
 import MbtiSummaryStep from './mbti/MbtiSummaryStep';
 import BirthFormStep from './mbti/BirthFormStep';
 import MbtiTestBackground from './MbtiTestBackground';
-import JourneysReadyStep from './journey/JourneysReadyStep';
 import JourneyDetailScreen from './journey/JourneyDetailScreen';
+import FourJourneysScreen from './FourJourneysScreen';
+import { buildMockJourneys } from '../data/mockJourneys';
 import type { SoulMapJourney } from '../types/journey';
 
 interface ResultScreenProps {
@@ -48,7 +57,7 @@ interface ResultScreenProps {
   isLoggedIn: boolean;
   currentUser: { name: string; email: string } | null;
   handleLogout: () => void;
-  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth') => void;
+  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth' | 'four_journeys') => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
   navigateToAssessment: (direction?: 'push' | 'none') => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
@@ -97,7 +106,14 @@ export default function ResultScreen({
 
   const openJourneysOverview = () => {
     setSelectedJourney(null);
-    setResultStep('reveal');
+    setTransitionDirection('push');
+    setCurrentScreen('four_journeys');
+  };
+
+  const continueToJourneys = () => {
+    setSelectedJourney(null);
+    setTransitionDirection('push');
+    setCurrentScreen('four_journeys');
   };
 
   const getElementColorClass = (element: string) => {
@@ -113,7 +129,7 @@ export default function ResultScreen({
   const isFlowStep =
     resultStep === 'mbti_summary' || resultStep === 'birth_form' || resultStep === 'generating';
 
-  const showSoulMapNavbar = true;
+  const showSoulMapNavbar = resultStep !== 'generating';
 
   const startGeneration = () => {
     setResultStep('generating');
@@ -124,13 +140,22 @@ export default function ResultScreen({
       setGenerationProgress(cur);
       if (cur >= 6) {
         clearInterval(t);
-        setTimeout(() => {
-          setResultStep('full_map');
-          setZoomMap(false);
-        }, 1000);
+        setZoomMap(false);
       }
     }, 1200);
   };
+
+  const generationPercent = Math.min(100, Math.round((generationProgress / 6) * 100));
+  const isGenerationComplete = generationProgress >= 6;
+
+  const generationSteps = [
+    { title: 'MBTI', subtitle: 'Phân tích tính cách', icon: Grid2X2 },
+    { title: 'Tử Vi', subtitle: 'Lá số tử vi đầu số', icon: Compass },
+    { title: 'Phân tích', subtitle: 'AI phân tích dữ liệu', icon: BarChart3 },
+    { title: 'Xây dựng Core Self', subtitle: 'Xác định bản ngã cốt lõi', icon: Trees },
+    { title: 'Tạo 4 Journey', subtitle: 'Đang xây dựng 4 hành trình của bạn', icon: Compass },
+    { title: 'Khởi tạo AI Mentor', subtitle: 'Chuẩn bị người đồng hành AI', icon: Bot },
+  ];
 
   return (
     <div className={`flex flex-col min-h-screen relative ${selectedJourney ? 'overflow-x-hidden bg-[#FAF6EE]' : `overflow-hidden ${isFlowStep ? 'bg-[#FAF6EE]' : 'bg-[#FAF6EE]'}`}`}>
@@ -187,55 +212,151 @@ export default function ResultScreen({
         )}
 
         {resultStep === 'generating' && (
-          <div className="mx-auto w-full max-w-[560px] animate-fade-in py-6">
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-[#E8DFCF]/90 bg-[#FFFCF8]/94 p-8 text-center shadow-[0_24px_80px_-48px_rgba(33,77,59,0.45)] backdrop-blur-sm md:p-10">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#C8A15A]/10 to-transparent rounded-full blur-3xl z-0 pointer-events-none"></div>
+          <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-[1180px] animate-fade-in items-center py-3">
+            <div className="relative max-h-[calc(100vh-3rem)] min-h-[680px] w-full overflow-y-auto overflow-x-hidden rounded-[2rem] border border-[#E8DFCF]/90 bg-[#FFFCF8]/88 px-6 py-6 text-center shadow-[0_28px_90px_-46px_rgba(33,77,59,0.48)] backdrop-blur-sm md:px-8 md:py-6">
+              <img
+                src="/soulmap-island.webp"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover opacity-18 blur-[1px]"
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_22%,rgba(255,252,248,0.86),rgba(255,252,248,0.62)_36%,rgba(250,246,238,0.78)_100%)]" />
+              <div className="pointer-events-none absolute -right-20 top-0 h-[420px] w-[420px] rounded-full bg-[#C8A15A]/12 blur-3xl" />
+              <div className="pointer-events-none absolute -left-20 bottom-0 h-[360px] w-[360px] rounded-full bg-[#24533E]/10 blur-3xl" />
 
-              <div className="relative z-10 flex flex-col gap-8 items-center">
-                {/* Header */}
-                <div>
-                  <h2 className="font-display text-3xl font-semibold text-[#214D3B]">AI Đang Kiến Tạo SoulMap</h2>
-                  <p className="font-serif text-sm text-[#636A64] mt-2">Vui lòng chờ giây lát để thuật toán hợp nhất dữ liệu của bạn...</p>
+              <div className="relative z-10 flex min-h-[628px] flex-col items-center">
+                <div className="flex w-full items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 text-left">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#C8A15A]/30 bg-[#FFFDF8]/80 text-[#B68A2F] shadow-sm">
+                      <Leaf className="h-5 w-5" />
+                    </span>
+                    <span className="font-display text-[1.35rem] font-bold uppercase tracking-wide text-[#214D3B]">SoulMap</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      className="hidden items-center gap-2 rounded-full border border-[#E8DFCF] bg-[#FFFDF8]/86 px-4 py-2 font-sans text-[0.82rem] font-bold text-[#7A6E5C] shadow-sm sm:flex"
+                    >
+                      <HelpCircle className="h-4 w-4 text-[#B68A2F]" />
+                      Hướng dẫn
+                    </button>
+                    <div className="flex items-center gap-2 rounded-full bg-[#FFFDF8]/70 px-2 py-1.5">
+                      <img
+                        src="/linh-nhi-mascot.png"
+                        alt="Linh Nhi"
+                        className="h-10 w-10 rounded-full object-contain"
+                        draggable={false}
+                      />
+                      <span className="hidden font-sans text-[0.82rem] font-bold text-[#214D3B] sm:inline">Linh Nhi</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Progress Loader Sphere */}
-                <div className="relative w-32 h-32 flex items-center justify-center">
-                  <div className="absolute inset-0 border-4 border-[#C8A15A]/10 rounded-full"></div>
-                  <div className="absolute inset-0 border-4 border-t-[#C8A15A] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-                    <Compass className="w-12 h-12 text-[#24533E] animate-pulse" />
+                <div className="mt-4 text-center">
+                  <p className="font-display text-[1.2rem] leading-none text-[#C8A15A]">✦</p>
+                  <h2 className="mt-1 font-display text-[2.5rem] font-bold leading-tight text-[#214D3B] md:text-[3.25rem]">
+                    {isGenerationComplete ? 'SoulMap Đã Sẵn Sàng' : 'AI Đang Kiến Tạo SoulMap'}
+                  </h2>
+                  <p className="mt-2 font-sans text-[0.94rem] font-medium text-[#636A64] md:text-[1rem]">
+                    {isGenerationComplete
+                      ? 'Bốn hành trình cá nhân hóa của bạn đã được khởi tạo.'
+                      : 'Vui lòng chờ giây lát để thuật toán hợp nhất dữ liệu của bạn...'}
+                  </p>
                 </div>
 
-                {/* Steps list */}
-                <div className="w-full flex flex-col gap-3.5 max-w-sm text-left bg-[#FFFCF8]/40 p-6 rounded-2xl border border-[#24533E]/5">
-                  {[
-                    "MBTI",
-                    "Tử Vi",
-                    "Phân tích",
-                    "Xây dựng Core Self",
-                    "Tạo 4 Journey",
-                    "Khởi tạo AI Mentor"
-                  ].map((step, idx) => {
-                    const isDone = generationProgress > idx;
-                    const isActive = generationProgress === idx;
-                    return (
-                      <div key={idx} className="flex items-center justify-between py-1.5 border-b border-[#214D3B]/5 last:border-none transition-all duration-300">
-                        <span className={`font-sans text-sm font-semibold transition-colors duration-300 ${
-                          isDone ? 'text-[#24533E]' : isActive ? 'text-[#C8A15A] font-bold animate-pulse' : 'text-[#636A64]/40'
-                        }`}>
-                          {idx + 1}. {step}
-                        </span>
-                        <div className="flex items-center justify-center w-5 h-5">
-                          {isDone ? (
-                            <span className="material-symbols-outlined text-[#24533E] text-base font-bold bg-[#24533E]/10 rounded-full p-0.5 animate-bounce">check</span>
-                          ) : isActive ? (
-                            <RefreshCw className="w-4 h-4 text-[#C8A15A] animate-spin" />
-                          ) : (
-                            <div className="w-2 h-2 rounded-full bg-[#636A64]/20"></div>
-                          )}
-                        </div>
+                <div className="mt-6 grid w-full flex-1 grid-cols-1 items-stretch gap-5 lg:grid-cols-[0.92fr_1.08fr]">
+                  <div className="flex flex-col items-center justify-center rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFFDF8]/64 p-5 shadow-[0_18px_44px_-34px_rgba(77,52,28,0.38)] backdrop-blur-sm">
+                    <div className="relative flex h-44 w-44 items-center justify-center md:h-48 md:w-48">
+                      <div className="absolute inset-0 rounded-full border border-dashed border-[#C8A15A]/65" />
+                      <div className="absolute inset-4 rounded-full border-[10px] border-[#E8DFCF]" />
+                      <div
+                        className="absolute inset-4 rounded-full border-[10px] border-transparent border-t-[#24533E] border-r-[#C8A15A]"
+                        style={{ transform: `rotate(${generationPercent * 3.6}deg)` }}
+                      />
+                      <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#FFFDF8] shadow-[0_12px_30px_-18px_rgba(33,77,59,0.45)]">
+                        <Compass className="h-12 w-12 text-[#24533E]" />
                       </div>
-                    );
-                  })}
+                      <span className="absolute -bottom-2 font-sans text-[1.05rem] font-extrabold text-[#24533E]">
+                        {generationPercent}%
+                      </span>
+                    </div>
+
+                    <div className="mt-7 flex w-full items-center gap-4 rounded-[1.25rem] border border-[#E8DFCF] bg-[#FFFDF8]/78 p-4 text-left">
+                      <img
+                        src="/linh-nhi-mascot.png"
+                        alt="Linh Nhi"
+                        className="h-20 w-20 shrink-0 object-contain"
+                        draggable={false}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-sans text-[0.98rem] font-extrabold text-[#214D3B]">
+                          {isGenerationComplete ? 'Bản đồ đã sẵn sàng cho bạn ✨' : 'Linh Nhi đang chuẩn bị bản đồ dành riêng cho bạn ✨'}
+                        </p>
+                        <p className="mt-1.5 font-sans text-[0.82rem] leading-relaxed text-[#6A6E69]">
+                          Mỗi người là một vũ trụ riêng biệt. SoulMap đang thấu hiểu bạn sâu sắc nhất.
+                        </p>
+                      </div>
+                    </div>
+
+                    {isGenerationComplete && (
+                      <button
+                        type="button"
+                        onClick={continueToJourneys}
+                        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#24533E] px-7 py-3.5 font-sans text-[0.95rem] font-extrabold text-white shadow-[0_16px_30px_-16px_rgba(33,77,59,0.58)]"
+                      >
+                        Chuyển đến hành trình
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col justify-center rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFFDF8]/72 p-5 text-left shadow-[0_18px_44px_-30px_rgba(77,52,28,0.42)] backdrop-blur-sm md:p-6">
+                    {generationSteps.map((step, idx) => {
+                      const isDone = generationProgress > idx;
+                      const isActive = generationProgress === idx && !isGenerationComplete;
+                      const StepIcon = step.icon;
+
+                      return (
+                        <div key={step.title} className="flex items-center gap-4 border-b border-[#E8DFCF] py-3 first:pt-0 last:border-none last:pb-0">
+                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                            isDone ? 'bg-[#24533E]/10 text-[#24533E]' : isActive ? 'bg-[#C8A15A]/14 text-[#B17922]' : 'bg-[#E8E4DC] text-[#A7A39B]'
+                          }`}>
+                            <StepIcon className="h-5 w-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className={`font-sans text-[0.98rem] font-extrabold ${
+                              isDone ? 'text-[#24533E]' : isActive ? 'text-[#B17922]' : 'text-[#A7A39B]'
+                            }`}>
+                              {idx + 1}. {step.title}
+                            </p>
+                            <p className="mt-0.5 font-sans text-[0.82rem] text-[#6A6E69]">{step.subtitle}</p>
+                          </div>
+                          <div className="flex min-w-[92px] items-center justify-end gap-2">
+                            {isDone ? (
+                              <>
+                                <CheckCircle2 className="h-5 w-5 text-[#24533E]" />
+                                <span className="font-sans text-[0.82rem] font-medium text-[#5F9071]">Hoàn tất</span>
+                              </>
+                            ) : isActive ? (
+                              <>
+                                <RefreshCw className="h-5 w-5 animate-spin text-[#B17922]" />
+                                <span className="font-sans text-[0.82rem] font-bold text-[#B17922]">Đang xử lý</span>
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="h-4 w-4 text-[#B9B5AE]" />
+                                <span className="font-sans text-[0.82rem] text-[#B9B5AE]">Chờ xử lý</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <p className="mt-4 text-center font-sans text-[0.78rem] text-[#7A8A7D]">
+                      Dữ liệu của bạn được bảo mật tuyệt đối và chỉ bạn mới có thể xem SoulMap.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -243,9 +364,10 @@ export default function ResultScreen({
         )}
 
         {resultStep === 'reveal' && (
-          <JourneysReadyStep
-            profile={profile}
+          <FourJourneysScreen
+            journeys={buildMockJourneys(profile)}
             onExplore={openJourneyDetail}
+            userName={currentUser?.name}
           />
         )}
 
