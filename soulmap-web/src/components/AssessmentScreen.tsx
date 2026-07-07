@@ -1,10 +1,14 @@
-import React from 'react';
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  Sparkles 
+import { useState } from 'react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bookmark,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
-import { Question, SOULMAP_QUESTIONS } from '../types';
+import MbtiTestBackground from './MbtiTestBackground';
+import LinhNhiMessage from './LinhNhiMessage';
+import { SOULMAP_QUESTIONS } from '../types';
 
 interface AssessmentScreenProps {
   currentQuestionIndex: number;
@@ -12,9 +16,11 @@ interface AssessmentScreenProps {
   handleSelectOption: (option: 'A' | 'B') => void;
   handlePrevQuestion: () => void;
   handleNextQuestion: () => void;
-  navigateToLanding: (direction?: 'push_back' | 'none') => void;
   getLinhNhiDialogue: () => string;
+  onSaveProgress: () => void;
 }
+
+const TOTAL_QUESTIONS = 72;
 
 export default function AssessmentScreen({
   currentQuestionIndex,
@@ -22,205 +28,153 @@ export default function AssessmentScreen({
   handleSelectOption,
   handlePrevQuestion,
   handleNextQuestion,
-  navigateToLanding,
   getLinhNhiDialogue,
+  onSaveProgress,
 }: AssessmentScreenProps) {
+  const [saveHint, setSaveHint] = useState<string | null>(null);
   const currentQuestion = SOULMAP_QUESTIONS[currentQuestionIndex];
+  const displayIndex = currentQuestionIndex + 1;
+  const progress = (displayIndex / TOTAL_QUESTIONS) * 100;
+  const progressPercent = Math.round(progress);
+
+  const handleSaveProgress = () => {
+    onSaveProgress();
+    setSaveHint('Đã lưu tiến độ!');
+    window.setTimeout(() => setSaveHint(null), 2200);
+  };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Top Fixed Header with navigation, progress tracker */}
-      <nav className="fixed top-0 w-full z-50 bg-[#fbf9f5]/80 backdrop-blur-md border-b border-[#214D3B]/10 shadow-sm shadow-[#214D3B]/5 h-20">
-        <div className="flex justify-between items-center h-full px-6 max-w-[1200px] mx-auto w-full">
-          {/* Brand Logo */}
-          <div className="font-display text-2xl font-semibold text-[#214D3B] flex items-center gap-2 cursor-pointer" onClick={() => navigateToLanding('push_back')}>
-            <span className="material-symbols-outlined text-[#B68A2F] text-3xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
-            <span className="tracking-wide">SoulMap</span>
+    <div className="relative z-[1] min-h-screen px-4 pb-10 pt-24 sm:px-6">
+      <MbtiTestBackground />
+
+      <main className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-5 lg:grid-cols-[272px_minmax(0,1fr)]">
+        <aside className="flex flex-col rounded-[1.75rem] border border-[#E8DFCF] bg-[#FFFCF8]/82 p-6 shadow-[0_18px_50px_-38px_rgba(33,77,59,0.35)] backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 font-sans text-xs font-extrabold text-[#214D3B]">
+              <Sparkles className="h-4 w-4 text-[#4B7E55]" />
+              Tiến trình bài test
+            </div>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={handleSaveProgress}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#E8DFCF] bg-[#FFFCF8]/88 px-3 py-2 font-sans text-[11px] font-bold text-[#24533E] shadow-sm transition hover:border-[#3F7A58]/40 hover:bg-[#FFFCF8]"
+              >
+                <Bookmark className="h-3.5 w-3.5 text-[#4B7E55]" />
+                Lưu
+              </button>
+              {saveHint && (
+                <span className="absolute right-0 top-9 whitespace-nowrap font-sans text-[10px] font-bold text-[#3F7A58]">
+                  {saveHint}
+                </span>
+              )}
+            </div>
           </div>
 
-          {/* Exit Button: 'Thoát bài test' with transition='push_back' */}
-          <button 
-            onClick={() => navigateToLanding('push_back')}
-            className="flex items-center gap-2 px-5 py-2.5 border border-[#214D3B]/20 rounded-full font-sans font-semibold text-xs text-[#214D3B] hover:bg-[#214D3B]/5 transition-all duration-300 active:scale-95"
-          >
-            Thoát bài test
-            <span className="material-symbols-outlined text-sm font-bold">close</span>
-          </button>
-        </div>
-      </nav>
+          <div className="mt-8">
+            <p className="font-display text-[2.35rem] font-bold leading-none tracking-tight text-[#214D3B]">
+              {displayIndex}
+              <span className="mx-1 text-[#8C928D]/70">/</span>
+              <span className="text-[#8C928D]/85">{TOTAL_QUESTIONS}</span>
+            </p>
+            <p className="mt-2 font-sans text-xs font-semibold text-[#5E625F]">
+              Hoàn thành {progressPercent}%
+            </p>
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#E8E6D9]">
+              <div
+                className="h-full rounded-full bg-[#3F7A58] transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
 
-      {/* Main Grid Content */}
-      <main className="flex-grow pt-28 pb-16 max-w-[1200px] mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Left Column: Interactive Assessment Card */}
-        <div className="lg:col-span-7 flex flex-col gap-6 w-full">
-          
-          {/* Question Glass Card */}
-          <div className="glass-card rounded-[2rem] p-8 md:p-10 shadow-lg border border-[#214D3B]/8 text-left relative overflow-hidden flex flex-col gap-8">
-            
-            {/* Section tag, numerical identifier and progress bar */}
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#214D3B]/5 pb-6">
-              <div>
-                <h2 className="font-display text-3xl font-semibold text-[#214D3B]">
-                  Câu {currentQuestionIndex + 1} / {SOULMAP_QUESTIONS.length}
-                </h2>
-              </div>
-              {/* Custom thin glowing progress bar */}
-              <div className="w-full sm:w-1/3 bg-[#eae8e4] rounded-full h-1.5 overflow-hidden relative">
-                <div 
-                  className="bg-[#B68A2F] h-full rounded-full transition-all duration-500 shadow-md shadow-[#B68A2F]/30"
-                  style={{ width: `${((currentQuestionIndex + 1) / SOULMAP_QUESTIONS.length) * 100}%` }}
-                ></div>
-              </div>
-            </header>
+          <div className="my-7 h-px bg-[#E8DFCF]" />
 
-            {/* Question Statement */}
-            <h3 className="font-display text-2xl text-[#214D3B] font-medium leading-relaxed">
-              {currentQuestion.questionText}
-            </h3>
+          <div className="flex items-start gap-3">
+            <Clock className="mt-0.5 h-5 w-5 shrink-0 text-[#4B7E55]" />
+            <div>
+              <p className="font-sans text-xs font-medium text-[#5E625F]">Thời gian ước tính</p>
+              <p className="font-sans text-sm font-extrabold text-[#214D3B]">15 – 20 phút</p>
+            </div>
+          </div>
 
-            {/* Options List */}
-            <div className="flex flex-col gap-4">
-              {currentQuestion.options.map((opt) => {
-                const isSelected = selectedOption === opt.key;
-                return (
-                  <button 
-                    key={opt.key}
-                    onClick={() => handleSelectOption(opt.key)}
-                    className={`group rounded-2xl p-5 flex items-center text-left transition-all duration-300 active:scale-[0.99] border cursor-pointer ${
-                      isSelected 
-                        ? 'bg-white border-[#B68A2F] shadow-md shadow-[#B68A2F]/10' 
-                        : 'bg-white/50 border-[#214D3B]/10 hover:border-[#B68A2F]/50 hover:bg-white'
+          <div className="mt-8">
+            <LinhNhiMessage variant="tip" message={getLinhNhiDialogue()} />
+          </div>
+
+          <p className="mt-auto pt-8 text-center font-sans text-[10px] font-medium leading-relaxed text-[#8C928D]">
+            Mỗi lựa chọn sẽ giúp Linh Nhi hiểu bạn thêm một chút ✨
+          </p>
+        </aside>
+
+        <section className="rounded-[1.75rem] border border-[#E8DFCF] bg-[#FFFCF8]/88 p-5 shadow-[0_18px_50px_-38px_rgba(33,77,59,0.32)] backdrop-blur-xl sm:p-7 md:p-8">
+          <p className="font-sans text-sm font-extrabold text-[#214D3B]">
+            Câu {displayIndex} / {TOTAL_QUESTIONS}
+          </p>
+
+          <h1 className="mx-auto mt-6 max-w-[580px] text-center font-display text-xl font-bold leading-snug text-[#1F5A43] md:text-2xl">
+            {currentQuestion.questionText}
+          </h1>
+
+          <div className="mx-auto mt-6 grid max-w-[560px] grid-cols-1 gap-3">
+            {currentQuestion.options.map((opt) => {
+              const isSelected = selectedOption === opt.key;
+
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => handleSelectOption(opt.key)}
+                  className={`flex items-start gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 active:scale-[0.99] ${
+                    isSelected
+                      ? 'border-[#2F6B4D] bg-[#F0F7F2] shadow-[0_8px_24px_-18px_rgba(33,77,59,0.35)]'
+                      : 'border-[#E8DFCF] bg-[#FFFCF8] hover:border-[#3F7A58]/50 hover:bg-[#FAF6EE]'
+                  }`}
+                >
+                  <span
+                    className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-sans text-sm font-extrabold transition-colors ${
+                      isSelected ? 'bg-[#2F6B4D] text-white' : 'bg-[#EDE9DF] text-[#5E625F]'
                     }`}
                   >
-                    {/* Selector Badge (A/B) */}
-                    <div className={`w-10 h-10 rounded-full border flex items-center justify-center font-sans font-bold text-sm mr-4 transition-all duration-300 ${
-                      isSelected
-                        ? 'bg-[#B68A2F] border-[#B68A2F] text-white shadow-sm'
-                        : 'border-[#214D3B]/10 text-[#214D3B] group-hover:bg-[#B68A2F] group-hover:border-[#B68A2F] group-hover:text-white'
-                    }`}>
-                      {opt.key}
-                    </div>
-                    <span className="body-text text-[#636A64] flex-1">
-                      {opt.text}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Navigation Row */}
-            <div className="flex items-center justify-between pt-4 border-t border-[#214D3B]/5 mt-2">
-              <button 
-                onClick={handlePrevQuestion}
-                disabled={currentQuestionIndex === 0}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-sans font-semibold text-sm transition-all duration-300 ${
-                  currentQuestionIndex === 0
-                    ? 'opacity-30 cursor-not-allowed text-[#636A64]/50'
-                    : 'text-[#214D3B] hover:bg-[#214D3B]/5'
-                }`}
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Câu trước
-              </button>
-
-              {/* 'Câu tiếp theo' with transition='none' */}
-              <button 
-                onClick={handleNextQuestion}
-                disabled={!selectedOption}
-                className={`bg-[#214D3B] text-white hover:bg-[#1a3c34] active:scale-95 px-8 py-3.5 rounded-full font-sans font-semibold text-sm transition-all duration-300 flex items-center gap-2 shadow-md ${
-                  !selectedOption ? 'opacity-40 cursor-not-allowed shadow-none' : ''
-                }`}
-              >
-                {currentQuestionIndex === SOULMAP_QUESTIONS.length - 1 ? 'Khám phá kết quả' : 'Câu tiếp theo'}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+                    {opt.key}
+                  </span>
+                  <p className="font-sans text-sm font-medium leading-relaxed text-[#263D36]">
+                    {opt.text}
+                  </p>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Bottom Tip Card */}
-          <div className="flex gap-4 items-start p-5 bg-[#B68A2F]/5 border border-[#B68A2F]/10 rounded-2xl text-left shadow-sm">
-            <Sparkles className="w-6 h-6 text-[#B68A2F] flex-shrink-0 mt-0.5" />
-            <div>
-              <span className="font-sans font-bold text-xs text-[#214D3B] uppercase tracking-wider block mb-1">Mẹo nhỏ từ SoulMap</span>
-              <p className="body-text-sm text-[#636A64] italic">
-                &quot;Đừng quá suy nghĩ về việc câu trả lời nào là &apos;đúng&apos;. Hãy chọn phương án đầu tiên hiện ra trong tâm trí bạn - đó chính là tiếng nói chân thực nhất của thế giới nội tại.&quot;
-              </p>
-            </div>
+          <div className="mx-auto mt-7 flex w-full max-w-[560px] items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={handlePrevQuestion}
+              disabled={currentQuestionIndex === 0}
+              className={`relative flex min-w-[160px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#24533E] px-5 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] transition-all duration-300 hover:bg-[#214D3B] active:scale-95 sm:min-w-[190px] ${
+                currentQuestionIndex === 0 ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
+              }`}
+            >
+              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
+              <ArrowLeft className="h-4 w-4" />
+              Quay lại câu trước
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNextQuestion}
+              disabled={!selectedOption}
+              className={`relative flex min-w-[160px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#24533E] px-5 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] transition-all duration-300 hover:bg-[#214D3B] active:scale-95 sm:min-w-[190px] ${
+                !selectedOption ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
+              }`}
+            >
+              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
+              {currentQuestionIndex === SOULMAP_QUESTIONS.length - 1 ? 'Khám phá kết quả' : 'Câu tiếp theo'}
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
-        </div>
-
-        {/* Right Column: Dynamic Visual & Badges */}
-        <div className="lg:col-span-5 flex flex-col gap-6 w-full lg:sticky lg:top-28 lg:self-start">
-          {/* Illustration Block with floating Linh Nhi mascot */}
-          <div className="relative w-full aspect-[5/4] max-h-[360px] rounded-[2rem] overflow-hidden shadow-xl border border-[#214D3B]/10">
-            {/* Scenic Background image representing the mystical forest */}
-            <img 
-              alt="Mystical journey atmosphere" 
-              className="absolute inset-0 w-full h-full object-cover grayscale-[0.1] brightness-[0.88] hover:grayscale-0 transition-all duration-1000" 
-              src="/journey/journey-scenery.png"
-            />
-
-            {/* Linh Nhi mascot + speech bubble */}
-            <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col items-end gap-3 z-20">
-              <div className="glass-card p-3.5 rounded-2xl rounded-br-none shadow-xl border border-[#B68A2F]/20 max-w-[220px] text-left">
-                <p className="body-text-xs text-[#214D3B] leading-relaxed">
-                  {getLinhNhiDialogue()} 🌿
-                </p>
-              </div>
-              <div className="relative w-24 sm:w-28 max-w-[120px] mascot-glow animate-float pointer-events-none">
-                <img 
-                  alt="Linh Nhi Mascot" 
-                  className="w-full h-auto drop-shadow-[0_20px_36px_rgba(33,77,59,0.35)]" 
-                  src="/linh-nhi-mascot.png"
-                />
-              </div>
-            </div>
-
-            {/* Dark Forest Gradient Overlay */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#214D3B]/50 via-[#214D3B]/10 to-transparent z-10"></div>
-          </div>
-
-          {/* Trust/Advantage Badges Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="glass-card p-4 rounded-2xl flex flex-col items-center text-center group hover:border-[#214D3B]/25 transition-all shadow-sm">
-              <span className="material-symbols-outlined text-[#214D3B] text-2xl mb-1.5 group-hover:scale-110 transition-transform font-bold">science</span>
-              <h4 className="font-display font-semibold text-[#214D3B] text-sm">Khoa học</h4>
-              <p className="text-[10px] text-[#636A64]/80 mt-0.5 font-sans">Dựa trên mô hình MBTI danh tiếng</p>
-            </div>
-
-            <div className="glass-card p-4 rounded-2xl flex flex-col items-center text-center group hover:border-[#214D3B]/25 transition-all shadow-sm">
-              <span className="material-symbols-outlined text-[#214D3B] text-2xl mb-1.5 group-hover:scale-110 transition-transform font-bold">lock</span>
-              <h4 className="font-display font-semibold text-[#214D3B] text-sm">Bảo mật</h4>
-              <p className="text-[10px] text-[#636A64]/80 mt-0.5 font-sans">Dữ liệu cá nhân ẩn danh 100%</p>
-            </div>
-
-            <div className="glass-card p-4 rounded-2xl flex flex-col items-center text-center group hover:border-[#214D3B]/25 transition-all shadow-sm">
-              <span className="material-symbols-outlined text-[#214D3B] text-2xl mb-1.5 group-hover:scale-110 transition-transform font-bold">psychology</span>
-              <h4 className="font-display font-semibold text-[#214D3B] text-sm">Thấu hiểu</h4>
-              <p className="text-[10px] text-[#636A64]/80 mt-0.5 font-sans">Phân tích sâu sắc về tâm lý học</p>
-            </div>
-
-            <div className="glass-card p-4 rounded-2xl flex flex-col items-center text-center group hover:border-[#214D3B]/25 transition-all shadow-sm">
-              <span className="material-symbols-outlined text-[#214D3B] text-2xl mb-1.5 group-hover:scale-110 transition-transform font-bold">moving</span>
-              <h4 className="font-display font-semibold text-[#214D3B] text-sm">Phát triển</h4>
-              <p className="text-[10px] text-[#636A64]/80 mt-0.5 font-sans">Lời khuyên nâng tầm chất lượng sống</p>
-            </div>
-          </div>
-        </div>
+        </section>
       </main>
-
-      {/* Footer space */}
-      <footer className="w-full py-12 mt-auto bg-[#214D3B] text-white">
-        <div className="flex flex-col md:flex-row justify-between items-center px-6 gap-4 max-w-[1200px] mx-auto text-xs text-white/70 font-sans">
-          <div className="font-display text-xl text-white font-semibold">SoulMap</div>
-          <div>© 2026 SoulMap. Embark on your mystical journey.</div>
-          <div className="flex gap-6">
-            <a className="hover:text-white hover:underline transition-all" href="#">Privacy Policy</a>
-            <a className="hover:text-white hover:underline transition-all" href="#">Terms of Service</a>
-            <a className="hover:text-white hover:underline transition-all" href="#">Contact</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

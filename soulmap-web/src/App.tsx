@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { SOULMAP_QUESTIONS, calculateProfile, PersonalityProfile } from './types';
+import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, calculateProfile, PersonalityProfile } from './types';
 
 // Import modular subcomponents
 import Navbar from './components/Navbar';
 import LandingScreen from './components/LandingScreen';
 import AuthScreen from './components/AuthScreen';
+import MbtiStartScreen from './components/MbtiStartScreen';
 import AssessmentScreen from './components/AssessmentScreen';
 import ResultScreen from './components/ResultScreen';
 
 export default function App() {
-  // Screens: 'landing' | 'assessment' | 'result' | 'auth'
-  const [currentScreen, setCurrentScreen] = useState<'landing' | 'assessment' | 'result' | 'auth'>('landing');
+  type Screen = 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth';
+  const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [transitionDirection, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
 
   // User Authentication State
@@ -31,6 +32,28 @@ export default function App() {
           setCurrentUser(JSON.parse(u));
         } catch (e) {
           console.error('Failed to parse user from localStorage:', e);
+        }
+      }
+
+      const savedProgress = localStorage.getItem('soulmap_mbti_progress');
+      if (savedProgress) {
+        try {
+          const parsed = JSON.parse(savedProgress) as {
+            currentQuestionIndex?: number;
+            answers?: Record<number, 'A' | 'B'>;
+          };
+          if (typeof parsed.currentQuestionIndex === 'number') {
+            setCurrentQuestionIndex(parsed.currentQuestionIndex);
+          }
+          if (parsed.answers) {
+            setAnswers(parsed.answers);
+            const qId = SOULMAP_QUESTIONS[parsed.currentQuestionIndex ?? 0]?.id;
+            if (qId && parsed.answers[qId]) {
+              setSelectedOption(parsed.answers[qId]);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to parse MBTI progress from localStorage:', e);
         }
       }
     }
@@ -145,8 +168,9 @@ export default function App() {
   
   // Birth Information State
   const [birthDate, setBirthDate] = useState<string>('1998-08-15');
+  const [birthCalendar, setBirthCalendar] = useState<'solar' | 'lunar'>('solar');
   const [birthTime, setBirthTime] = useState<string>('08:30');
-  const [gender, setGender] = useState<'Nam' | 'Nữ' | 'Khác'>('Nữ');
+  const [gender, setGender] = useState<'Nam' | 'Nữ'>('Nữ');
 
   // Generation Animation Progress
   const [generationProgress, setGenerationProgress] = useState<number>(0);
@@ -182,9 +206,45 @@ export default function App() {
     setCurrentScreen('assessment');
   };
 
+  const navigateToTestIntro = (direction: 'push' | 'none' = 'push') => {
+    setTransitionDirection(direction);
+    setCurrentScreen('test_intro');
+  };
+
   const navigateToLanding = (direction: 'push_back' | 'none' = 'push_back') => {
     setTransitionDirection(direction);
     setCurrentScreen('landing');
+  };
+
+  const buildAnswersFromMbtiType = (mbtiType: string): Record<number, 'A' | 'B'> => {
+    const letters = new Set(mbtiType.split(''));
+    return SOULMAP_QUESTIONS.reduce<Record<number, 'A' | 'B'>>((acc, question) => {
+      const preferred = question.options.find((option) => letters.has(option.mbtiValue));
+      acc[question.id] = preferred?.key || 'A';
+      return acc;
+    }, {});
+  };
+
+  const handleManualMbtiSubmit = (mbtiType: string) => {
+    const normalizedType = mbtiType.trim().toUpperCase();
+    const computedProfile = PERSONALITY_PROFILES[normalizedType] || PERSONALITY_PROFILES.DEFAULT;
+    const inferredAnswers = buildAnswersFromMbtiType(computedProfile.type);
+
+    setTransitionDirection('push');
+    setAnswers(inferredAnswers);
+    setSelectedOption(null);
+    setCurrentQuestionIndex(0);
+    setProfile(computedProfile);
+    setChatHistory([
+      {
+        sender: 'assistant',
+        text: `Linh Nhi đã ghi nhận kết quả MBTI ${computedProfile.type} của bạn. Bước tiếp theo là bổ sung thông tin ngày sinh để mở khóa SoulMap hoàn chỉnh nhé. ✨`,
+      },
+    ]);
+    setResultStep('mbti_summary');
+    setGenerationProgress(0);
+    setZoomMap(false);
+    setCurrentScreen('result');
   };
 
   const handleSelectOption = (option: 'A' | 'B') => {
@@ -232,9 +292,17 @@ export default function App() {
     }
   };
 
+  const handleSaveProgress = () => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(
+      'soulmap_mbti_progress',
+      JSON.stringify({ currentQuestionIndex, answers }),
+    );
+  };
+
   // Dynamically get support message from Linh Nhi based on progress
   const getLinhNhiDialogue = () => {
-    if (currentQuestionIndex === 0) return "Chào bạn lữ hành! Hãy chọn phương án đầu tiên trực giác mách bảo bạn nhé. Linh Nhi sẽ đồng hành cùng bạn! 🌿";
+    if (currentQuestionIndex === 0) return 'Đừng suy nghĩ quá lâu nhé! Câu trả lời đầu tiên thường phản ánh bạn thật nhất.';
     if (currentQuestionIndex === 2) return "Tính cách của bạn đang dần hiển lộ trên bản đồ rồi. Thật kỳ diệu! ✨";
     if (currentQuestionIndex === 5) return "Đã đi được nửa chặng đường rồi! Hãy hít thở thật sâu và tiếp tục lắng nghe nội tâm của mình nhé.";
     if (currentQuestionIndex === 8) return "Chỉ còn vài câu hỏi nữa thôi, Linh Nhi đang chuẩn bị dệt nên bức tranh tâm hồn độc bản dành riêng cho bạn!";
@@ -282,16 +350,17 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#fbf9f5] flex flex-col selection:bg-[#214D3B]/20 selection:text-[#214D3B] transition-all duration-500 overflow-x-hidden ${getScreenTransitionClass()}`}>
+    <div className={`min-h-screen bg-[#fbf9f5] flex flex-col transition-all duration-500 overflow-x-hidden ${getScreenTransitionClass()}`}>
       
       {/* Top Navigation Bar (Shared across all pages except custom headers) */}
-      {currentScreen !== 'assessment' && currentScreen !== 'auth' && currentScreen !== 'result' && (
+      {currentScreen !== 'auth' && currentScreen !== 'result' && (
         <Navbar 
           isLoggedIn={isLoggedIn}
           currentUser={currentUser}
           handleLogout={handleLogout}
           navigateToLanding={navigateToLanding}
           navigateToAssessment={navigateToAssessment}
+          navigateToTestIntro={navigateToTestIntro}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -304,6 +373,14 @@ export default function App() {
           setTransitionDirection={setTransitionDirection}
           setCurrentScreen={setCurrentScreen}
           navigateToAssessment={navigateToAssessment}
+          navigateToTestIntro={navigateToTestIntro}
+        />
+      )}
+
+      {currentScreen === 'test_intro' && (
+        <MbtiStartScreen
+          navigateToAssessment={navigateToAssessment}
+          handleManualMbtiSubmit={handleManualMbtiSubmit}
         />
       )}
 
@@ -347,18 +424,21 @@ export default function App() {
           handleSelectOption={handleSelectOption}
           handlePrevQuestion={handlePrevQuestion}
           handleNextQuestion={handleNextQuestion}
-          navigateToLanding={navigateToLanding}
           getLinhNhiDialogue={getLinhNhiDialogue}
+          onSaveProgress={handleSaveProgress}
         />
       )}
 
       {currentScreen === 'result' && profile && (
         <ResultScreen 
           profile={profile}
+          answers={answers}
           resultStep={resultStep}
           setResultStep={setResultStep}
           birthDate={birthDate}
           setBirthDate={setBirthDate}
+          birthCalendar={birthCalendar}
+          setBirthCalendar={setBirthCalendar}
           birthTime={birthTime}
           setBirthTime={setBirthTime}
           gender={gender}
@@ -371,6 +451,11 @@ export default function App() {
           setChatInput={setChatInput}
           chatHistory={chatHistory}
           isTyping={isTyping}
+          isLoggedIn={isLoggedIn}
+          currentUser={currentUser}
+          handleLogout={handleLogout}
+          setCurrentScreen={setCurrentScreen}
+          setTransitionDirection={setTransitionDirection}
           navigateToAssessment={navigateToAssessment}
           navigateToLanding={navigateToLanding}
           handleSendMessage={handleSendMessage}

@@ -1,4 +1,4 @@
-import React from 'react';
+import { APP_ASSETS } from '../assets';
 
 /**
  * Assembled SoulMap island — ported from soulmap-compass-test.
@@ -38,7 +38,7 @@ interface SoulmapIslandProps {
 
 export default function SoulmapIsland({
   className = '',
-  basePath = '/soulmap-canvas',
+  basePath = APP_ASSETS.soulmapCanvas.basePath,
   interactive = true,
 }: SoulmapIslandProps) {
   const mapFilter = 'saturate(1.22) contrast(1.07) brightness(1.04)';

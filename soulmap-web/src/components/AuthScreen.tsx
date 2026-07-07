@@ -34,7 +34,7 @@ interface AuthScreenProps {
   setAgreeTerms: (agree: boolean) => void;
   handleAuthSubmit: (e: React.FormEvent) => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
-  setCurrentScreen: (screen: 'landing' | 'assessment' | 'result' | 'auth') => void;
+  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth') => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   setCurrentUser: (user: { name: string; email: string } | null) => void;

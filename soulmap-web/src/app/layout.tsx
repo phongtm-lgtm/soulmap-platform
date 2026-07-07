@@ -1,10 +1,6 @@
 import React from 'react';
 import '../index.css';
 
-export const metadata = {
-  title: 'SoulMap - Bản Đồ Nội Tâm & Thấu Hiểu Bản Thân',
-  description: 'Bản đồ nội tâm - Trải nghiệm khám phá bản thân cao cấp kết hợp MBTI, Tử Vi và Trí tuệ Nhân tạo.',
-};
 
 export default function RootLayout({
   children,

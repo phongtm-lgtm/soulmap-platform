@@ -1,0 +1,25 @@
+/* SVG trail + map node ring glow — khó làm thuần Tailwind */
+.journeys-map-trail path.journeys-map-trail__line {
+  fill: none;
+  stroke: #b68a2f;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1 12;
+  opacity: 0.55;
+  vector-effect: non-scaling-stroke;
+}
+
+.journeys-map-trail path.journeys-map-trail__glow {
+  fill: none;
+  stroke: rgba(182, 138, 47, 0.22);
+  stroke-width: 8;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.journeys-map-node.is-active .journeys-map-node__ring {
+  box-shadow:
+    0 0 0 6px rgba(255, 252, 248, 0.72),
+    0 0 0 10px rgba(182, 138, 47, 0.18),
+    0 18px 36px -14px rgba(33, 77, 59, 0.42);
+}

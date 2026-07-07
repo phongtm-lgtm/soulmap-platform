@@ -1,5 +1,6 @@
 export interface Question {
   id: number;
+  section?: string;
   questionText: string;
   options: {
     key: 'A' | 'B';
@@ -292,6 +293,38 @@ export const PERSONALITY_PROFILES: Record<string, PersonalityProfile> = {
     ]
   }
 };
+
+export interface MbtiScores {
+  introversion: number;
+  intuition: number;
+  feeling: number;
+  judging: number;
+}
+
+export function calculateMbtiScores(answers: Record<number, 'A' | 'B'>): MbtiScores {
+  const counts = { I: 0, E: 0, N: 0, S: 0, F: 0, T: 0, J: 0, P: 0 };
+
+  Object.entries(answers).forEach(([qIdStr, ans]) => {
+    const question = SOULMAP_QUESTIONS.find((q) => q.id === parseInt(qIdStr));
+    const option = question?.options.find((o) => o.key === ans);
+    if (!option) return;
+    const val = option.mbtiValue as keyof typeof counts;
+    if (val in counts) counts[val]++;
+  });
+
+  const pct = (dominant: number, recessive: number) => {
+    const total = dominant + recessive;
+    if (total === 0) return 50;
+    return Math.round((dominant / total) * 100);
+  };
+
+  return {
+    introversion: pct(counts.I, counts.E),
+    intuition: pct(counts.N, counts.S),
+    feeling: pct(counts.F, counts.T),
+    judging: pct(counts.J, counts.P),
+  };
+}
 
 export function calculateProfile(answers: Record<number, 'A' | 'B'>): PersonalityProfile {
   // Simple heuristic based on answer selections

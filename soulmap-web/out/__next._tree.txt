@@ -1,0 +1,4 @@
+:HL["/_next/static/chunks/436c7thwk9k_6.css","style"]
+:HL["/_next/static/chunks/0w9oa-o3uo652.css","style"]
+:HL["https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@200;300;400;500;600;700;800&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Be+Vietnam+Pro:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}},"staleTime":300,"buildId":"6xeP99A5KHRyNuzxJK5Ds"}
