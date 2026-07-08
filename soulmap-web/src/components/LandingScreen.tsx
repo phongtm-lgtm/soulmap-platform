@@ -3,10 +3,13 @@ import {
   ArrowRight,
   ArrowUp,
   Briefcase,
+  Check,
   Compass,
+  Copy,
   Globe,
   Heart,
   Leaf,
+  MoreHorizontal,
   Send,
   ShieldCheck,
   Sparkles,
@@ -26,57 +29,49 @@ interface LandingScreenProps {
 
 const demoChat: { sender: 'user' | 'assistant'; text: string }[] = [
     {
-        sender: 'assistant',
-        text: 'Chào bạn, mình là Linh Nhi. Bản đồ nội tâm của bạn vừa hé lộ vài điều thú vị đấy. Bạn muốn mình bắt đầu từ đâu?',
-    },
-    {
         sender: 'user',
-        text: 'Dạo này mình khá phân vân về hướng đi sự nghiệp.',
+        text: 'Nếu người ta không còn yêu em thì sao?',
     },
     {
         sender: 'assistant',
-        text: 'Mình hiểu cảm giác đó. Với bản mệnh Mộc và năng lượng trực giác mạnh, bạn hợp với những vai trò sáng tạo và dẫn dắt. Mình cùng nhau nhìn kỹ hơn nhé?',
-    },
-    {
-        sender: 'user',
-        text: 'Nghe hay đấy, mình muốn nghe thêm.',
+        text: 'Đó là câu hỏi khiến rất nhiều người lo lắng.\n\nNhưng Linh Nhi muốn hỏi ngược lại một chút.\n\nNếu một người không còn yêu bạn...\nLiệu việc cố giữ họ lại có khiến bạn hạnh phúc hơn không?\n\nĐôi khi, điều đáng sợ không phải là chia tay.\nMà là ở trong một mối quan hệ mà mỗi ngày đều phải tự hỏi: “Mình có còn được yêu không?”',
     },
 ];
 
 const journeySteps = [
     {
         n: 1,
-        title: 'Chia sẻ thông tin',
-        desc: 'Bắt đầu bằng việc chia sẻ những nét tính cách cốt lõi và các xu hướng hành vi tự nhiên.',
-        tag: 'Tự nhiên & an toàn',
+        title: 'Khởi hành',
+        desc: 'Mọi hành trình đều bắt đầu từ một khoảnh khắc rất khẽ: khi bạn dừng lại và lắng nghe chính mình.',
+        tag: 'Hạt mầm đầu tiên',
         tagIcon: ShieldCheck,
     },
     {
         n: 2,
-        title: 'AI kiến tạo SoulMap',
-        desc: 'Hệ thống thông thái phân tích sâu, đúc kết mô hình MBTI tương sinh Ngũ hành của riêng bạn.',
-        tag: 'AI cá nhân hóa',
+        title: 'Mở bản đồ',
+        desc: 'Từ những mảnh ghép sâu kín, SoulMap dần vẽ nên bức tranh mang tên bạn.',
+        tag: 'Một bản đồ, một cuộc đời',
         tagIcon: Sparkles,
     },
     {
         n: 3,
-        title: 'Linh Nhi dẫn dắt',
-        desc: 'Mascot AI hóa thân làm người đồng hành, diễn giải chi tiết từng địa danh bản đồ nội tâm.',
-        tag: 'Thấu hiểu & đồng hành',
+        title: 'Khám phá',
+        desc: 'Từng vùng đất mở ra một câu trả lời, đưa bạn đến gần hơn với con người thật bên trong.',
+        tag: 'Đi để hiểu mình',
         tagIcon: Heart,
     },
     {
         n: 4,
-        title: 'Khám phá Journey',
-        desc: 'Thực hiện các bài viết tự sự (journaling), đối thoại cùng AI và hoàn thành thử thách phát triển ngày.',
-        tag: 'Trải nghiệm & chuyển hóa',
+        title: 'Đồng hành',
+        desc: 'Linh Nhi ở bên, lắng nghe những điều chưa gọi thành tên và soi sáng từng bước bạn đi.',
+        tag: 'Không bước một mình',
         tagIcon: Compass,
     },
     {
         n: 5,
-        title: 'Ghi nhớ & phát triển',
-        desc: 'Hệ thống tự động cập nhật bản đồ năng lượng khi bạn trưởng thành qua từng chặng đời.',
-        tag: 'Tiến bộ & bền vững',
+        title: 'Trưởng thành',
+        desc: 'Mỗi insight nhỏ sẽ hóa thành một dấu mốc, để bạn lớn lên dịu dàng qua từng ngày.',
+        tag: 'Bản đồ lớn lên cùng bạn',
         tagIcon: TrendingUp,
     },
 ];
@@ -85,7 +80,7 @@ const pillars = [
     {
         icon: User,
         title: 'Tôi là ai',
-        desc: 'Khám phá tâm hồn qua lăng kính MBTI hiện đại và lá số Tử Vi cổ điển để thấu suốt bản chất thực sự bên trong.',
+        desc: 'Lắng nghe phần sâu nhất trong bạn, nơi tính cách, cảm xúc và giá trị thật dần hiện rõ.',
         image: APP_ASSETS.pillars.self,
         decor: APP_ASSETS.pillars.decorLeaf,
         number: 1,
@@ -93,7 +88,7 @@ const pillars = [
     {
         icon: Briefcase,
         title: 'Sự nghiệp',
-        desc: 'Định vị nghề nghiệp tối ưu dựa trên tài năng thiên bẩm, ngũ hành bản mệnh và nhận diện các cơ hội phát triển ẩn mình.',
+        desc: 'Tìm ngọn núi dành cho mình, nơi thế mạnh của bạn có thể lớn lên và tỏa sáng.',
         image: APP_ASSETS.pillars.career,
         decor: APP_ASSETS.pillars.decorLeaf,
         number: 2,
@@ -101,7 +96,7 @@ const pillars = [
     {
         icon: Heart,
         title: 'Tình yêu',
-        desc: 'Thấu hiểu sâu sắc cách thức bạn liên kết, biểu đạt cảm xúc và tìm kiếm mảnh ghép tâm giao đồng điệu năng lượng.',
+        desc: 'Hiểu cách trái tim bạn kết nối, để yêu thương dịu dàng hơn và ít lạc nhịp hơn.',
         image: APP_ASSETS.pillars.love,
         decor: APP_ASSETS.pillars.decorBlossom,
         number: 3,
@@ -109,7 +104,7 @@ const pillars = [
     {
         icon: Globe,
         title: 'Cuộc đời',
-        desc: 'Nhìn nhận bức tranh toàn cảnh về những giai đoạn thăng trầm, sứ mệnh cuộc đời và các đại vận quan trọng của bản thân.',
+        desc: 'Nhìn dòng chảy cuộc đời, nhận ra những ngã rẽ quan trọng và bước tiếp vững vàng hơn.',
         image: APP_ASSETS.pillars.life,
         decor: APP_ASSETS.pillars.decorLeaf,
         number: 4,
@@ -164,22 +159,20 @@ export default function LandingScreen({
                 <div
                     className="relative z-20 max-w-[1600px] mx-auto px-6 md:px-12 lg:px-16 pt-28 pb-12 md:pt-36 md:pb-16">
                     <div
-                        className="grid grid-cols-1 lg:grid-cols-[3fr_5fr] items-center gap-12 lg:gap-6 overflow-visible">
+                        className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,5fr)] items-center gap-12 lg:gap-6 overflow-visible">
 
                         {/* LEFT — narrative (3) */}
                         <div
-                            className="w-full overflow-visible relative z-30 flex flex-col items-start gap-6 md:gap-7 text-left lg:pr-4">
+                            className="hero-copy w-full overflow-visible relative z-30 flex flex-col items-start text-left lg:pr-4">
                             {/* Big Display Title */}
-                            <h1 className="hero-title font-bold text-[34px] sm:text-[41px] md:text-[47px] relative z-30 max-w-none">
+                            <h1 className="hero-title font-bold relative z-30 max-w-none">
                                 Khám phá<br/>
                                 bản đồ nội tâm<br/>
-                                <span className="hero-title-line-last">
-                  được <span className="hero-highlight">tạo riêng</span> cho bạn.
-                </span>
+                                được <span className="hero-highlight">tạo riêng</span> cho bạn.
                             </h1>
 
                             {/* Description Paragraph */}
-                            <p className="body-lead max-w-full">
+                            <p className="body-lead">
                                 SoulMap kết hợp khoa học tính cách <span
                                 className="text-[#24533E] font-semibold">MBTI</span>, chiều sâu tinh tú của <span
                                 className="text-[#24533E] font-semibold">Tử Vi</span> cổ xưa, trợ lý thông thái <span
@@ -200,7 +193,7 @@ export default function LandingScreen({
                                             navigateToTestIntro('push');
                                         }
                                     }}
-                                    className="btn-primary px-8 py-3.5 rounded-full flex items-center justify-center gap-2.5 cursor-pointer"
+                                    className="btn-primary rounded-full flex items-center justify-center gap-2.5 cursor-pointer"
                                 >
                                     Bắt đầu hành trình
                                     <ArrowRight className="w-5 h-5"/>
@@ -387,7 +380,7 @@ export default function LandingScreen({
                     <div className="text-center landing-section-header">
                         <h2 className="font-display text-3xl md:text-[47px] leading-[1.05] tracking-[-1px] text-[#214D3B] font-semibold">Các
                             trụ cột hành trình</h2>
-                        <p className="body-text text-[#5E625F] mt-3 max-w-xl mx-auto">Bốn hành trình cốt lõi giúp bạn
+                        <p className="pillar-section-subtitle body-text text-[#5E625F] mt-3 max-w-xl mx-auto">Bốn hành trình cốt lõi giúp bạn
                             khám phá, thấu hiểu và phát triển toàn diện.</p>
                         <div className="w-16 h-0.5 bg-[#B68A2F]/40 mx-auto mt-4"></div>
                     </div>
@@ -405,7 +398,7 @@ export default function LandingScreen({
                                 <div className="pillar-icon">
                                     <Icon className="w-6 h-6" strokeWidth={1.75}/>
                                 </div>
-                                <h3 className="pillar-title">{title}</h3>
+                                <h5 className="pillar-title">{title}</h5>
                                 <p className="pillar-desc">{desc}</p>
                                 <div className="pillar-image-wrap">
                                     <img src={image} alt={title} className="pillar-image" draggable={false}/>
@@ -423,7 +416,7 @@ export default function LandingScreen({
                     <div className="text-center landing-section-header">
                         <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] tracking-[-1px] text-[#214D3B] font-semibold">Hành
                             trình cùng SoulMap</h2>
-                        <p className="body-text text-[#5E625F] mt-3">Từng bước khám phá thế giới nội tâm sâu thẳm của
+                        <p className="landing-section-subtitle body-text text-[#5E625F] mt-3">Từng bước khám phá thế giới nội tâm sâu thẳm của
                             bạn</p>
                         <div className="w-16 h-0.5 bg-[#B68A2F]/40 mx-auto mt-4"></div>
                     </div>
@@ -462,7 +455,7 @@ export default function LandingScreen({
                                             <span className="journey-node-num">{n}</span>
                                         </div>
                                     </div>
-                                    <h4 className="journey-step-title">{title}</h4>
+                                    <h5 className="journey-step-title">{title}</h5>
                                     <p className="journey-step-desc">{desc}</p>
                                     <span className="journey-chip">
                     <TagIcon className="w-3.5 h-3.5" strokeWidth={2}/>
@@ -478,121 +471,129 @@ export default function LandingScreen({
             {/* Chat Demo Section — trò chuyện cùng Linh Nhi */}
             <section id="chat-demo" className="landing-section bg-[#fbf9f5]/60 border-t border-[#214D3B]/5">
                 <div className="max-w-[1200px] mx-auto px-6 w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
-
-                        {/* LEFT — narrative */}
-                        <div className="text-center lg:text-left">
+                    <div className="text-center">
               <span
                   className="inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-[0.14em] text-[#B68A2F] mb-4">
                 <Sparkles className="w-4 h-4"/>
                 Linh Nhi
               </span>
-                            <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] tracking-[-1px] text-[#214D3B] font-semibold">
-                                Trò chuyện cùng người<br className="hidden md:block"/> bạn đồng hành thấu cảm
-                            </h2>
-                            <p className="body-text text-[#5E625F] mt-5 max-w-lg mx-auto lg:mx-0">
-                                Linh Nhi không chỉ đọc bản đồ nội tâm của bạn, mà còn lắng nghe, thấu hiểu và dẫn dắt
-                                bạn qua từng ngã rẽ của sự nghiệp, tình yêu và cuộc đời — bất cứ khi nào bạn cần.
-                            </p>
-                            <div className="w-16 h-0.5 bg-[#B68A2F]/40 mx-auto lg:mx-0 mt-6"></div>
+                        <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] tracking-[-1px] text-[#214D3B] font-semibold">
+                            Người bạn đồng hành trên SoulMap
+                        </h2>
+                        <p className="landing-section-subtitle body-text text-[#5E625F] mt-5 max-w-2xl mx-auto">
+                            Linh Nhi ở bên để lắng nghe, giải thích từng insight và cùng bạn đi qua những câu hỏi về bản thân, sự nghiệp, tình yêu và cuộc đời.
+                        </p>
+                    </div>
+
+                    {/* Simulated chat window */}
+                    <div
+                        className="glass-card mt-8 md:mt-10 rounded-3xl border border-[#214D3B]/8 shadow-lg flex flex-col overflow-hidden">
+
+                        {/* Chat Header */}
+                        <div
+                            className="px-6 py-4 bg-[#214D3B]/5 border-b border-[#214D3B]/10 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className="w-10 h-10 rounded-full border border-[#B68A2F]/40 bg-white overflow-hidden shadow-sm flex items-center justify-center p-0.5">
+                                    <img
+                                        src={APP_ASSETS.linhNhiMascot}
+                                        alt="Linh Nhi"
+                                        className="w-full h-full object-contain"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="font-display font-semibold text-sm text-[#214D3B]">Linh Nhi</h4>
+                                    <span
+                                        className="flex items-center gap-1 text-[9px] font-sans text-emerald-700 font-bold uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Đang hoạt động
+                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* RIGHT — simulated chat window */}
-                        <div
-                            className="glass-card rounded-3xl border border-[#214D3B]/8 shadow-lg flex flex-col overflow-hidden">
-
-                            {/* Chat Header */}
-                            <div
-                                className="px-6 py-4 bg-[#214D3B]/5 border-b border-[#214D3B]/10 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className="w-10 h-10 rounded-full border border-[#B68A2F]/40 bg-white overflow-hidden shadow-sm flex items-center justify-center p-0.5">
-                                        <img
-                                            src={APP_ASSETS.linhNhiMascot}
-                                            alt="Linh Nhi"
-                                            className="w-full h-full object-contain"
-                                            referrerPolicy="no-referrer"
-                                        />
-                                    </div>
-                                    <div className="text-left">
-                                        <h4 className="font-display font-semibold text-sm text-[#214D3B]">Linh Nhi</h4>
-                                        <span
-                                            className="flex items-center gap-1 text-[9px] font-sans text-emerald-700 font-bold uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Đang trực tuyến
-                    </span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            {/* Chat Messages Body */}
-                            <div className="p-6 flex flex-col gap-4 bg-white/20">
-                                {demoChat.map((msg, index) => (
-                                    <div
-                                        key={index}
-                                        className={`flex items-start gap-3 max-w-[85%] ${
-                                            msg.sender === 'user' ? 'self-end flex-row-reverse text-right' : 'self-start text-left'
-                                        }`}
-                                    >
+                        {/* Chat Messages Body */}
+                        <div className="p-6 flex flex-col gap-5 bg-white/20">
+                            {demoChat.map((msg, index) => (
+                                <div
+                                    key={index}
+                                    className={`chat-demo-message flex items-start gap-3 max-w-[82%] ${
+                                        msg.sender === 'user' ? 'self-end flex-row-reverse text-right' : 'self-start text-left'
+                                    }`}
+                                >
+                                    {msg.sender === 'assistant' && (
+                                        <div
+                                            className="w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
+                                            <img
+                                                src={APP_ASSETS.linhNhiMascot}
+                                                alt="Linh Nhi"
+                                                className="w-full h-full object-contain"
+                                                referrerPolicy="no-referrer"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className={`p-4 rounded-2xl shadow-sm body-text-sm ${
+                                        msg.sender === 'user'
+                                            ? 'chat-demo-user-bubble rounded-br-none'
+                                            : 'bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none'
+                                    }`}>
+                                        <p className="chat-demo-author">
+                                            {msg.sender === 'user' ? 'Người dùng' : 'Linh Nhi'}
+                                            {msg.sender === 'assistant' && <Leaf className="inline-block w-3 h-3 ml-1 text-[#68A55C]"/>}
+                                        </p>
+                                        <p className="chat-demo-text whitespace-pre-line">{msg.text}</p>
+                                        <div className="chat-demo-meta">
+                                            <span>10:32</span>
+                                            {msg.sender === 'user' && <Check className="w-3.5 h-3.5"/>}
+                                        </div>
                                         {msg.sender === 'assistant' && (
-                                            <div
-                                                className="w-8 h-8 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                                                <img
-                                                    src={APP_ASSETS.linhNhiMascot}
-                                                    alt="Linh Nhi"
-                                                    className="w-full h-full object-contain"
-                                                    referrerPolicy="no-referrer"
-                                                />
+                                            <div className="chat-demo-actions" aria-hidden="true">
+                                                <Heart className="w-4 h-4"/>
+                                                <Copy className="w-4 h-4"/>
+                                                <MoreHorizontal className="w-4 h-4"/>
                                             </div>
                                         )}
-                                        <div className={`p-4 rounded-2xl shadow-sm body-text-sm ${
-                                            msg.sender === 'user'
-                                                ? 'bg-[#214D3B] text-white rounded-br-none'
-                                                : 'bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none'
-                                        }`}>
-                                            {msg.text}
-                                        </div>
                                     </div>
-                                ))}
+                                </div>
+                            ))}
 
-                                {/* Typing indicator */}
-                                <div className="flex items-start gap-3 self-start text-left max-w-[85%]">
-                                    <div
-                                        className="w-8 h-8 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                                        <img
-                                            src={APP_ASSETS.linhNhiMascot}
-                                            alt="Linh Nhi"
-                                            className="w-full h-full object-contain"
-                                            referrerPolicy="no-referrer"
-                                        />
-                                    </div>
-                                    <div
-                                        className="p-4 rounded-2xl bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                              style={{animationDelay: '0ms'}}></span>
-                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                              style={{animationDelay: '150ms'}}></span>
-                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                              style={{animationDelay: '300ms'}}></span>
-                                    </div>
+                            {/* Typing indicator */}
+                            <div className="flex items-start gap-3 self-start text-left max-w-[82%]">
+                                <div
+                                    className="w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
+                                    <img
+                                        src={APP_ASSETS.linhNhiMascot}
+                                        alt="Linh Nhi"
+                                        className="w-full h-full object-contain"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                </div>
+                                <div
+                                    className="p-4 rounded-2xl bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
+                                          style={{animationDelay: '0ms'}}></span>
+                                    <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
+                                          style={{animationDelay: '150ms'}}></span>
+                                    <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
+                                          style={{animationDelay: '300ms'}}></span>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Chat Input Footer (decorative) */}
-                            <div className="p-4 bg-white border-t border-[#214D3B]/10 flex gap-3 items-center">
-                                <div
-                                    className="flex-grow bg-[#fbf9f5] border border-[#214D3B]/10 rounded-full px-5 py-3 text-sm font-sans text-[#636A64]/70 select-none">
-                                    Hỏi Linh Nhi bất kỳ điều gì về bản đồ của bạn...
-                                </div>
-                                <span
-                                    className="w-12 h-12 rounded-full bg-[#214D3B] text-white flex items-center justify-center shadow-md flex-shrink-0">
+                        {/* Chat Input Footer (decorative) */}
+                        <div className="p-4 bg-white border-t border-[#214D3B]/10 flex gap-3 items-center">
+                            <div
+                                className="flex-grow bg-[#fbf9f5] border border-[#214D3B]/10 rounded-full px-5 py-3 text-sm font-sans text-[#636A64]/70 select-none">
+                                Hỏi Linh Nhi bất kỳ điều gì về bản đồ của bạn...
+                            </div>
+                            <span
+                                className="w-12 h-12 rounded-full bg-[#214D3B] text-white flex items-center justify-center shadow-md flex-shrink-0">
                   <Send className="w-5 h-5"/>
                 </span>
-                            </div>
-
                         </div>
                     </div>
+
                 </div>
             </section>
 

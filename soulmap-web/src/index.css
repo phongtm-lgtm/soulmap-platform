@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Manrope", "Be Vietnam Pro", "Inter", sans-serif;
-  --font-serif: "Cormorant Garamond", "Noto Serif", "Georgia", serif;
-  --font-display: "Cormorant Garamond", "EB Garamond", serif;
-  --font-reading: "Noto Serif", "Georgia", serif;
+  --font-sans: "Instrument Sans", sans-serif;
+  --font-serif: "Instrument Sans", sans-serif;
+  --font-display: "Instrument Sans", sans-serif;
+  --font-reading: "Instrument Sans", sans-serif;
 
   --color-primary: #24533E;
   --color-forest: #35684D;
@@ -15,6 +15,9 @@
   --color-card-bg: #FFFDF8;
   --color-border-custom: #E8DFCF;
   --color-bg-base: #F8F4EB;
+  --heading-weight: 500;
+  --heading-tracking: -0.6px;
+  --heading-line-height: 1.06;
   
   --animate-float: float 6s ease-in-out infinite;
   --animate-float-slow: floatSlow 9s ease-in-out infinite;
@@ -56,9 +59,14 @@ html {
 
 body {
   background-color: #F8F4EB;
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   color: #5E625F;
   -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
 }
 
 ::selection {
@@ -100,7 +108,7 @@ a,
 }
 
 h1, h2, h3, .font-display {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
+  font-family: "Instrument Sans", sans-serif;
   color: #214D3B;
 }
 
@@ -126,9 +134,42 @@ h1, h2, h3, .font-display {
 .landing-section-header {
   margin-bottom: 2.5rem;
 }
+
+.landing-section-header h2 {
+  font-size: 38px;
+  font-weight: var(--heading-weight);
+  line-height: var(--heading-line-height);
+  letter-spacing: var(--heading-tracking);
+}
+
+.landing-section-header .body-text {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.landing-section h2.font-display {
+  font-size: 38px;
+  font-weight: var(--heading-weight);
+  line-height: var(--heading-line-height);
+  letter-spacing: var(--heading-tracking);
+}
+
 @media (min-width: 768px) {
   .landing-section-header {
     margin-bottom: 3rem;
+  }
+
+  .landing-section-header h2 {
+    font-size: 42px;
+  }
+
+  .landing-section-header .body-text {
+    font-size: 22px;
+  }
+
+  .landing-section h2.font-display {
+    font-size: 42px;
   }
 }
 
@@ -175,18 +216,36 @@ h1, h2, h3, .font-display {
    ========================================================================== */
 
 /* --- Hero typography --- */
+.hero-copy {
+  gap: 1.85rem;
+}
+
+@media (min-width: 1024px) {
+  .hero-copy {
+    padding-left: 0.35rem;
+    transform: translateY(0.35rem);
+  }
+}
+
 .hero-title {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
-  font-weight: 700;
-  line-height: 1.0;
-  letter-spacing: -1.2px;
+  font-family: "Instrument Sans", sans-serif;
+  font-weight: var(--heading-weight);
+  font-size: 40px;
+  line-height: var(--heading-line-height);
+  letter-spacing: var(--heading-tracking);
   color: #2D5E46;
 }
 @media (min-width: 1024px) {
-  .hero-title { font-size: 54px; line-height: 0.98; letter-spacing: -1.35px; }
+  .hero-title { font-size: 46px; }
 }
 @media (min-width: 1280px) {
-  .hero-title { font-size: 58px; letter-spacing: -1.45px; }
+  .hero-title { font-size: 50px; }
+}
+@media (min-width: 1440px) {
+  .hero-title { font-size: 54px; }
+}
+@media (min-width: 1536px) {
+  .hero-title { font-size: 58px; }
 }
 
 /* Last hero line — one row on desktop, may overlap map column */
@@ -202,20 +261,20 @@ h1, h2, h3, .font-display {
 }
 
 .hero-highlight {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
+  font-family: "Instrument Sans", sans-serif;
   font-style: italic;
-  font-weight: 600;
+  font-weight: var(--heading-weight);
   color: #B68A2F;
   position: relative;
   white-space: nowrap;
-  font-size: 1.12em;
+  font-size: 1em;
 }
 .hero-highlight::after {
   content: "";
   position: absolute;
   left: 2%;
   right: 2%;
-  bottom: 0.02em;
+  bottom: -0.24em;
   height: 0.5em;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M2 14 C 40 4, 80 4, 120 10 S 180 16, 198 8' stroke='%23B68A2F' stroke-width='2.4' fill='none' stroke-linecap='round' opacity='0.6'/%3E%3C/svg%3E") no-repeat center bottom;
   background-size: 100% 100%;
@@ -223,39 +282,44 @@ h1, h2, h3, .font-display {
 }
 
 .body-lead {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 18px;
-  line-height: 1.8;
-  letter-spacing: 0.01em;
+  font-family: "Instrument Sans", sans-serif;
+  max-width: 42rem;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: -0.01em;
   color: #5E625F;
 }
 @media (min-width: 768px) {
   .body-lead {
     font-size: 19px;
-    line-height: 1.82;
+    line-height: 1.7;
   }
 }
 
-/* --- Reading body type scale (Noto Serif) --- */
+/* --- Reading body type scale --- */
 .body-text {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 16px;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
   line-height: 1.7;
 }
 .body-text-sm {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 14px;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.7;
 }
 .body-text-xs {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 13px;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.6;
 }
 
 /* --- Navbar brand --- */
 .brand-slogan {
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -269,9 +333,10 @@ h1, h2, h3, .font-display {
 
 /* --- Premium buttons --- */
 .btn-primary {
-  font-family: "Manrope", sans-serif;
-  font-size: 16px;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 18px;
   font-weight: 600;
+  padding: 18px 32px;
   letter-spacing: -0.2px;
   color: #FFFDF8;
   background: linear-gradient(180deg, #2C6249 0%, #24533E 55%, #1D4433 100%);
@@ -285,7 +350,7 @@ h1, h2, h3, .font-display {
 .btn-primary:active { transform: translateY(-1px) scale(0.99); }
 
 .btn-secondary {
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.2px;
@@ -294,6 +359,12 @@ h1, h2, h3, .font-display {
   border: 1px solid #E8DFCF;
   box-shadow: 0 6px 18px -10px rgba(33, 77, 59, 0.15);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+}
+
+.nav-menu-item {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 500;
 }
 .btn-secondary:hover {
   transform: translateY(-3px);
@@ -394,7 +465,7 @@ h1, h2, h3, .font-display {
   backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: 0 10px 24px -10px rgba(33, 77, 59, 0.28), 0 2px 6px rgba(33, 77, 59, 0.08);
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: #214D3B;
@@ -509,7 +580,7 @@ h1, h2, h3, .font-display {
   box-shadow: 0 18px 34px -14px rgba(33, 77, 59, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 .journey-tag .eyebrow {
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 7.2px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -518,7 +589,7 @@ h1, h2, h3, .font-display {
   line-height: 1;
 }
 .journey-tag .title {
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 10.8px;
   font-weight: 700;
   color: #1D4433;
@@ -538,7 +609,7 @@ h1, h2, h3, .font-display {
   box-shadow: 0 10px 30px -10px rgba(182, 138, 47, 0.55);
 }
 .core-tag .core-title {
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 10.8px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -546,7 +617,7 @@ h1, h2, h3, .font-display {
   line-height: 1.1;
 }
 .core-tag .core-sub {
-  font-family: "Manrope", sans-serif;
+  font-family: "Instrument Sans", sans-serif;
   font-size: 8px;
   font-weight: 500;
   color: rgba(251, 239, 201, 0.8);
@@ -575,6 +646,48 @@ h1, h2, h3, .font-display {
   border-bottom: 1px solid rgba(182, 138, 47, 0.22);
   border-bottom-right-radius: 5px;
   transform: rotate(45deg);
+}
+
+.chat-demo-user-bubble {
+  min-width: min(26rem, 100%);
+  color: #214d3b;
+  background: rgba(248, 249, 242, 0.92);
+  border: 1px solid rgba(33, 77, 59, 0.06);
+}
+
+.chat-demo-message .body-text-sm {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.chat-demo-author {
+  margin: 0 0 0.45rem;
+  font-size: 12px;
+  font-weight: 700;
+  color: #214d3b;
+}
+
+.chat-demo-text {
+  margin: 0;
+  color: inherit;
+}
+
+.chat-demo-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.85rem;
+  font-size: 11px;
+  color: rgba(94, 98, 95, 0.78);
+}
+
+.chat-demo-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.9rem;
+  color: rgba(33, 77, 59, 0.62);
 }
 
 /* --- Mascot glow --- */
@@ -1053,20 +1166,34 @@ h1, h2, h3, .font-display {
 }
 
 .pillar-title {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
+  font-family: "Instrument Sans", sans-serif;
   font-weight: 600;
-  font-size: 1.76rem;
+  font-size: 28px;
+  line-height: 1.15;
   color: #214d3b;
   margin-bottom: 0.55rem;
 }
 
 .pillar-desc {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 0.9rem;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
   line-height: 1.7;
   color: #5e625f;
   max-width: 15rem;
   margin: 0 auto 1.5rem;
+}
+
+.landing-section-header .pillar-section-subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+.landing-section .landing-section-subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.7;
 }
 
 /* arched landscape illustration */
@@ -1172,6 +1299,7 @@ h1, h2, h3, .font-display {
 .journey-node-wrap {
   height: 120px;
   display: flex;
+  align-items: center;
   justify-content: center;
   width: 100%;
 }
@@ -1193,16 +1321,12 @@ h1, h2, h3, .font-display {
     background 340ms ease, color 340ms ease;
 }
 
-.journey-step:nth-child(1) .journey-node-wrap { padding-top: 6px; }
-.journey-step:nth-child(2) .journey-node-wrap { padding-top: 35px; }
-.journey-step:nth-child(3) .journey-node-wrap { padding-top: 0; }
-.journey-step:nth-child(4) .journey-node-wrap { padding-top: 35px; }
-.journey-step:nth-child(5) .journey-node-wrap { padding-top: 6px; }
+.journey-step:nth-child(n) .journey-node-wrap { padding-top: 0; }
 
 .journey-node-num {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
-  font-weight: 600;
-  font-size: 1.9rem;
+  font-family: "Instrument Sans", sans-serif;
+  font-weight: 700;
+  font-size: 32px;
   line-height: 1;
   color: #214d3b;
   transition: color 340ms ease;
@@ -1233,21 +1357,23 @@ h1, h2, h3, .font-display {
 }
 
 .journey-step-title {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
+  font-family: "Instrument Sans", sans-serif;
   font-weight: 600;
-  font-size: 1.28rem;
+  font-size: 28px;
+  line-height: 1.16;
   color: #214d3b;
-  margin-top: 0.35rem;
+  margin-top: 1.1rem;
   margin-bottom: 0.5rem;
 }
 
 .journey-step-desc {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 0.8rem;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
   line-height: 1.7;
   color: #5e625f;
   max-width: 15rem;
-  min-height: 4.8rem;
+  min-height: calc(15px * 1.7 * 4);
   margin: 0 auto 0.75rem;
 }
 
@@ -1255,9 +1381,9 @@ h1, h2, h3, .font-display {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: "Manrope", sans-serif;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
   color: #35684d;
   padding: 0.38rem 0.9rem;
   border-radius: 999px;
@@ -1282,15 +1408,15 @@ h1, h2, h3, .font-display {
 }
 
 .journey-decor--start {
-  width: 118px;
-  left: -5%;
-  top: 55px;
+  width: 154px;
+  left: -8%;
+  top: 42px;
 }
 
 .journey-decor--goal {
-  width: 132px;
-  right: -8%;
-  top: 10px;
+  width: 172px;
+  right: -9%;
+  top: -4px;
 }
 
 .journey-decor--mascot {
@@ -1336,16 +1462,17 @@ h1, h2, h3, .font-display {
 }
 
 .journey-banner-lead {
-  font-family: "Cormorant Garamond", "EB Garamond", serif;
+  font-family: "Instrument Sans", sans-serif;
   font-weight: 600;
-  font-size: 1.35rem;
+  font-size: 28px;
   color: #214d3b;
   line-height: 1.3;
 }
 
 .journey-banner-sub {
-  font-family: "Noto Serif", "Georgia", serif;
-  font-size: 0.85rem;
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
   color: #5e625f;
   margin-top: 0.15rem;
 }

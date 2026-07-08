@@ -1,3 +1,14 @@
+/** Top-level screens the app can render. Shared across App.tsx, Navbar and ResultScreen
+ *  so navigation props stay in sync without duplicating the union everywhere. */
+export type AppScreen =
+  | 'landing'
+  | 'test_intro'
+  | 'assessment'
+  | 'result'
+  | 'auth'
+  | 'four_journeys'
+  | 'ai_chat';
+
 export interface Question {
   id: number;
   section?: string;

@@ -12,7 +12,6 @@ import {
   Droplet, 
   Mountain, 
   Quote, 
-  Send, 
   ArrowRight,
   Compass, 
   CheckCircle2,
@@ -22,8 +21,9 @@ import {
   BarChart3,
   Bot,
   Leaf,
+  MessageCircle,
 } from 'lucide-react';
-import { PersonalityProfile } from '../types';
+import { PersonalityProfile, AppScreen } from '../types';
 import Navbar from './Navbar';
 import MbtiSummaryStep from './mbti/MbtiSummaryStep';
 import BirthFormStep from './mbti/BirthFormStep';
@@ -50,18 +50,15 @@ interface ResultScreenProps {
   setGenerationProgress: React.Dispatch<React.SetStateAction<number>>;
   zoomMap: boolean;
   setZoomMap: (zoom: boolean) => void;
-  chatInput: string;
-  setChatInput: (input: string) => void;
   chatHistory: { sender: 'user' | 'assistant'; text: string }[];
-  isTyping: boolean;
   isLoggedIn: boolean;
   currentUser: { name: string; email: string } | null;
   handleLogout: () => void;
-  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth' | 'four_journeys') => void;
+  setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
   navigateToAssessment: (direction?: 'push' | 'none') => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
-  handleSendMessage: (textToSend?: string) => void;
+  navigateToAiChat: () => void;
 }
 
 export default function ResultScreen({
@@ -79,10 +76,7 @@ export default function ResultScreen({
   generationProgress,
   setGenerationProgress,
   setZoomMap,
-  chatInput,
-  setChatInput,
   chatHistory,
-  isTyping,
   isLoggedIn,
   currentUser,
   handleLogout,
@@ -90,7 +84,7 @@ export default function ResultScreen({
   setTransitionDirection,
   navigateToAssessment,
   navigateToLanding,
-  handleSendMessage,
+  navigateToAiChat,
 }: ResultScreenProps) {
   const [selectedJourney, setSelectedJourney] = React.useState<SoulMapJourney | null>(null);
 
@@ -181,6 +175,7 @@ export default function ResultScreen({
           navigateToLanding={navigateToLanding}
           navigateToAssessment={navigateToAssessment}
           onOpenJourneys={openJourneysOverview}
+          onOpenChat={navigateToAiChat}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -541,118 +536,56 @@ export default function ResultScreen({
                 </div>
               </div>
 
-              {/* Right Side: Interactive AI Companion chat with Linh Nhi (7 cols) */}
+              {/* Right Side: Launcher card for the dedicated AI Chat page (7 cols) */}
               <div className="lg:col-span-7 flex flex-col gap-6">
-                <div className="glass-card rounded-3xl border border-[#24533E]/8 shadow-lg flex flex-col h-full overflow-hidden min-h-[480px]">
-                  
-                  {/* Chat Header */}
-                  <div className="px-6 py-4 bg-[#24533E]/5 border-b border-[#24533E]/10 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full border border-[#C8A15A]/40 bg-[#FFFCF8] overflow-hidden shadow-sm flex items-center justify-center p-0.5">
-                        <img 
-                          src="https://lh3.googleusercontent.com/aida/AP1WRLvd66sPGu4H_1tGLFdCvf9aR0bDPYKAnrAsSuzrivZLFixhLtUiFXVuFWy08e04uor7tG8oCmc8yDUZdmvCj78rHlpezlPKeKaIstq5LBwI-PBoxczVa9ScHf9z2Bc-zSR_Km1wFIT42hCYX9tC2kJFLYXxpvuruTjSjuZkB4N8MQ5RAxayl0mb30SGtFvM8aLYm9W-Rd-w2-RfMXX4fCT_7t7jKWgt2koKFGsT1-rNINBqWkZumemW6wQ" 
-                          alt="Linh Nhi Chat Avatar" 
-                          className="w-full h-full object-contain"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                      <div className="text-left">
-                        <h4 className="font-display font-semibold text-sm text-[#24533E]">AI Mentor Linh Nhi</h4>
-                        <span className="flex items-center gap-1 text-[9px] font-sans text-emerald-700 font-bold uppercase tracking-wider">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Đang trực tuyến
-                        </span>
-                      </div>
+                <div className="glass-card flex h-full min-h-[480px] flex-col justify-between gap-6 rounded-3xl border border-[#24533E]/8 p-6 text-left shadow-lg md:p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#C8A15A]/30 bg-[#FFFCF8] p-1 shadow-sm">
+                      <img
+                        src="https://lh3.googleusercontent.com/aida/AP1WRLvd66sPGu4H_1tGLFdCvf9aR0bDPYKAnrAsSuzrivZLFixhLtUiFXVuFWy08e04uor7tG8oCmc8yDUZdmvCj78rHlpezlPKeKaIstq5LBwI-PBoxczVa9ScHf9z2Bc-zSR_Km1wFIT42hCYX9tC2kJFLYXxpvuruTjSjuZkB4N8MQ5RAxayl0mb30SGtFvM8aLYm9W-Rd-w2-RfMXX4fCT_7t7jKWgt2koKFGsT1-rNINBqWkZumemW6wQ"
+                        alt="Linh Nhi"
+                        className="h-full w-full object-contain"
+                        referrerPolicy="no-referrer"
+                      />
                     </div>
-                    <span className="text-xs font-sans text-[#636A64] bg-[#24533E]/5 px-2.5 py-1 rounded-full border border-[#24533E]/8">
-                      Cố vấn Bản đồ Nội tâm
-                    </span>
+                    <div>
+                      <h4 className="font-display text-lg font-semibold text-[#24533E]">AI Mentor Linh Nhi</h4>
+                      <span className="flex items-center gap-1.5 font-sans text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Đang trực tuyến
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Chat Messages Body */}
-                  <div className="flex-grow p-6 overflow-y-auto max-h-[300px] flex flex-col gap-4 custom-scrollbar bg-[#FFFCF8]/20">
-                    {chatHistory.map((msg, index) => (
-                      <div 
-                        key={index} 
-                        className={`flex items-start gap-3 max-w-[85%] ${
-                          msg.sender === 'user' ? 'self-end flex-row-reverse text-right' : 'self-start text-left'
+                  {/* Preview of the latest exchange */}
+                  <div className="flex flex-col gap-3 rounded-2xl border border-[#24533E]/8 bg-[#FFFCF8]/60 p-5">
+                    {chatHistory.slice(-2).map((msg, index) => (
+                      <p
+                        key={index}
+                        className={`body-text-sm line-clamp-2 ${
+                          msg.sender === 'user' ? 'text-right text-[#24533E]/70' : 'text-left text-[#24533E]'
                         }`}
                       >
-                        {msg.sender === 'assistant' && (
-                          <div className="w-8 h-8 rounded-full border border-[#C8A15A]/30 bg-[#FFFCF8] overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                            <img 
-                              src="https://lh3.googleusercontent.com/aida/AP1WRLvd66sPGu4H_1tGLFdCvf9aR0bDPYKAnrAsSuzrivZLFixhLtUiFXVuFWy08e04uor7tG8oCmc8yDUZdmvCj78rHlpezlPKeKaIstq5LBwI-PBoxczVa9ScHf9z2Bc-zSR_Km1wFIT42hCYX9tC2kJFLYXxpvuruTjSjuZkB4N8MQ5RAxayl0mb30SGtFvM8aLYm9W-Rd-w2-RfMXX4fCT_7t7jKWgt2koKFGsT1-rNINBqWkZumemW6wQ" 
-                              alt="Linh Nhi Chat Small Avatar" 
-                              className="w-full h-full object-contain"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                        )}
-                        <div className={`p-4 rounded-2xl shadow-sm body-text-sm ${
-                          msg.sender === 'user' 
-                            ? 'bg-[#24533E] text-white rounded-br-none' 
-                            : 'bg-[#FFFCF8] border border-[#24533E]/8 text-[#24533E] rounded-bl-none'
-                        }`}>
-                          {msg.text}
-                        </div>
-                      </div>
-                    ))}
-
-                    {isTyping && (
-                      <div className="flex items-start gap-3 self-start text-left max-w-[85%]">
-                        <div className="w-8 h-8 rounded-full border border-[#C8A15A]/30 bg-[#FFFCF8] overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                          <img 
-                            src="https://lh3.googleusercontent.com/aida/AP1WRLvd66sPGu4H_1tGLFdCvf9aR0bDPYKAnrAsSuzrivZLFixhLtUiFXVuFWy08e04uor7tG8oCmc8yDUZdmvCj78rHlpezlPKeKaIstq5LBwI-PBoxczVa9ScHf9z2Bc-zSR_Km1wFIT42hCYX9tC2kJFLYXxpvuruTjSjuZkB4N8MQ5RAxayl0mb30SGtFvM8aLYm9W-Rd-w2-RfMXX4fCT_7t7jKWgt2koKFGsT1-rNINBqWkZumemW6wQ" 
-                            alt="Linh Nhi Typing" 
-                            className="w-full h-full object-contain"
-                            referrerPolicy="no-referrer"
-                          />
-                        </div>
-                        <div className="p-4 rounded-2xl bg-[#FFFCF8] border border-[#24533E]/8 text-[#24533E] rounded-bl-none flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 bg-[#24533E] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                          <span className="w-1.5 h-1.5 bg-[#24533E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                          <span className="w-1.5 h-1.5 bg-[#24533E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Preset Quick Questions */}
-                  <div className="px-6 py-3 border-t border-[#24533E]/5 bg-[#FAF6EE]/30 flex flex-wrap gap-2 justify-start items-center">
-                    <span className="text-[10px] font-bold uppercase text-[#636A64]/70 mr-1">Chủ đề gợi ý:</span>
-                    {[
-                      { text: "Lời khuyên sự nghiệp cho tôi?", action: "Cho tôi xin lời khuyên phát triển sự nghiệp." },
-                      { text: "Tình duyên của tôi thế nào?", action: "Đường tình duyên của tôi cần lưu ý gì?" },
-                      { text: "Năng lượng Ngũ hành & Tử Vi?", action: "Lá số Tử Vi và bản mệnh ngũ hành của tôi mang năng lượng gì?" }
-                    ].map((p, idx) => (
-                      <button 
-                        key={idx}
-                        onClick={() => handleSendMessage(p.action)}
-                        className="text-[11px] font-semibold text-[#24533E] bg-[#FFFCF8] border border-[#24533E]/10 hover:border-[#C8A15A] hover:bg-[#24533E]/5 px-3 py-1.5 rounded-full transition-all active:scale-95 duration-150 cursor-pointer"
-                      >
-                        {p.text}
-                      </button>
+                        {msg.sender === 'assistant' ? '“' : ''}
+                        {msg.text}
+                        {msg.sender === 'assistant' ? '”' : ''}
+                      </p>
                     ))}
                   </div>
 
-                  {/* Chat Input Footer */}
-                  <div className="p-4 bg-[#FFFCF8] border-t border-[#24533E]/10 flex gap-3 items-center">
-                    <input 
-                      type="text"
-                      placeholder="Hỏi Linh Nhi bất kỳ điều gì về bản đồ của bạn..."
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                      className="flex-grow bg-[#FAF6EE] border border-[#24533E]/10 focus:border-[#C8A15A] rounded-full px-5 py-3 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-[#C8A15A] text-[#24533E]"
-                    />
-                    <button 
-                      onClick={() => handleSendMessage()}
-                      className="w-12 h-12 rounded-full bg-[#24533E] hover:bg-[#1a3c34] text-white flex items-center justify-center shadow-md active:scale-90 transition-all duration-150 cursor-pointer flex-shrink-0"
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
+                  <p className="body-text-sm text-[#636A64]">
+                    Trò chuyện chi tiết hơn với Linh Nhi trong không gian riêng, tập trung hoàn toàn vào cuộc hội thoại của bạn.
+                  </p>
 
+                  <button
+                    type="button"
+                    onClick={navigateToAiChat}
+                    className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#24533E] px-6 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_30px_-14px_rgba(33,77,59,0.55)] transition hover:-translate-y-0.5 hover:bg-[#1D4433] active:translate-y-0"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Mở cuộc trò chuyện
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </div>

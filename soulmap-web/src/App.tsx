@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, calculateProfile, PersonalityProfile } from './types';
+import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, calculateProfile, PersonalityProfile, AppScreen } from './types';
 
 // Import modular subcomponents
 import Navbar from './components/Navbar';
@@ -11,11 +11,13 @@ import MbtiStartScreen from './components/MbtiStartScreen';
 import AssessmentScreen from './components/AssessmentScreen';
 import ResultScreen from './components/ResultScreen';
 import FourJourneysScreen from './components/FourJourneysScreen';
+import JourneyDetailScreen from './components/journey/JourneyDetailScreen';
+import AIChatScreen from './components/AIChatScreen';
 import { buildMockJourneys } from './data/mockJourneys';
 import type { SoulMapJourney } from './types/journey';
 
 export default function App() {
-  type Screen = 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth' | 'four_journeys';
+  type Screen = AppScreen;
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [transitionDirection, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
 
@@ -220,13 +222,46 @@ export default function App() {
   };
 
   const navigateToFourJourneys = () => {
+    setJourneyDetail(null);
     setTransitionDirection('push');
     setCurrentScreen('four_journeys');
   };
 
+  // Track which screen to return to when the user exits the dedicated AI Chat page.
+  const [screenBeforeChat, setScreenBeforeChat] = useState<Screen>('result');
+
+  const navigateToAiChat = () => {
+    setScreenBeforeChat(currentScreen);
+    setTransitionDirection('push');
+    setCurrentScreen('ai_chat');
+  };
+
+  const exitAiChat = () => {
+    setTransitionDirection('push_back');
+    setCurrentScreen(screenBeforeChat);
+  };
+
+  const handleNewChat = () => {
+    setChatHistory([
+      {
+        sender: 'assistant',
+        text: 'Chào bạn! Linh Nhi đang lắng nghe. Hãy chia sẻ điều bạn đang suy nghĩ nhé. 🌿',
+      },
+    ]);
+    setChatInput('');
+  };
+
+  // Journey detail overlay for the standalone four_journeys screen
+  const [journeyDetail, setJourneyDetail] = useState<SoulMapJourney | null>(null);
+
   const handleExploreJourney = (journey: SoulMapJourney) => {
-    // Future: navigate to JourneyDetailScreen
-    console.log('Explore journey:', journey.slug);
+    setTransitionDirection('push');
+    setJourneyDetail(journey);
+  };
+
+  const handleBackFromJourneyDetail = () => {
+    setTransitionDirection('push_back');
+    setJourneyDetail(null);
   };
 
   const buildAnswersFromMbtiType = (mbtiType: string): Record<number, 'A' | 'B'> => {
@@ -366,7 +401,7 @@ export default function App() {
     <div className={`min-h-screen bg-[#fbf9f5] flex flex-col transition-all duration-500 overflow-x-hidden ${getScreenTransitionClass()}`}>
       
       {/* Top Navigation Bar (Shared across all pages except custom headers) */}
-      {currentScreen !== 'auth' && currentScreen !== 'result' && (
+      {currentScreen !== 'auth' && currentScreen !== 'result' && currentScreen !== 'ai_chat' && (
         <Navbar 
           isLoggedIn={isLoggedIn}
           currentUser={currentUser}
@@ -375,6 +410,7 @@ export default function App() {
           navigateToAssessment={navigateToAssessment}
           navigateToTestIntro={navigateToTestIntro}
           onOpenJourneys={navigateToFourJourneys}
+          onOpenChat={navigateToAiChat}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -461,10 +497,7 @@ export default function App() {
           setGenerationProgress={setGenerationProgress}
           zoomMap={zoomMap}
           setZoomMap={setZoomMap}
-          chatInput={chatInput}
-          setChatInput={setChatInput}
           chatHistory={chatHistory}
-          isTyping={isTyping}
           isLoggedIn={isLoggedIn}
           currentUser={currentUser}
           handleLogout={handleLogout}
@@ -472,11 +505,15 @@ export default function App() {
           setTransitionDirection={setTransitionDirection}
           navigateToAssessment={navigateToAssessment}
           navigateToLanding={navigateToLanding}
-          handleSendMessage={handleSendMessage}
+          navigateToAiChat={navigateToAiChat}
         />
       )}
 
-      {currentScreen === 'four_journeys' && (
+      {currentScreen === 'four_journeys' && journeyDetail && (
+        <JourneyDetailScreen journey={journeyDetail} onBack={handleBackFromJourneyDetail} />
+      )}
+
+      {currentScreen === 'four_journeys' && !journeyDetail && (
         <FourJourneysScreen
           journeys={profile ? buildMockJourneys(profile) : buildMockJourneys({
             type: 'INFJ', name: 'Người Bảo Hộ', title: 'The Advocate',
@@ -492,6 +529,19 @@ export default function App() {
           })}
           onExplore={handleExploreJourney}
           userName={currentUser?.name}
+        />
+      )}
+
+      {currentScreen === 'ai_chat' && (
+        <AIChatScreen
+          chatInput={chatInput}
+          setChatInput={setChatInput}
+          chatHistory={chatHistory}
+          isTyping={isTyping}
+          currentUser={currentUser}
+          handleSendMessage={handleSendMessage}
+          onNewChat={handleNewChat}
+          onExit={exitAiChat}
         />
       )}
     </div>

@@ -128,7 +128,7 @@ export default function FourJourneysScreen({ journeys, onExplore, userName }: Fo
   return (
     <div className="min-h-screen bg-[#F8F4EB]">
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 pb-5 pt-32 lg:flex-row lg:px-6 xl:px-8 min-[1800px]:max-w-[1680px] min-[1800px]:gap-7 min-[1800px]:px-10 max-[430px]:gap-4 max-[430px]:px-3 max-[430px]:pb-4 max-[430px]:pt-20">
-        <aside className="w-full shrink-0 rounded-[1.75rem] border border-[#E8DFCF] bg-[#FFFDF8]/92 p-4 shadow-[0_18px_45px_-30px_rgba(77,52,28,0.45)] lg:fixed lg:left-6 lg:top-32 lg:z-20 lg:max-h-[calc(100vh-9rem)] lg:w-[280px] lg:overflow-y-auto xl:left-[max(2rem,calc((100vw-1440px)/2+2rem))] min-[1800px]:left-[max(2.5rem,calc((100vw-1680px)/2+2.5rem))] min-[1800px]:w-[300px] min-[1800px]:p-5 max-[430px]:rounded-[1.35rem] max-[430px]:p-3.5">
+        <aside className="w-full shrink-0 rounded-[1.75rem] border border-[#E8DFCF] bg-[#FFFDF8]/92 p-4 shadow-[0_18px_45px_-30px_rgba(77,52,28,0.45)] lg:sticky lg:top-32 lg:z-20 lg:self-start lg:max-h-[calc(100vh-9rem)] lg:w-[280px] lg:overflow-y-auto min-[1800px]:w-[300px] min-[1800px]:p-5 max-[430px]:rounded-[1.35rem] max-[430px]:p-3.5">
           <div>
             <p className="font-sans text-[0.88rem] font-medium text-[#6A6E69]">Xin chào,</p>
             <h1 className="mt-1 truncate font-sans text-[1.35rem] font-extrabold leading-tight tracking-tight text-[#214D3B] max-[430px]:text-[1.18rem]">
@@ -191,7 +191,7 @@ export default function FourJourneysScreen({ journeys, onExplore, userName }: Fo
           </div>
         </aside>
 
-        <div className="min-w-0 flex-1 lg:ml-[300px] min-[1800px]:ml-[330px]">
+        <div className="min-w-0 flex-1">
           <div className="mb-4 flex items-center justify-between gap-4 max-[430px]:flex-col max-[430px]:items-stretch max-[430px]:gap-3">
             <h2 className="font-display text-[1.6rem] font-bold text-[#2C251B] max-[430px]:text-[1.35rem]">Các hành trình của bạn</h2>
             <div className="relative hidden w-[260px] sm:block min-[1800px]:w-[320px] max-[430px]:block max-[430px]:w-full">

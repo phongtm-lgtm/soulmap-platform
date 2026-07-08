@@ -12,7 +12,9 @@ import {
   Menu,
   X,
   Sparkles,
+  Bot,
 } from 'lucide-react';
+import type { AppScreen } from '../types';
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -22,7 +24,8 @@ interface NavbarProps {
   navigateToAssessment: (direction?: 'push' | 'none') => void;
   navigateToTestIntro?: (direction?: 'push' | 'none') => void;
   onOpenJourneys?: () => void;
-  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth' | 'four_journeys') => void;
+  onOpenChat?: () => void;
+  setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
 }
 
@@ -34,6 +37,7 @@ export default function Navbar({
   navigateToAssessment,
   navigateToTestIntro,
   onOpenJourneys,
+  onOpenChat,
   setCurrentScreen,
   setTransitionDirection,
 }: NavbarProps) {
@@ -76,6 +80,20 @@ export default function Navbar({
     onOpenJourneys?.();
   };
 
+  const openChat = () => {
+    setIsMobileMenuOpen(false);
+    setIsProfileMenuOpen(false);
+    if (onOpenChat) {
+      onOpenChat();
+      return;
+    }
+    // No chat handler wired (e.g. guest context) — send them to sign in first.
+    if (!isLoggedIn) {
+      setTransitionDirection('push');
+      setCurrentScreen('auth');
+    }
+  };
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#F8F4EB]/90 backdrop-blur-xl border-b border-[#E8DFCF]/70 shadow-[0_1px_0_rgba(232,223,207,0.6)] h-20 transition-all duration-300">
       <div className="flex justify-between items-center h-full px-6 md:px-12 lg:px-16 max-w-[1600px] mx-auto w-full">
@@ -99,7 +117,7 @@ export default function Navbar({
         <div className="hidden lg:flex items-center gap-1">
           <button 
             onClick={goToLanding}
-            className="px-4 py-2 rounded-full flex items-center gap-2 font-sans text-[13px] font-semibold text-[#24533E] bg-[#FFFDF8] border border-[#E8DFCF] shadow-sm hover:border-[#B68A2F]/40 transition-all duration-300 cursor-pointer"
+            className="nav-menu-item px-4 py-2 rounded-full flex items-center gap-2 text-[#24533E] bg-[#FFFDF8] border border-[#E8DFCF] shadow-sm hover:border-[#B68A2F]/40 transition-all duration-300 cursor-pointer"
           >
             <Compass className="w-4 h-4 text-[#B68A2F]" />
             <span>{isLoggedIn ? 'Bản đồ của tôi' : 'SoulMap'}</span>
@@ -108,7 +126,7 @@ export default function Navbar({
           {!isLoggedIn && (
             <a
               href="#how-it-works"
-              className="group flex items-center gap-2 px-4 py-2 rounded-full font-sans text-[13px] font-semibold text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
+              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
               <span>Cách hoạt động</span>
@@ -118,7 +136,7 @@ export default function Navbar({
           {isLoggedIn ? (
             <button
               onClick={onOpenJourneys ? openJourneys : startSoulMap}
-              className="group flex items-center gap-2 px-4 py-2 rounded-full font-sans text-[13px] font-semibold text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer bg-transparent border-none outline-none"
+              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer bg-transparent border-none outline-none"
             >
               <Trophy className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
               <span>Hành trình</span>
@@ -126,7 +144,7 @@ export default function Navbar({
           ) : (
             <a
               href="#pillars"
-              className="group flex items-center gap-2 px-4 py-2 rounded-full font-sans text-[13px] font-semibold text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
+              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
             >
               <Trophy className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
               <span>Hành trình</span>
@@ -136,7 +154,7 @@ export default function Navbar({
           {isLoggedIn ? (
             <button
               onClick={startSoulMap}
-              className="group flex items-center gap-2 px-4 py-2 rounded-full font-sans text-[13px] font-semibold text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer bg-transparent border-none outline-none"
+              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer bg-transparent border-none outline-none"
             >
               <BookOpen className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
               <span>Nhật ký</span>
@@ -144,12 +162,20 @@ export default function Navbar({
           ) : (
             <a
               href="#chat-demo"
-              className="group flex items-center gap-2 px-4 py-2 rounded-full font-sans text-[13px] font-semibold text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
+              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
               <span>Linh Nhi AI</span>
             </a>
           )}
+
+          <button
+            onClick={openChat}
+            className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#24533E] border border-[#B68A2F]/30 bg-[#B68A2F]/8 hover:bg-[#B68A2F]/14 hover:border-[#B68A2F]/50 transition-all duration-300 cursor-pointer outline-none"
+          >
+            <Bot className="w-4 h-4 text-[#B68A2F]" />
+            <span>AI Mentor</span>
+          </button>
         </div>
 
         {/* Right Section: Profile / Login CTA */}
@@ -316,6 +342,14 @@ export default function Navbar({
                 Linh Nhi AI
               </a>
             )}
+
+            <button
+              onClick={openChat}
+              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-sans text-sm font-semibold text-[#24533E] border border-[#B68A2F]/30 bg-[#B68A2F]/8 hover:bg-[#B68A2F]/14 transition-colors outline-none"
+            >
+              <Bot className="w-4 h-4 text-[#B68A2F]" />
+              AI Mentor
+            </button>
 
             {!isLoggedIn ? (
               <div className="mt-2 border-t border-[#E8DFCF] pt-3">
