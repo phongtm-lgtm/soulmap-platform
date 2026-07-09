@@ -7,7 +7,9 @@ export type AppScreen =
   | 'result'
   | 'auth'
   | 'four_journeys'
-  | 'ai_chat';
+  | 'ai_chat'
+  | 'journal'
+  | 'academy';
 
 export interface Question {
   id: number;
@@ -281,6 +283,246 @@ export const PERSONALITY_PROFILES: Record<string, PersonalityProfile> = {
       "Học cách đối diện trực tiếp với thực tế và giải quyết xung đột thay vì chọn cách né tránh.",
       "Chuyển hóa những giấc mơ tuyệt đẹp trong tâm trí thành những tác phẩm nghệ thuật hữu hình.",
       "Sử dụng công cụ theo dõi cảm xúc hàng ngày trên SoulMap để làm chủ thế giới nội tâm phức tạp."
+    ]
+  },
+  "ISTJ": {
+    type: "ISTJ",
+    name: "Người Giữ Gìn Trật Tự (The Steady Guardian)",
+    title: "Người xây nền vững chắc bằng kỷ luật và trách nhiệm",
+    element: "Thổ",
+    zodiac: "Sao Thiên Tướng",
+    mbtiMatch: "ISTJ - Kỷ luật, Thực tế & Đáng tin cậy",
+    description: "Bạn là người sống có nguyên tắc, đáng tin và luôn coi trọng trách nhiệm. Năng lượng Thổ giúp bạn bền bỉ, thực tế và kiên định với những gì đã cam kết. Bạn không dễ bị cuốn theo cảm xúc nhất thời mà thường chọn hành động dựa trên dữ kiện, kinh nghiệm và sự chuẩn bị chắc chắn.",
+    pillars: {
+      identity: "Bản sắc ổn định, tôn trọng quy chuẩn, luôn muốn làm đúng và làm đến nơi đến chốn.",
+      career: "Phù hợp với quản trị vận hành, tài chính, kiểm toán, pháp lý, kỹ thuật, quản lý dữ liệu hoặc các vai trò cần độ chính xác cao.",
+      love: "Yêu bằng sự bền bỉ, trách nhiệm và chăm sóc thực tế. Không phô trương nhưng rất đáng tin.",
+      life: "Xây dựng cuộc sống có nền tảng, tích lũy từng bước và bảo vệ những giá trị lâu dài."
+    },
+    advice: [
+      "Cho phép bản thân linh hoạt hơn khi kế hoạch thay đổi ngoài dự tính.",
+      "Đừng ôm quá nhiều trách nhiệm một mình, hãy học cách chia sẻ gánh nặng.",
+      "Thỉnh thoảng thử một trải nghiệm mới để làm mềm các khuôn mẫu quen thuộc."
+    ]
+  },
+  "ISFJ": {
+    type: "ISFJ",
+    name: "Người Chăm Sóc Dịu Dàng (The Devoted Nurturer)",
+    title: "Người gìn giữ bình yên bằng sự tận tâm âm thầm",
+    element: "Thổ",
+    zodiac: "Sao Thiên Đồng",
+    mbtiMatch: "ISFJ - Tận tụy, Ấm áp & Chu đáo",
+    description: "Bạn mang nguồn năng lượng nuôi dưỡng, kiên nhẫn và rất nhạy với nhu cầu của người khác. Bạn thường tạo cảm giác an toàn cho những người xung quanh bằng sự quan tâm tinh tế và hành động thực tế. Nội tâm của bạn sâu sắc hơn vẻ ngoài điềm tĩnh rất nhiều.",
+    pillars: {
+      identity: "Tận tâm, khiêm nhường, ghi nhớ chi tiết và luôn muốn bảo vệ những điều thân thương.",
+      career: "Phù hợp với giáo dục, chăm sóc khách hàng, y tế, nhân sự, vận hành cộng đồng hoặc các công việc hỗ trợ con người.",
+      love: "Yêu bằng sự chăm sóc đều đặn, nhớ những điều nhỏ nhặt và đặt sự ổn định lên hàng đầu.",
+      life: "Tạo dựng mái ấm tinh thần, nuôi dưỡng các kết nối bền vững và sống tử tế mỗi ngày."
+    },
+    advice: [
+      "Đừng quên nhu cầu của mình trong lúc chăm sóc người khác.",
+      "Tập nói ra mong muốn thay vì kỳ vọng đối phương tự hiểu.",
+      "Hãy đặt ranh giới mềm mại để lòng tốt không biến thành kiệt sức."
+    ]
+  },
+  "ESTJ": {
+    type: "ESTJ",
+    name: "Người Điều Hành Thực Tế (The Grounded Commander)",
+    title: "Người biến kế hoạch thành kết quả rõ ràng",
+    element: "Kim",
+    zodiac: "Sao Vũ Khúc",
+    mbtiMatch: "ESTJ - Tổ chức, Quyết đoán & Hiệu quả",
+    description: "Bạn có năng lực tổ chức mạnh, tư duy thực tế và khả năng kéo mọi thứ vào trật tự. Bạn nhìn thấy việc cần làm, phân vai nhanh và thúc đẩy tập thể tiến về kết quả. Năng lượng Kim khiến bạn sắc bén, trực diện và đề cao tiêu chuẩn.",
+    pillars: {
+      identity: "Quyết đoán, rõ ràng, coi trọng trách nhiệm và hiệu suất trong mọi việc.",
+      career: "Phù hợp với quản lý, điều hành, kinh doanh, tài chính, logistics, pháp lý hoặc xây dựng hệ thống vận hành.",
+      love: "Thẳng thắn, bảo vệ người mình yêu bằng hành động cụ thể và định hướng tương lai rõ ràng.",
+      life: "Thiết lập trật tự, xây thành tựu bền vững và trở thành trụ cột đáng tin cho cộng đồng."
+    },
+    advice: [
+      "Lắng nghe cảm xúc trước khi đưa ra giải pháp quá nhanh.",
+      "Dành không gian cho người khác thử cách làm khác với tiêu chuẩn của bạn.",
+      "Nghỉ ngơi cũng là một phần của hiệu suất dài hạn."
+    ]
+  },
+  "ESFJ": {
+    type: "ESFJ",
+    name: "Người Kết Nối Cộng Đồng (The Heartful Host)",
+    title: "Người lan tỏa sự ấm áp qua chăm sóc và gắn kết",
+    element: "Hỏa",
+    zodiac: "Sao Thái Dương",
+    mbtiMatch: "ESFJ - Hòa đồng, Quan tâm & Trách nhiệm",
+    description: "Bạn có khả năng tạo bầu không khí thân thiện, kết nối mọi người và nhận ra điều ai đó đang cần. Bạn sống giàu tình cảm, coi trọng sự hòa hợp và thường là người giữ nhịp cho tập thể. Năng lượng Hỏa giúp bạn ấm áp, chủ động và dễ truyền động lực.",
+    pillars: {
+      identity: "Hướng về cộng đồng, nhạy cảm với cảm xúc tập thể và thích chăm sóc bằng hành động cụ thể.",
+      career: "Phù hợp với nhân sự, giáo dục, dịch vụ khách hàng, truyền thông cộng đồng, tổ chức sự kiện hoặc chăm sóc sức khỏe.",
+      love: "Yêu nồng hậu, thích quan tâm chủ động và cần cảm giác được trân trọng rõ ràng.",
+      life: "Xây dựng các mối quan hệ ấm áp, tạo không gian thuộc về và nuôi dưỡng tinh thần cộng đồng."
+    },
+    advice: [
+      "Không phải mọi sự bất hòa đều là lỗi của bạn.",
+      "Học cách ưu tiên bản thân mà không cảm thấy ích kỷ.",
+      "Đừng đánh giá giá trị của mình chỉ qua sự công nhận từ người khác."
+    ]
+  },
+  "ISTP": {
+    type: "ISTP",
+    name: "Người Thợ Giải Mã (The Quiet Tactician)",
+    title: "Người xử lý thực tế bằng sự bình tĩnh và sắc bén",
+    element: "Kim",
+    zodiac: "Sao Thất Sát",
+    mbtiMatch: "ISTP - Linh hoạt, Kỹ thuật & Bình tĩnh",
+    description: "Bạn có đầu óc phân tích thực dụng, thích hiểu cách mọi thứ vận hành và thường giữ bình tĩnh trong tình huống áp lực. Bạn không nói quá nhiều nhưng quan sát rất kỹ. Khi cần hành động, bạn ra tay nhanh, gọn và hiệu quả.",
+    pillars: {
+      identity: "Độc lập, thực tế, thích tự do hành động và học qua trải nghiệm trực tiếp.",
+      career: "Phù hợp với kỹ thuật, sản phẩm, an ninh, dữ liệu, cơ khí, thiết kế hệ thống hoặc các vai trò xử lý sự cố.",
+      love: "Yêu bằng sự tôn trọng không gian cá nhân, hành động thiết thực và lòng trung thành kín đáo.",
+      life: "Khám phá thế giới qua kỹ năng, trải nghiệm và khả năng ứng biến trước những điều bất ngờ."
+    },
+    advice: [
+      "Tập diễn đạt cảm xúc trước khi người khác phải tự đoán.",
+      "Đừng rút lui quá nhanh khi mối quan hệ cần một cuộc trò chuyện sâu.",
+      "Xây dựng vài cam kết dài hạn sẽ giúp tự do của bạn có nền vững hơn."
+    ]
+  },
+  "ISFP": {
+    type: "ISFP",
+    name: "Người Nghệ Sĩ Tự Do (The Gentle Artisan)",
+    title: "Người chạm vào cuộc sống bằng cảm xúc và vẻ đẹp riêng",
+    element: "Thủy",
+    zodiac: "Sao Thái Âm",
+    mbtiMatch: "ISFP - Nhạy cảm, Nghệ thuật & Tự do",
+    description: "Bạn sống bằng cảm nhận tinh tế, yêu cái đẹp và thường có thế giới nội tâm giàu màu sắc. Bạn không thích bị ép vào khuôn cứng nhắc, mà cần không gian để thể hiện bản thân theo cách tự nhiên. Năng lượng Thủy khiến bạn mềm mại, sâu lắng và giàu trực giác cảm xúc.",
+    pillars: {
+      identity: "Chân thật, giàu cảm xúc, tôn trọng tự do cá nhân và nhạy với vẻ đẹp của hiện tại.",
+      career: "Phù hợp với nghệ thuật, thiết kế, thời trang, nội dung sáng tạo, chăm sóc tinh thần, nhiếp ảnh hoặc sản phẩm trải nghiệm.",
+      love: "Yêu dịu dàng, sâu sắc, thể hiện qua hành động nhỏ và sự hiện diện chân thành.",
+      life: "Sống đúng cảm xúc, bảo vệ sự tự do nội tâm và biến trải nghiệm đời thường thành chất liệu sáng tạo."
+    },
+    advice: [
+      "Đừng né tránh xung đột cần thiết chỉ để giữ bình yên tạm thời.",
+      "Biến cảm hứng thành thói quen nhỏ để tài năng có đất phát triển.",
+      "Học cách nói rõ giới hạn khi điều gì đó làm bạn tổn thương."
+    ]
+  },
+  "ESTP": {
+    type: "ESTP",
+    name: "Người Khai Phá Hành Động (The Bold Pathfinder)",
+    title: "Người bứt phá bằng bản lĩnh và tốc độ",
+    element: "Hỏa",
+    zodiac: "Sao Phá Quân",
+    mbtiMatch: "ESTP - Năng động, Táo bạo & Thực chiến",
+    description: "Bạn có năng lượng hành động mạnh, thích thử thách và phản ứng rất nhanh với cơ hội trước mắt. Bạn học tốt nhất khi trực tiếp va chạm thực tế. Sự hiện diện của bạn thường khiến không khí trở nên sống động, quyết liệt và nhiều khả năng mới.",
+    pillars: {
+      identity: "Gan dạ, thực tế, thích tốc độ và không ngại bước vào tình huống chưa rõ kết quả.",
+      career: "Phù hợp với kinh doanh, sales, thể thao, truyền thông, startup, vận hành hiện trường hoặc xử lý khủng hoảng.",
+      love: "Yêu sôi nổi, trực tiếp, thích cùng nhau trải nghiệm hơn là chỉ nói về cảm xúc.",
+      life: "Chinh phục giới hạn, học qua hành động và biến rủi ro thành cơ hội phát triển."
+    },
+    advice: [
+      "Chậm lại một nhịp trước các quyết định có tác động dài hạn.",
+      "Lắng nghe cảm xúc sâu hơn thay vì chỉ xử lý bề mặt tình huống.",
+      "Kỷ luật nhỏ mỗi ngày sẽ giúp sự bứt phá của bạn bền vững hơn."
+    ]
+  },
+  "ESFP": {
+    type: "ESFP",
+    name: "Người Thắp Sáng Khoảnh Khắc (The Radiant Performer)",
+    title: "Người biến hiện tại thành sân khấu của niềm vui",
+    element: "Hỏa",
+    zodiac: "Sao Hồng Loan",
+    mbtiMatch: "ESFP - Sống động, Cảm xúc & Cuốn hút",
+    description: "Bạn mang năng lượng rạng rỡ, dễ kết nối và biết cách làm cho cuộc sống trở nên giàu trải nghiệm. Bạn nhạy với cảm xúc của môi trường xung quanh và thường đem lại sự nhẹ nhõm, vui tươi cho người khác. Bạn tỏa sáng nhất khi được sống thật, tự nhiên và gần con người.",
+    pillars: {
+      identity: "Cởi mở, giàu cảm xúc, yêu trải nghiệm và thích lan tỏa sự tích cực bằng sự hiện diện chân thật.",
+      career: "Phù hợp với nghệ thuật biểu diễn, truyền thông, du lịch, chăm sóc khách hàng, giáo dục trải nghiệm hoặc sáng tạo nội dung.",
+      love: "Yêu nồng nhiệt, thích sự gần gũi, vui vẻ và những kỷ niệm sống động cùng nhau.",
+      life: "Tận hưởng hiện tại, kết nối với con người và biến niềm vui thành nguồn chữa lành."
+    },
+    advice: [
+      "Đừng trì hoãn những việc quan trọng chỉ vì cảm xúc hiện tại chưa sẵn sàng.",
+      "Tập nhìn xa hơn để các lựa chọn hôm nay phục vụ tương lai bạn muốn.",
+      "Giữ một khoảng lặng riêng để phân biệt điều mình muốn và điều đám đông mong chờ."
+    ]
+  },
+  "INTP": {
+    type: "INTP",
+    name: "Nhà Giải Mã Tư Duy (The Abstract Alchemist)",
+    title: "Người truy tìm cấu trúc ẩn sau mọi ý tưởng",
+    element: "Thủy",
+    zodiac: "Sao Thiên Cơ",
+    mbtiMatch: "INTP - Phân tích, Tò mò & Độc lập",
+    description: "Bạn có tư duy lý thuyết mạnh, luôn muốn hiểu bản chất và đặt câu hỏi đến tận cùng. Bạn thích không gian tự do để suy nghĩ, thử giả thuyết và kết nối các ý tưởng tưởng như rời rạc. Năng lượng Thủy giúp trí tuệ của bạn linh hoạt, sâu và khó bị giới hạn.",
+    pillars: {
+      identity: "Tò mò, độc lập, yêu sự chính xác trong tư duy và không dễ chấp nhận câu trả lời đơn giản.",
+      career: "Phù hợp với nghiên cứu, công nghệ, dữ liệu, AI, chiến lược sản phẩm, triết học, khoa học hoặc kiến trúc hệ thống.",
+      love: "Yêu bằng sự tôn trọng trí tuệ, không gian riêng và những cuộc đối thoại sâu sắc.",
+      life: "Khám phá quy luật, xây hệ thống hiểu biết riêng và biến tri thức thành tự do nội tâm."
+    },
+    advice: [
+      "Đưa ý tưởng ra thử nghiệm sớm thay vì hoàn thiện mãi trong đầu.",
+      "Tập gọi tên cảm xúc bằng ngôn ngữ đơn giản hơn.",
+      "Đừng để sự phân tích khiến bạn đứng ngoài những trải nghiệm quan trọng."
+    ]
+  },
+  "ENTP": {
+    type: "ENTP",
+    name: "Người Khơi Mở Khả Năng (The Spark Strategist)",
+    title: "Người phá khuôn bằng ý tưởng và tranh biện sắc bén",
+    element: "Hỏa",
+    zodiac: "Sao Liêm Trinh",
+    mbtiMatch: "ENTP - Sáng tạo, Linh hoạt & Thách thức",
+    description: "Bạn nhanh trí, thích khám phá khả năng mới và thường nhìn thấy nhiều hướng đi mà người khác bỏ qua. Bạn không ngại đặt câu hỏi, thử góc nhìn trái chiều và phá vỡ khuôn mẫu cũ. Năng lượng Hỏa khiến ý tưởng của bạn bùng lên mạnh mẽ và dễ truyền cảm hứng.",
+    pillars: {
+      identity: "Tò mò, sắc sảo, thích tự do tư duy và luôn muốn mở rộng giới hạn của vấn đề.",
+      career: "Phù hợp với startup, chiến lược, marketing, sản phẩm, công nghệ, tư vấn, sáng tạo nội dung hoặc đổi mới mô hình kinh doanh.",
+      love: "Yêu bằng sự kích thích trí tuệ, hài hước và những cuộc trò chuyện không bao giờ nhàm chán.",
+      life: "Thử nghiệm, mở đường, chất vấn điều cũ và biến ý tưởng thành sân chơi phát triển."
+    },
+    advice: [
+      "Chọn vài ý tưởng thật sự quan trọng để theo đến cùng.",
+      "Tranh luận nên mở rộng kết nối, không chỉ để thắng lý lẽ.",
+      "Kỷ luật thực thi sẽ là chiếc neo cho sức sáng tạo rất lớn của bạn."
+    ]
+  },
+  "ENTJ": {
+    type: "ENTJ",
+    name: "Người Kiến Tạo Quyền Lực (The Vision Commander)",
+    title: "Người dẫn đường bằng tầm nhìn và ý chí sắc bén",
+    element: "Kim",
+    zodiac: "Sao Tử Vi",
+    mbtiMatch: "ENTJ - Lãnh đạo, Chiến lược & Quyết liệt",
+    description: "Bạn có tầm nhìn lớn, tư duy hệ thống và khả năng tổ chức nguồn lực để đạt mục tiêu. Bạn thường nhìn thấy con đường tối ưu, ra quyết định nhanh và không ngại chịu trách nhiệm. Năng lượng Kim giúp bạn có khí chất lãnh đạo rõ ràng, mạnh mẽ và hướng thành tựu.",
+    pillars: {
+      identity: "Tham vọng, lý trí, có năng lực dẫn dắt và luôn muốn nâng cấp hệ thống xung quanh.",
+      career: "Phù hợp với lãnh đạo doanh nghiệp, chiến lược, đầu tư, quản trị sản phẩm, tư vấn, công nghệ hoặc xây dựng tổ chức.",
+      love: "Yêu rõ ràng, nghiêm túc, định hướng tương lai và cần một người đồng hành có bản lĩnh riêng.",
+      life: "Tạo ảnh hưởng, xây thành tựu lớn và dùng năng lực lãnh đạo để kiến tạo giá trị dài hạn."
+    },
+    advice: [
+      "Đừng xem cảm xúc là vật cản, đó cũng là dữ liệu quan trọng của con người.",
+      "Cho người khác thời gian bắt kịp tốc độ tư duy của bạn.",
+      "Học cách nghỉ ngơi trước khi cơ thể buộc bạn phải dừng lại."
+    ]
+  },
+  "ENFJ": {
+    type: "ENFJ",
+    name: "Người Dẫn Lối Tâm Hồn (The Empathic Guide)",
+    title: "Người truyền cảm hứng bằng thấu cảm và tầm nhìn nhân văn",
+    element: "Mộc",
+    zodiac: "Sao Thiên Phủ",
+    mbtiMatch: "ENFJ - Truyền cảm hứng, Thấu cảm & Dẫn dắt",
+    description: "Bạn có khả năng nhìn thấy tiềm năng trong người khác và khơi dậy điều tốt đẹp ở họ. Bạn kết hợp sự ấm áp với năng lực tổ chức, khiến người khác cảm thấy được lắng nghe và được dẫn đường. Năng lượng Mộc giúp bạn phát triển, chữa lành và lan tỏa lý tưởng sống tích cực.",
+    pillars: {
+      identity: "Giàu thấu cảm, hướng cộng đồng, có tầm nhìn và mong muốn nâng đỡ người khác phát triển.",
+      career: "Phù hợp với coaching, giáo dục, nhân sự, truyền thông, lãnh đạo cộng đồng, tâm lý học hoặc phát triển tổ chức.",
+      love: "Yêu sâu sắc, chủ động chăm sóc cảm xúc và mong muốn cùng nhau trưởng thành.",
+      life: "Kết nối con người, gieo cảm hứng và xây những cộng đồng có ý nghĩa."
+    },
+    advice: [
+      "Đừng biến việc cứu giúp người khác thành trách nhiệm thường trực của mình.",
+      "Giữ một phần năng lượng cho mục tiêu cá nhân, không chỉ cho tập thể.",
+      "Học cách chấp nhận rằng không phải ai cũng cần được dẫn dắt ngay lúc này."
     ]
   },
   "DEFAULT": {

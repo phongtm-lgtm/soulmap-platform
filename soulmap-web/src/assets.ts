@@ -3,6 +3,7 @@ const SOULMAP_CANVAS_BASE = '/soulmap-canvas';
 export const APP_ASSETS = {
   linhNhiMascot: '/linh-nhi-mascot.png',
   linhNhiMbtiMascot: '/mbti/linhnhi-mbti-Photoroom.png',
+  mbtiPreparationBg: '/mbti/mbti-preparation-bg.png',
   mbtiTestBg: '/mbti-test-bg.webp',
   mbtiStartTestBg: 'https://res.cloudinary.com/mlv5dzac/image/upload/v1783400296/bg-lam-bai-test_eprhio.png',
   mbtiManualResultBg: 'https://res.cloudinary.com/mlv5dzac/image/upload/v1783400298/bg-nhap-kq-mbti_jajqar.png',

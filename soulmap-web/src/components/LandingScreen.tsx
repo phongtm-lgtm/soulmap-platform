@@ -38,6 +38,13 @@ const demoChat: { sender: 'user' | 'assistant'; text: string }[] = [
     },
 ];
 
+const demoChatSuggestions = [
+    'Mình nên buông hay tiếp tục?',
+    'Giải thích theo SoulMap của mình',
+    'Cho mình một lời khuyên nhẹ nhàng',
+    'Gợi ý bước tiếp theo',
+];
+
 const journeySteps = [
     {
         n: 1,
@@ -112,14 +119,59 @@ const pillars = [
 ];
 
 export default function LandingScreen({
-                                          isLoggedIn,
-                                          setTransitionDirection,
-                                           setCurrentScreen,
-                                           navigateToTestIntro,
-                                       }: LandingScreenProps) {
+                                           isLoggedIn,
+                                           setTransitionDirection,
+                                            setCurrentScreen,
+                                            navigateToTestIntro,
+                                        }: LandingScreenProps) {
+    const [landingChatMessages, setLandingChatMessages] = React.useState(demoChat);
+    const [isLandingChatTyping, setIsLandingChatTyping] = React.useState(false);
+    const landingChatScrollRef = React.useRef<HTMLDivElement>(null);
+
     const scrollToTop = () => {
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
+
+    const getDemoReply = (message: string) => {
+        const lowerMessage = message.toLowerCase();
+
+        if (lowerMessage.includes('buông') || lowerMessage.includes('tiếp tục')) {
+            return 'Nếu việc tiếp tục khiến bạn luôn phải thu nhỏ cảm xúc của mình, Linh Nhi nghĩ bạn nên dừng lại một nhịp để lắng nghe bản thân trước.\n\nBuông không phải lúc nào cũng là hết yêu. Đôi khi đó là cách bạn chọn không đánh mất chính mình.';
+        }
+
+        if (lowerMessage.includes('soulmap')) {
+            return 'Theo SoulMap, mỗi mối quan hệ thường chạm vào một bài học nội tâm.\n\nCâu hỏi quan trọng không chỉ là “người ấy còn yêu mình không?”, mà là “mối quan hệ này đang giúp mình nở ra hay co lại?”.';
+        }
+
+        if (lowerMessage.includes('lời khuyên')) {
+            return 'Lời khuyên nhẹ nhàng của Linh Nhi là: hôm nay đừng ép mình phải quyết định ngay.\n\nHãy viết ra 3 điều bạn cần trong một mối quan hệ an toàn. Nếu hiện tại không còn đáp ứng được những điều đó, bạn sẽ thấy câu trả lời rõ hơn.';
+        }
+
+        if (lowerMessage.includes('bước tiếp')) {
+            return 'Bước tiếp theo có thể rất nhỏ thôi:\n\n1. Gọi tên cảm xúc thật của bạn.\n2. Viết ra điều bạn đang sợ mất.\n3. Tự hỏi: “Nếu là người bạn thương nhất, mình sẽ khuyên họ thế nào?”.';
+        }
+
+        return 'Linh Nhi nghe thấy bạn. Điều bạn đang cảm nhận không hề nhỏ đâu.\n\nNếu muốn, mình có thể cùng bạn bóc tách cảm xúc này thành từng phần để bạn nhìn rõ hơn điều trái tim đang cần.';
+    };
+
+    const sendLandingChatMessage = (message?: string) => {
+        const text = (message ?? '').trim();
+        if (!text || isLandingChatTyping) return;
+
+        setLandingChatMessages((messages) => [...messages, { sender: 'user', text }]);
+        setIsLandingChatTyping(true);
+
+        window.setTimeout(() => {
+            setLandingChatMessages((messages) => [...messages, { sender: 'assistant', text: getDemoReply(text) }]);
+            setIsLandingChatTyping(false);
+        }, 650);
+    };
+
+    React.useEffect(() => {
+        const el = landingChatScrollRef.current;
+        if (!el) return;
+        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }, [landingChatMessages.length, isLandingChatTyping]);
 
     return (
         <div className="relative isolate flex flex-col min-h-screen landing-bg overflow-hidden">
@@ -487,18 +539,18 @@ export default function LandingScreen({
 
                     {/* Simulated chat window */}
                     <div
-                        className="glass-card mt-8 md:mt-10 rounded-3xl border border-[#214D3B]/8 shadow-lg flex flex-col overflow-hidden">
+                        className="chat-demo-window glass-card mt-8 md:mt-10 rounded-3xl border border-[#214D3B]/8 shadow-lg flex flex-col overflow-hidden">
 
                         {/* Chat Header */}
                         <div
                             className="px-6 py-4 bg-[#214D3B]/5 border-b border-[#214D3B]/10 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div
-                                    className="w-10 h-10 rounded-full border border-[#B68A2F]/40 bg-white overflow-hidden shadow-sm flex items-center justify-center p-0.5">
+                                    className="chat-demo-avatar w-10 h-10 rounded-full border border-[#B68A2F]/40 bg-white overflow-hidden shadow-sm flex items-center justify-center p-0.5">
                                     <img
                                         src={APP_ASSETS.linhNhiMascot}
                                         alt="Linh Nhi"
-                                        className="w-full h-full object-contain"
+                                        className="chat-demo-avatar-img w-full h-full object-contain"
                                         referrerPolicy="no-referrer"
                                     />
                                 </div>
@@ -514,8 +566,8 @@ export default function LandingScreen({
                         </div>
 
                         {/* Chat Messages Body */}
-                        <div className="p-6 flex flex-col gap-5 bg-white/20">
-                            {demoChat.map((msg, index) => (
+                        <div ref={landingChatScrollRef} className="chat-demo-body custom-scrollbar p-6 flex flex-col gap-5 bg-white/20 overflow-y-auto">
+                            {landingChatMessages.map((msg, index) => (
                                 <div
                                     key={index}
                                     className={`chat-demo-message flex items-start gap-3 max-w-[82%] ${
@@ -524,11 +576,11 @@ export default function LandingScreen({
                                 >
                                     {msg.sender === 'assistant' && (
                                         <div
-                                            className="w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
+                                            className="chat-demo-avatar w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
                                             <img
                                                 src={APP_ASSETS.linhNhiMascot}
                                                 alt="Linh Nhi"
-                                                className="w-full h-full object-contain"
+                                                className="chat-demo-avatar-img w-full h-full object-contain"
                                                 referrerPolicy="no-referrer"
                                             />
                                         </div>
@@ -559,38 +611,55 @@ export default function LandingScreen({
                             ))}
 
                             {/* Typing indicator */}
-                            <div className="flex items-start gap-3 self-start text-left max-w-[82%]">
-                                <div
-                                    className="w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                                    <img
-                                        src={APP_ASSETS.linhNhiMascot}
-                                        alt="Linh Nhi"
-                                        className="w-full h-full object-contain"
-                                        referrerPolicy="no-referrer"
-                                    />
+                            {isLandingChatTyping && (
+                                <div className="flex items-start gap-3 self-start text-left max-w-[82%]">
+                                    <div
+                                        className="chat-demo-avatar w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
+                                        <img
+                                            src={APP_ASSETS.linhNhiMascot}
+                                            alt="Linh Nhi"
+                                            className="chat-demo-avatar-img w-full h-full object-contain"
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    </div>
+                                    <div
+                                        className="p-4 rounded-2xl bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
+                                              style={{animationDelay: '0ms'}}></span>
+                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
+                                              style={{animationDelay: '150ms'}}></span>
+                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
+                                              style={{animationDelay: '300ms'}}></span>
+                                    </div>
                                 </div>
-                                <div
-                                    className="p-4 rounded-2xl bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                          style={{animationDelay: '0ms'}}></span>
-                                    <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                          style={{animationDelay: '150ms'}}></span>
-                                    <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                          style={{animationDelay: '300ms'}}></span>
-                                </div>
+                            )}
+
+                            <div className="chat-demo-suggestions flex flex-wrap gap-2 pl-14">
+                                {demoChatSuggestions.map((suggestion) => (
+                                    <button
+                                        key={suggestion}
+                                        type="button"
+                                        onClick={() => sendLandingChatMessage(suggestion)}
+                                        disabled={isLandingChatTyping}
+                                        className="rounded-full border border-[#E8DFCF] bg-white/85 px-4 py-2 font-sans text-xs font-bold text-[#151A16] shadow-[0_12px_28px_-24px_rgba(33,77,59,0.55)] transition hover:border-[#C8A15A]/60 hover:bg-[#C8A15A]/8"
+                                    >
+                                        {suggestion}
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
                         {/* Chat Input Footer (decorative) */}
                         <div className="p-4 bg-white border-t border-[#214D3B]/10 flex gap-3 items-center">
-                            <div
-                                className="flex-grow bg-[#fbf9f5] border border-[#214D3B]/10 rounded-full px-5 py-3 text-sm font-sans text-[#636A64]/70 select-none">
-                                Hỏi Linh Nhi bất kỳ điều gì về bản đồ của bạn...
+                            <div className="flex-grow bg-[#fbf9f5] border border-[#214D3B]/10 rounded-full px-5 py-3 text-sm font-sans text-[#636A64]/70 select-none">
+                                Chọn một gợi ý phía trên để mô phỏng trò chuyện...
                             </div>
-                            <span
-                                className="w-12 h-12 rounded-full bg-[#214D3B] text-white flex items-center justify-center shadow-md flex-shrink-0">
-                  <Send className="w-5 h-5"/>
-                </span>
+                            <button
+                                type="button"
+                                disabled
+                                className="w-12 h-12 rounded-full bg-[#214D3B] text-white flex items-center justify-center shadow-md flex-shrink-0 disabled:opacity-60 disabled:cursor-not-allowed">
+                                <Send className="w-5 h-5"/>
+                            </button>
                         </div>
                     </div>
 

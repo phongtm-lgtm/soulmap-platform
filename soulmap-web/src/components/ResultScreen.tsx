@@ -57,8 +57,10 @@ interface ResultScreenProps {
   setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
   navigateToAssessment: (direction?: 'push' | 'none') => void;
+  navigateToTestIntro: (direction?: 'push' | 'none') => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
   navigateToAiChat: () => void;
+  navigateToJourneys: () => void;
 }
 
 export default function ResultScreen({
@@ -83,8 +85,10 @@ export default function ResultScreen({
   setCurrentScreen,
   setTransitionDirection,
   navigateToAssessment,
+  navigateToTestIntro,
   navigateToLanding,
   navigateToAiChat,
+  navigateToJourneys,
 }: ResultScreenProps) {
   const [selectedJourney, setSelectedJourney] = React.useState<SoulMapJourney | null>(null);
 
@@ -99,15 +103,11 @@ export default function ResultScreen({
   };
 
   const openJourneysOverview = () => {
-    setSelectedJourney(null);
-    setTransitionDirection('push');
-    setCurrentScreen('four_journeys');
+    navigateToJourneys();
   };
 
   const continueToJourneys = () => {
-    setSelectedJourney(null);
-    setTransitionDirection('push');
-    setCurrentScreen('four_journeys');
+    navigateToJourneys();
   };
 
   const getElementColorClass = (element: string) => {
@@ -171,11 +171,12 @@ export default function ResultScreen({
         <Navbar
           isLoggedIn={isLoggedIn}
           currentUser={currentUser}
+          currentScreen="result"
           handleLogout={handleLogout}
           navigateToLanding={navigateToLanding}
           navigateToAssessment={navigateToAssessment}
           onOpenJourneys={openJourneysOverview}
-          onOpenChat={navigateToAiChat}
+          onOpenAiMentor={navigateToAiChat}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -187,7 +188,7 @@ export default function ResultScreen({
           <MbtiSummaryStep
             profile={profile}
             onContinue={() => setResultStep('birth_form')}
-            onRetake={() => navigateToAssessment('none')}
+            onRetake={() => navigateToTestIntro('none')}
           />
         )}
 
@@ -261,23 +262,27 @@ export default function ResultScreen({
                 </div>
 
                 <div className="mt-6 grid w-full flex-1 grid-cols-1 items-stretch gap-5 lg:grid-cols-[0.92fr_1.08fr]">
-                  <div className="flex flex-col items-center justify-center rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFFDF8]/64 p-5 shadow-[0_18px_44px_-34px_rgba(77,52,28,0.38)] backdrop-blur-sm">
-                    <div className="relative flex h-44 w-44 items-center justify-center md:h-48 md:w-48">
-                      <div className="absolute inset-0 rounded-full border border-dashed border-[#C8A15A]/65" />
-                      <div className="absolute inset-4 rounded-full border-[10px] border-[#E8DFCF]" />
-                      <div
-                        className="absolute inset-4 rounded-full border-[10px] border-transparent border-t-[#24533E] border-r-[#C8A15A]"
-                        style={{ transform: `rotate(${generationPercent * 3.6}deg)` }}
-                      />
-                      <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#FFFDF8] shadow-[0_12px_30px_-18px_rgba(33,77,59,0.45)]">
-                        <Compass className="h-12 w-12 text-[#24533E]" />
+                  <div className="flex flex-col items-center justify-center rounded-[1.5rem] border border-[#E8DFCF] bg-gradient-to-b from-[#FFFDF8]/82 to-[#FAF6EE]/72 p-5 shadow-[0_18px_44px_-34px_rgba(77,52,28,0.38)] backdrop-blur-sm">
+                    <div className="relative flex flex-col items-center">
+                      <div className="relative flex h-36 w-36 items-center justify-center md:h-40 md:w-40">
+                        <div className="absolute inset-0 rounded-full border border-dashed border-[#C8A15A]/45" />
+                        <div className="absolute inset-3 rounded-full bg-[#F4EFE3] shadow-inner" />
+                        <div
+                          className="absolute inset-3 rounded-full shadow-[0_18px_38px_-30px_rgba(33,77,59,0.8)]"
+                          style={{
+                            background: `conic-gradient(#24533E 0deg ${generationPercent * 3.6}deg, #E7DFD0 ${generationPercent * 3.6}deg 360deg)`,
+                          }}
+                        />
+                        <div className="absolute inset-[24px] rounded-full bg-[#FFFDF8] shadow-[inset_0_0_0_1px_rgba(232,223,207,0.9)]" />
+                        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[#FFFDF8] md:h-24 md:w-24">
+                          <span className="font-sans text-[1.45rem] font-extrabold leading-none text-[#24533E] md:text-[1.6rem]">
+                            {generationPercent}%
+                          </span>
+                        </div>
                       </div>
-                      <span className="absolute -bottom-2 font-sans text-[1.05rem] font-extrabold text-[#24533E]">
-                        {generationPercent}%
-                      </span>
                     </div>
 
-                    <div className="mt-7 flex w-full items-center gap-4 rounded-[1.25rem] border border-[#E8DFCF] bg-[#FFFDF8]/78 p-4 text-left">
+                    <div className="mt-6 flex w-full items-center gap-4 rounded-[1.25rem] border border-[#E8DFCF] bg-[#FFFDF8]/82 p-4 text-left shadow-[0_12px_32px_-26px_rgba(77,52,28,0.36)]">
                       <img
                         src="/linh-nhi-mascot.png"
                         alt="Linh Nhi"

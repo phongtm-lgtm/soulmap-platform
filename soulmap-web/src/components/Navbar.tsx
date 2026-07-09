@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { 
   Compass, 
   Trophy, 
-  BookOpen, 
   Zap, 
   Bell, 
   ChevronDown, 
@@ -11,33 +10,42 @@ import {
   Leaf,
   Menu,
   X,
-  Sparkles,
-  Bot,
+  BotMessageSquare,
+  NotebookPen,
+  Newspaper,
 } from 'lucide-react';
 import type { AppScreen } from '../types';
 
 interface NavbarProps {
+  isAuthReady?: boolean;
   isLoggedIn: boolean;
   currentUser: { name: string; email: string } | null;
+  currentScreen: AppScreen;
   handleLogout: () => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
   navigateToAssessment: (direction?: 'push' | 'none') => void;
   navigateToTestIntro?: (direction?: 'push' | 'none') => void;
   onOpenJourneys?: () => void;
-  onOpenChat?: () => void;
+  onOpenAiMentor?: () => void;
+  onOpenJournal?: () => void;
+  onOpenAcademy?: () => void;
   setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
 }
 
 export default function Navbar({
+  isAuthReady = true,
   isLoggedIn,
   currentUser,
+  currentScreen,
   handleLogout,
   navigateToLanding,
   navigateToAssessment,
   navigateToTestIntro,
   onOpenJourneys,
-  onOpenChat,
+  onOpenAiMentor,
+  onOpenJournal,
+  onOpenAcademy,
   setCurrentScreen,
   setTransitionDirection,
 }: NavbarProps) {
@@ -80,26 +88,63 @@ export default function Navbar({
     onOpenJourneys?.();
   };
 
-  const openChat = () => {
+  const openAiMentor = () => {
     setIsMobileMenuOpen(false);
     setIsProfileMenuOpen(false);
-    if (onOpenChat) {
-      onOpenChat();
-      return;
-    }
-    // No chat handler wired (e.g. guest context) — send them to sign in first.
     if (!isLoggedIn) {
       setTransitionDirection('push');
       setCurrentScreen('auth');
+      return;
     }
+    onOpenAiMentor?.();
   };
+
+  const openJournal = () => {
+    setIsMobileMenuOpen(false);
+    setIsProfileMenuOpen(false);
+    if (!isLoggedIn) {
+      setTransitionDirection('push');
+      setCurrentScreen('auth');
+      return;
+    }
+    onOpenJournal?.();
+  };
+
+  const openAcademy = () => {
+    setIsMobileMenuOpen(false);
+    setIsProfileMenuOpen(false);
+    onOpenAcademy?.();
+  };
+
+  const isMapActive = currentScreen === 'landing' || currentScreen === 'test_intro' || currentScreen === 'assessment';
+  const isJourneysActive = currentScreen === 'four_journeys';
+  const isAiMentorActive = currentScreen === 'ai_chat';
+  const isJournalActive = currentScreen === 'journal';
+  const isAcademyActive = currentScreen === 'academy';
+
+  const desktopNavClass = (active: boolean) =>
+    `nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 cursor-pointer border outline-none ${
+      active
+        ? 'text-[#24533E] bg-[#FFFDF8] border-[#E8DFCF] shadow-sm'
+        : 'text-[#5E625F] bg-transparent border-transparent hover:text-[#24533E] hover:bg-[#24533E]/5'
+    }`;
+
+  const desktopIconClass = (active: boolean) =>
+    `w-4 h-4 transition-colors ${active ? 'text-[#B68A2F]' : 'text-[#8C928D] group-hover:text-[#B68A2F]'}`;
+
+  const mobileNavClass = (active: boolean) =>
+    `flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-sans text-sm font-semibold transition-colors border outline-none ${
+      active
+        ? 'text-[#24533E] bg-[#24533E]/5 border-[#24533E]/10'
+        : 'text-[#5E625F] bg-transparent border-transparent hover:bg-[#24533E]/5 hover:text-[#24533E]'
+    }`;
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#F8F4EB]/90 backdrop-blur-xl border-b border-[#E8DFCF]/70 shadow-[0_1px_0_rgba(232,223,207,0.6)] h-20 transition-all duration-300">
-      <div className="flex justify-between items-center h-full px-6 md:px-12 lg:px-16 max-w-[1600px] mx-auto w-full">
+      <div className="grid h-full w-full grid-cols-[auto_1fr_auto] items-center gap-4 px-5 sm:px-6 lg:px-10 2xl:px-12">
         {/* Brand Logo */}
         <div 
-          className="flex items-center gap-4 cursor-pointer group" 
+          className="flex shrink-0 items-center gap-4 cursor-pointer group" 
           onClick={goToLanding}
         >
           <span className="w-10 h-10 rounded-2xl bg-[#24533E]/7 flex items-center justify-center text-[#35684D] group-hover:scale-105 group-hover:bg-[#24533E]/10 transition-all duration-300">
@@ -114,74 +159,52 @@ export default function Navbar({
         </div>
         
         {/* Menu Items / Active Tabs (Desktop Only) */}
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center justify-center gap-1 xl:gap-2">
           <button 
             onClick={goToLanding}
-            className="nav-menu-item px-4 py-2 rounded-full flex items-center gap-2 text-[#24533E] bg-[#FFFDF8] border border-[#E8DFCF] shadow-sm hover:border-[#B68A2F]/40 transition-all duration-300 cursor-pointer"
+            className={desktopNavClass(isMapActive)}
           >
-            <Compass className="w-4 h-4 text-[#B68A2F]" />
-            <span>{isLoggedIn ? 'Bản đồ của tôi' : 'SoulMap'}</span>
+            <Compass className={desktopIconClass(isMapActive)} />
+            <span>Khám phá</span>
           </button>
 
-          {!isLoggedIn && (
-            <a
-              href="#how-it-works"
-              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
-              <span>Cách hoạt động</span>
-            </a>
-          )}
-
-          {isLoggedIn ? (
-            <button
-              onClick={onOpenJourneys ? openJourneys : startSoulMap}
-              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer bg-transparent border-none outline-none"
-            >
-              <Trophy className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
-              <span>Hành trình</span>
-            </button>
-          ) : (
-            <a
-              href="#pillars"
-              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
-            >
-              <Trophy className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
-              <span>Hành trình</span>
-            </a>
-          )}
-
-          {isLoggedIn ? (
-            <button
-              onClick={startSoulMap}
-              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer bg-transparent border-none outline-none"
-            >
-              <BookOpen className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
-              <span>Nhật ký</span>
-            </button>
-          ) : (
-            <a
-              href="#chat-demo"
-              className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#5E625F] hover:text-[#24533E] hover:bg-[#24533E]/5 transition-all duration-300 cursor-pointer"
-            >
-              <BookOpen className="w-4 h-4 text-[#8C928D] group-hover:text-[#B68A2F] transition-colors" />
-              <span>Linh Nhi AI</span>
-            </a>
-          )}
+          <button
+            onClick={onOpenJourneys ? openJourneys : startSoulMap}
+            className={desktopNavClass(isJourneysActive)}
+          >
+            <Trophy className={desktopIconClass(isJourneysActive)} />
+            <span>Hành trình</span>
+          </button>
 
           <button
-            onClick={openChat}
-            className="nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full text-[#24533E] border border-[#B68A2F]/30 bg-[#B68A2F]/8 hover:bg-[#B68A2F]/14 hover:border-[#B68A2F]/50 transition-all duration-300 cursor-pointer outline-none"
+            onClick={openAiMentor}
+            className={desktopNavClass(isAiMentorActive)}
           >
-            <Bot className="w-4 h-4 text-[#B68A2F]" />
+            <BotMessageSquare className={desktopIconClass(isAiMentorActive)} />
             <span>AI Mentor</span>
+          </button>
+
+          <button
+            onClick={openJournal}
+            className={desktopNavClass(isJournalActive)}
+          >
+            <NotebookPen className={desktopIconClass(isJournalActive)} />
+            <span>Nhật ký</span>
+          </button>
+
+          <button
+            onClick={openAcademy}
+            className={desktopNavClass(isAcademyActive)}
+          >
+            <Newspaper className={desktopIconClass(isAcademyActive)} />
+            <span>Học viện</span>
           </button>
         </div>
 
         {/* Right Section: Profile / Login CTA */}
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 md:gap-4">
           {/* Soul Energy + notifications — only for signed-in travelers */}
-          {isLoggedIn && (
+          {isAuthReady && isLoggedIn && (
             <>
               <div className="hidden sm:flex items-center gap-2">
                 <Zap className="w-5 h-5 text-[#B68A2F] fill-[#B68A2F] drop-shadow-[0_2px_4px_rgba(182,138,47,0.25)]" />
@@ -202,7 +225,9 @@ export default function Navbar({
           )}
 
           {/* User Profile dropdown */}
-          {isLoggedIn && currentUser ? (
+          {!isAuthReady ? (
+            <div className="hidden h-10 w-[132px] rounded-full bg-[#E8DFCF]/45 sm:block" aria-hidden="true" />
+          ) : isLoggedIn && currentUser ? (
             <div className="relative">
               <button
                 onClick={() => setIsProfileMenuOpen((open) => !open)}
@@ -270,6 +295,18 @@ export default function Navbar({
           )}
 
           <button
+            onClick={openAiMentor}
+            className={`hidden md:inline-flex lg:hidden items-center gap-2 rounded-full border px-3.5 py-2 font-sans text-xs font-bold transition-all ${
+              isAiMentorActive
+                ? 'border-[#E8DFCF] bg-[#FFFDF8] text-[#24533E] shadow-sm'
+                : 'border-transparent bg-[#24533E]/5 text-[#24533E] hover:bg-[#24533E]/10'
+            }`}
+          >
+            <BotMessageSquare className="h-4 w-4 text-[#B68A2F]" />
+            AI Mentor
+          </button>
+
+          <button
             onClick={() => {
               setIsProfileMenuOpen(false);
               setIsMobileMenuOpen((open) => !open);
@@ -288,70 +325,45 @@ export default function Navbar({
           <div className="flex flex-col gap-1">
             <button
               onClick={goToLanding}
-              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-sans text-sm font-semibold text-[#24533E] bg-[#24533E]/5 border border-[#24533E]/10"
+              className={mobileNavClass(isMapActive)}
             >
               <Compass className="w-4 h-4 text-[#B68A2F]" />
-              {isLoggedIn ? 'Bản đồ của tôi' : 'SoulMap'}
+              Khám phá
             </button>
 
-            {!isLoggedIn && (
-              <a
-                href="#how-it-works"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 font-sans text-sm font-semibold text-[#5E625F] hover:bg-[#24533E]/5 hover:text-[#24533E] transition-colors"
-              >
-                <Sparkles className="w-4 h-4 text-[#B68A2F]" />
-                Cách hoạt động
-              </a>
-            )}
-
-            {isLoggedIn ? (
-              <button
-                onClick={onOpenJourneys ? openJourneys : startSoulMap}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-sans text-sm font-semibold text-[#5E625F] hover:bg-[#24533E]/5 hover:text-[#24533E] transition-colors bg-transparent border-none outline-none"
-              >
-                <Trophy className="w-4 h-4 text-[#B68A2F]" />
-                Hành trình
-              </button>
-            ) : (
-              <a
-                href="#pillars"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 font-sans text-sm font-semibold text-[#5E625F] hover:bg-[#24533E]/5 hover:text-[#24533E] transition-colors"
-              >
-                <Trophy className="w-4 h-4 text-[#B68A2F]" />
-                Hành trình
-              </a>
-            )}
-
-            {isLoggedIn ? (
-              <button
-                onClick={startSoulMap}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-sans text-sm font-semibold text-[#5E625F] hover:bg-[#24533E]/5 hover:text-[#24533E] transition-colors bg-transparent border-none outline-none"
-              >
-                <BookOpen className="w-4 h-4 text-[#B68A2F]" />
-                Nhật ký
-              </button>
-            ) : (
-              <a
-                href="#chat-demo"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 font-sans text-sm font-semibold text-[#5E625F] hover:bg-[#24533E]/5 hover:text-[#24533E] transition-colors"
-              >
-                <BookOpen className="w-4 h-4 text-[#B68A2F]" />
-                Linh Nhi AI
-              </a>
-            )}
+            <button
+              onClick={onOpenJourneys ? openJourneys : startSoulMap}
+              className={mobileNavClass(isJourneysActive)}
+            >
+              <Trophy className="w-4 h-4 text-[#B68A2F]" />
+              Hành trình
+            </button>
 
             <button
-              onClick={openChat}
-              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-sans text-sm font-semibold text-[#24533E] border border-[#B68A2F]/30 bg-[#B68A2F]/8 hover:bg-[#B68A2F]/14 transition-colors outline-none"
+              onClick={openAiMentor}
+              className={mobileNavClass(isAiMentorActive)}
             >
-              <Bot className="w-4 h-4 text-[#B68A2F]" />
+              <BotMessageSquare className="w-4 h-4 text-[#B68A2F]" />
               AI Mentor
             </button>
 
-            {!isLoggedIn ? (
+            <button
+              onClick={openJournal}
+              className={mobileNavClass(isJournalActive)}
+            >
+              <NotebookPen className="w-4 h-4 text-[#B68A2F]" />
+              Nhật ký
+            </button>
+
+            <button
+              onClick={openAcademy}
+              className={mobileNavClass(isAcademyActive)}
+            >
+              <Newspaper className="w-4 h-4 text-[#B68A2F]" />
+              Học viện SoulMap
+            </button>
+
+            {!isAuthReady ? null : !isLoggedIn ? (
               <div className="mt-2 border-t border-[#E8DFCF] pt-3">
                 <button
                   onClick={goToAuth}

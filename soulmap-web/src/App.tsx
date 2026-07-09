@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, calculateProfile, PersonalityProfile, AppScreen } from './types';
+import { useRouter } from 'next/navigation';
+import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, PersonalityProfile, AppScreen, Question } from './types';
 
 // Import modular subcomponents
 import Navbar from './components/Navbar';
@@ -13,55 +14,81 @@ import ResultScreen from './components/ResultScreen';
 import FourJourneysScreen from './components/FourJourneysScreen';
 import JourneyDetailScreen from './components/journey/JourneyDetailScreen';
 import AIChatScreen from './components/AIChatScreen';
+import JournalScreen from './components/JournalScreen';
+import AcademyScreen from './components/AcademyScreen';
 import { buildMockJourneys } from './data/mockJourneys';
 import type { SoulMapJourney } from './types/journey';
+import { fetchMbtiQuestions, submitMbtiAnswers } from './lib/mbtiApi';
 
-export default function App() {
+interface AppProps {
+  initialScreen?: AppScreen;
+}
+
+export default function App({ initialScreen = 'landing' }: AppProps) {
+  const router = useRouter();
   type Screen = AppScreen;
-  const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
+  const [currentScreen, setCurrentScreen] = useState<Screen>(initialScreen);
   const [transitionDirection, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
 
   // User Authentication State
+  const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null);
 
   // Initialize from localStorage safely in useEffect after mounting to avoid Next.js SSR hydration errors
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loggedIn = localStorage.getItem('soulmap_logged_in') === 'true';
-      setIsLoggedIn(loggedIn);
-      
-      const u = localStorage.getItem('soulmap_user');
-      if (u) {
-        try {
-          setCurrentUser(JSON.parse(u));
-        } catch (e) {
-          console.error('Failed to parse user from localStorage:', e);
-        }
-      }
+    if (typeof window === 'undefined') return;
 
-      const savedProgress = localStorage.getItem('soulmap_mbti_progress');
-      if (savedProgress) {
-        try {
-          const parsed = JSON.parse(savedProgress) as {
-            currentQuestionIndex?: number;
-            answers?: Record<number, 'A' | 'B'>;
-          };
-          if (typeof parsed.currentQuestionIndex === 'number') {
-            setCurrentQuestionIndex(parsed.currentQuestionIndex);
-          }
-          if (parsed.answers) {
-            setAnswers(parsed.answers);
-            const qId = SOULMAP_QUESTIONS[parsed.currentQuestionIndex ?? 0]?.id;
-            if (qId && parsed.answers[qId]) {
-              setSelectedOption(parsed.answers[qId]);
-            }
-          }
-        } catch (e) {
-          console.error('Failed to parse MBTI progress from localStorage:', e);
-        }
+    const loggedIn = localStorage.getItem('soulmap_logged_in') === 'true';
+    const u = localStorage.getItem('soulmap_user');
+    let parsedUser: { name: string; email: string } | null = null;
+    if (u) {
+      try {
+        parsedUser = JSON.parse(u);
+      } catch (e) {
+        console.error('Failed to parse user from localStorage:', e);
       }
     }
+
+    if (loggedIn && parsedUser) {
+      setIsLoggedIn(true);
+      setCurrentUser(parsedUser);
+    } else {
+      localStorage.removeItem('soulmap_logged_in');
+      localStorage.removeItem('soulmap_user');
+      setIsLoggedIn(false);
+      setCurrentUser(null);
+    }
+
+    const savedProgress = localStorage.getItem('soulmap_mbti_progress');
+    if (savedProgress) {
+      try {
+        const parsed = JSON.parse(savedProgress) as {
+          currentQuestionIndex?: number;
+          answers?: Record<number, 'A' | 'B'>;
+        };
+        if (typeof parsed.currentQuestionIndex === 'number') {
+          setCurrentQuestionIndex(parsed.currentQuestionIndex);
+        }
+        if (parsed.answers) {
+          setAnswers(parsed.answers);
+        }
+      } catch (e) {
+        console.error('Failed to parse MBTI progress from localStorage:', e);
+      }
+    }
+
+    const savedProfile = localStorage.getItem('soulmap_profile');
+    if (savedProfile) {
+      try {
+        setProfile(JSON.parse(savedProfile));
+      } catch (e) {
+        console.error('Failed to parse SoulMap profile from localStorage:', e);
+        localStorage.removeItem('soulmap_profile');
+      }
+    }
+
+    setIsAuthReady(true);
   }, []);
 
   // Auth Screen Local States
@@ -152,9 +179,9 @@ export default function App() {
         setAuthError('');
         setAuthSuccessMsg('');
         
-        // Go back to landing or assessment depending on context
-        setCurrentScreen('landing');
-        setTransitionDirection('push_back');
+        router.push('/journeys');
+        setCurrentScreen('four_journeys');
+        setTransitionDirection('push');
       }, 1500);
 
     }, 2000);
@@ -164,9 +191,40 @@ export default function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<number, 'A' | 'B'>>({});
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | null>(null);
+  const [mbtiQuestions, setMbtiQuestions] = useState<Question[]>([]);
+  const [isQuestionsLoading, setIsQuestionsLoading] = useState<boolean>(false);
+  const [questionsError, setQuestionsError] = useState<string | null>(null);
+  const [isSubmittingMbti, setIsSubmittingMbti] = useState<boolean>(false);
   
   // Profile / Result State
   const [profile, setProfile] = useState<PersonalityProfile | null>(null);
+
+  useEffect(() => {
+    if (!isAuthReady || currentScreen !== 'result' || profile) return;
+    router.replace('/mbti-test');
+    setCurrentScreen('test_intro');
+  }, [currentScreen, isAuthReady, profile, router]);
+
+  useEffect(() => {
+    if (currentScreen !== 'assessment' || mbtiQuestions.length > 0 || isQuestionsLoading) return;
+
+    setIsQuestionsLoading(true);
+    setQuestionsError(null);
+
+    fetchMbtiQuestions()
+      .then((questions) => {
+        setMbtiQuestions(questions);
+        const currentQuestion = questions[currentQuestionIndex];
+        setSelectedOption(currentQuestion ? answers[currentQuestion.id] || null : null);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch MBTI questions:', error);
+        setQuestionsError('Không thể tải bộ câu hỏi MBTI. Vui lòng kiểm tra kết nối backend và thử lại.');
+      })
+      .finally(() => {
+        setIsQuestionsLoading(false);
+      });
+  }, [answers, currentQuestionIndex, currentScreen, isQuestionsLoading, mbtiQuestions.length]);
 
   // Sub-steps for the results screen: 'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map'
   const [resultStep, setResultStep] = useState<'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map'>('mbti_summary');
@@ -205,6 +263,7 @@ export default function App() {
   // Navigation handlers with specified transition names
   const navigateToAssessment = (direction: 'push' | 'none' = 'push') => {
     setTransitionDirection(direction);
+    router.push('/mbti-assessment');
     setCurrentQuestionIndex(0);
     setAnswers({});
     setSelectedOption(null);
@@ -213,18 +272,33 @@ export default function App() {
 
   const navigateToTestIntro = (direction: 'push' | 'none' = 'push') => {
     setTransitionDirection(direction);
+    router.push('/mbti-test');
     setCurrentScreen('test_intro');
   };
 
   const navigateToLanding = (direction: 'push_back' | 'none' = 'push_back') => {
     setTransitionDirection(direction);
+    router.push('/soulmap');
     setCurrentScreen('landing');
   };
 
   const navigateToFourJourneys = () => {
     setJourneyDetail(null);
     setTransitionDirection('push');
+    router.push('/journeys');
     setCurrentScreen('four_journeys');
+  };
+
+  const navigateToJournal = () => {
+    setTransitionDirection('push');
+    router.push('/journal');
+    setCurrentScreen('journal');
+  };
+
+  const navigateToAcademy = () => {
+    setTransitionDirection('push');
+    router.push('/academy');
+    setCurrentScreen('academy');
   };
 
   // Track which screen to return to when the user exits the dedicated AI Chat page.
@@ -233,11 +307,13 @@ export default function App() {
   const navigateToAiChat = () => {
     setScreenBeforeChat(currentScreen);
     setTransitionDirection('push');
+    router.push('/ai-mentor');
     setCurrentScreen('ai_chat');
   };
 
   const exitAiChat = () => {
     setTransitionDirection('push_back');
+    router.push(screenBeforeChat === 'four_journeys' ? '/journeys' : '/soulmap');
     setCurrentScreen(screenBeforeChat);
   };
 
@@ -283,6 +359,8 @@ export default function App() {
     setSelectedOption(null);
     setCurrentQuestionIndex(0);
     setProfile(computedProfile);
+    localStorage.setItem('soulmap_profile', JSON.stringify(computedProfile));
+    localStorage.setItem('soulmap_mbti_answers', JSON.stringify(inferredAnswers));
     setChatHistory([
       {
         sender: 'assistant',
@@ -292,29 +370,50 @@ export default function App() {
     setResultStep('mbti_summary');
     setGenerationProgress(0);
     setZoomMap(false);
+    router.push('/soulmap-result');
     setCurrentScreen('result');
   };
 
   const handleSelectOption = (option: 'A' | 'B') => {
+    const currentQuestion = mbtiQuestions[currentQuestionIndex];
+    if (!currentQuestion) return;
+
     setSelectedOption(option);
-    setAnswers(prev => ({ ...prev, [SOULMAP_QUESTIONS[currentQuestionIndex].id]: option }));
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: option }));
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (!selectedOption) return;
+    const currentQuestion = mbtiQuestions[currentQuestionIndex];
+    if (!currentQuestion) return;
 
     // Transition between questions is 'none'
     setTransitionDirection('none');
+    const updatedAnswers = { ...answers, [currentQuestion.id]: selectedOption };
 
-    if (currentQuestionIndex < SOULMAP_QUESTIONS.length - 1) {
+    if (currentQuestionIndex < mbtiQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       // Pre-fill if already answered
-      const nextQId = SOULMAP_QUESTIONS[currentQuestionIndex + 1].id;
-      setSelectedOption(answers[nextQId] || null);
+      const nextQId = mbtiQuestions[currentQuestionIndex + 1].id;
+      setSelectedOption(updatedAnswers[nextQId] || null);
     } else {
-      // Calculate final results
-      const computedProfile = calculateProfile(answers);
+      setIsSubmittingMbti(true);
+
+      let computedProfile: PersonalityProfile;
+      try {
+        const mbtiType = await submitMbtiAnswers(updatedAnswers);
+        computedProfile = PERSONALITY_PROFILES[mbtiType] || PERSONALITY_PROFILES.DEFAULT;
+      } catch (error) {
+        console.error('Failed to submit MBTI answers:', error);
+        setQuestionsError('Không thể gửi kết quả MBTI. Vui lòng thử lại sau.');
+        setIsSubmittingMbti(false);
+        return;
+      }
+
+      setIsSubmittingMbti(false);
       setProfile(computedProfile);
+      localStorage.setItem('soulmap_profile', JSON.stringify(computedProfile));
+      localStorage.setItem('soulmap_mbti_answers', JSON.stringify(updatedAnswers));
       
       // Initialize AI welcome chat for this archetype
       setChatHistory([
@@ -327,6 +426,7 @@ export default function App() {
       setResultStep('mbti_summary');
       setGenerationProgress(0);
       setZoomMap(false);
+      router.push('/soulmap-result');
       setCurrentScreen('result');
     }
   };
@@ -335,7 +435,7 @@ export default function App() {
     if (currentQuestionIndex > 0) {
       setTransitionDirection('none');
       setCurrentQuestionIndex(prev => prev - 1);
-      const prevQId = SOULMAP_QUESTIONS[currentQuestionIndex - 1].id;
+      const prevQId = mbtiQuestions[currentQuestionIndex - 1].id;
       setSelectedOption(answers[prevQId] || null);
     }
   };
@@ -392,25 +492,27 @@ export default function App() {
 
   // Determine container translation animation classes based on state
   const getScreenTransitionClass = () => {
-    if (transitionDirection === 'push') return 'animate-slide-in';
-    if (transitionDirection === 'push_back') return 'animate-slide-out';
     return '';
   };
 
   return (
-    <div className={`min-h-screen bg-[#fbf9f5] flex flex-col transition-all duration-500 overflow-x-hidden ${getScreenTransitionClass()}`}>
+    <div className={`min-h-screen bg-[#fbf9f5] flex flex-col overflow-x-hidden ${getScreenTransitionClass()}`}>
       
       {/* Top Navigation Bar (Shared across all pages except custom headers) */}
-      {currentScreen !== 'auth' && currentScreen !== 'result' && currentScreen !== 'ai_chat' && (
+      {currentScreen !== 'auth' && currentScreen !== 'result' && (
         <Navbar 
           isLoggedIn={isLoggedIn}
+          isAuthReady={isAuthReady}
           currentUser={currentUser}
+          currentScreen={currentScreen}
           handleLogout={handleLogout}
           navigateToLanding={navigateToLanding}
           navigateToAssessment={navigateToAssessment}
           navigateToTestIntro={navigateToTestIntro}
           onOpenJourneys={navigateToFourJourneys}
-          onOpenChat={navigateToAiChat}
+          onOpenAiMentor={navigateToAiChat}
+          onOpenJournal={navigateToJournal}
+          onOpenAcademy={navigateToAcademy}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -469,6 +571,7 @@ export default function App() {
 
       {currentScreen === 'assessment' && (
         <AssessmentScreen 
+          questions={mbtiQuestions}
           currentQuestionIndex={currentQuestionIndex}
           selectedOption={selectedOption}
           handleSelectOption={handleSelectOption}
@@ -476,6 +579,9 @@ export default function App() {
           handleNextQuestion={handleNextQuestion}
           getLinhNhiDialogue={getLinhNhiDialogue}
           onSaveProgress={handleSaveProgress}
+          isLoading={isQuestionsLoading}
+          error={questionsError}
+          isSubmitting={isSubmittingMbti}
         />
       )}
 
@@ -504,8 +610,10 @@ export default function App() {
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
           navigateToAssessment={navigateToAssessment}
+          navigateToTestIntro={navigateToTestIntro}
           navigateToLanding={navigateToLanding}
           navigateToAiChat={navigateToAiChat}
+          navigateToJourneys={navigateToFourJourneys}
         />
       )}
 
@@ -543,6 +651,14 @@ export default function App() {
           onNewChat={handleNewChat}
           onExit={exitAiChat}
         />
+      )}
+
+      {currentScreen === 'journal' && (
+        <JournalScreen currentUser={currentUser} />
+      )}
+
+      {currentScreen === 'academy' && (
+        <AcademyScreen currentUser={currentUser} />
       )}
     </div>
   );

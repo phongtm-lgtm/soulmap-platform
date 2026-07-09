@@ -8,21 +8,24 @@ import {
 } from 'lucide-react';
 import MbtiTestBackground from './MbtiTestBackground';
 import LinhNhiMessage from './LinhNhiMessage';
-import { SOULMAP_QUESTIONS } from '../types';
+import type { Question } from '../types';
 
 interface AssessmentScreenProps {
+  questions: Question[];
   currentQuestionIndex: number;
   selectedOption: 'A' | 'B' | null;
   handleSelectOption: (option: 'A' | 'B') => void;
   handlePrevQuestion: () => void;
-  handleNextQuestion: () => void;
+  handleNextQuestion: () => void | Promise<void>;
   getLinhNhiDialogue: () => string;
   onSaveProgress: () => void;
+  isLoading: boolean;
+  error: string | null;
+  isSubmitting: boolean;
 }
 
-const TOTAL_QUESTIONS = 72;
-
 export default function AssessmentScreen({
+  questions,
   currentQuestionIndex,
   selectedOption,
   handleSelectOption,
@@ -30,11 +33,15 @@ export default function AssessmentScreen({
   handleNextQuestion,
   getLinhNhiDialogue,
   onSaveProgress,
+  isLoading,
+  error,
+  isSubmitting,
 }: AssessmentScreenProps) {
   const [saveHint, setSaveHint] = useState<string | null>(null);
-  const currentQuestion = SOULMAP_QUESTIONS[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
   const displayIndex = currentQuestionIndex + 1;
-  const progress = (displayIndex / TOTAL_QUESTIONS) * 100;
+  const totalQuestions = questions.length;
+  const progress = totalQuestions > 0 ? (currentQuestionIndex / totalQuestions) * 100 : 0;
   const progressPercent = Math.round(progress);
 
   const handleSaveProgress = () => {
@@ -44,7 +51,7 @@ export default function AssessmentScreen({
   };
 
   return (
-    <div className="relative z-[1] min-h-screen px-4 pb-10 pt-24 sm:px-6">
+    <div className="relative z-[1] flex min-h-screen items-center px-4 py-24 sm:px-6">
       <MbtiTestBackground />
 
       <main className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-5 lg:grid-cols-[272px_minmax(0,1fr)]">
@@ -73,9 +80,9 @@ export default function AssessmentScreen({
 
           <div className="mt-8">
             <p className="font-display text-[2.35rem] font-bold leading-none tracking-tight text-[#214D3B]">
-              {displayIndex}
+              {totalQuestions > 0 ? displayIndex : 0}
               <span className="mx-1 text-[#8C928D]/70">/</span>
-              <span className="text-[#8C928D]/85">{TOTAL_QUESTIONS}</span>
+              <span className="text-[#8C928D]/85">{totalQuestions || '--'}</span>
             </p>
             <p className="mt-2 font-sans text-xs font-semibold text-[#5E625F]">
               Hoàn thành {progressPercent}%
@@ -108,8 +115,22 @@ export default function AssessmentScreen({
         </aside>
 
         <section className="rounded-[1.75rem] border border-[#E8DFCF] bg-[#FFFCF8]/88 p-5 shadow-[0_18px_50px_-38px_rgba(33,77,59,0.32)] backdrop-blur-xl sm:p-7 md:p-8">
+          {isLoading && (
+            <div className="flex min-h-[360px] items-center justify-center text-center font-sans text-sm font-bold text-[#24533E]">
+              Đang tải bộ câu hỏi MBTI...
+            </div>
+          )}
+
+          {!isLoading && error && (
+            <div className="flex min-h-[360px] items-center justify-center text-center font-sans text-sm font-bold text-[#8A3A2F]">
+              {error}
+            </div>
+          )}
+
+          {!isLoading && !error && currentQuestion && (
+            <>
           <p className="font-sans text-sm font-extrabold text-[#214D3B]">
-            Câu {displayIndex} / {TOTAL_QUESTIONS}
+            Câu {displayIndex} / {totalQuestions}
           </p>
 
           <h1 className="mx-auto mt-6 max-w-[580px] text-center font-display text-xl font-bold leading-snug text-[#1F5A43] md:text-2xl">
@@ -147,10 +168,10 @@ export default function AssessmentScreen({
           </div>
 
           <div className="mx-auto mt-7 flex w-full max-w-[560px] items-center justify-between gap-4">
-            <button
-              type="button"
-              onClick={handlePrevQuestion}
-              disabled={currentQuestionIndex === 0}
+              <button
+                type="button"
+                onClick={handlePrevQuestion}
+                disabled={currentQuestionIndex === 0}
               className={`relative flex min-w-[160px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#24533E] px-5 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] transition-all duration-300 hover:bg-[#214D3B] active:scale-95 sm:min-w-[190px] ${
                 currentQuestionIndex === 0 ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
               }`}
@@ -160,19 +181,21 @@ export default function AssessmentScreen({
               Quay lại câu trước
             </button>
 
-            <button
-              type="button"
-              onClick={handleNextQuestion}
-              disabled={!selectedOption}
+              <button
+                type="button"
+                onClick={handleNextQuestion}
+              disabled={!selectedOption || isSubmitting}
               className={`relative flex min-w-[160px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#24533E] px-5 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] transition-all duration-300 hover:bg-[#214D3B] active:scale-95 sm:min-w-[190px] ${
-                !selectedOption ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
+                !selectedOption || isSubmitting ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
               }`}
             >
               <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
-              {currentQuestionIndex === SOULMAP_QUESTIONS.length - 1 ? 'Khám phá kết quả' : 'Câu tiếp theo'}
+              {isSubmitting ? 'Đang gửi kết quả...' : currentQuestionIndex === questions.length - 1 ? 'Khám phá kết quả' : 'Câu tiếp theo'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
+            </>
+          )}
         </section>
       </main>
     </div>

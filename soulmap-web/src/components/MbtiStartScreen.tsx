@@ -42,20 +42,18 @@ export default function MbtiStartScreen({
   };
 
   return (
-    <main className="relative min-h-screen overflow-y-auto bg-[#FAF6EE] text-[#24533E]">
+    <main className="relative mt-20 min-h-[calc(100vh-5rem)] overflow-hidden bg-[#FAF6EE] text-[#24533E]">
       <img
-        src={APP_ASSETS.mbtiTestBg}
+        src={APP_ASSETS.mbtiPreparationBg}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover opacity-90 saturate-[0.95]"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_58%_70%_at_68%_48%,rgba(200,161,90,0.18),transparent_72%),linear-gradient(90deg,rgba(250,246,238,0.98)_0%,rgba(250,246,238,0.9)_36%,rgba(250,246,238,0.56)_66%,rgba(250,246,238,0.38)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_100%,rgba(139,173,115,0.16),transparent_60%)]" />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-5 pb-5 pt-24 sm:px-8 lg:px-10 lg:pb-6 lg:pt-28">
-        <section className="mx-auto grid w-full max-w-[1320px] flex-1 items-center justify-center gap-8 py-8 lg:grid-cols-[minmax(0,560px)_minmax(0,620px)] lg:gap-14 lg:py-6">
+      <div className="relative z-10 flex min-h-[calc(100vh-5rem)] flex-col px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+        <section className="mx-auto grid w-full max-w-[1320px] flex-1 items-center justify-center gap-8 lg:grid-cols-[minmax(0,560px)_minmax(0,620px)] lg:gap-14">
           <div className="mx-auto w-full max-w-[560px] lg:mx-0">
-            <h1 className="max-w-[520px] font-display text-[2.75rem] font-bold leading-[1.05] tracking-[-0.03em] text-[#24533E] sm:text-[3.75rem] lg:text-[4rem]">
+            <h1 className="max-w-[560px] font-display text-[2.6rem] font-medium leading-[1.05] tracking-[-1px] text-[#24533E] sm:text-[3.35rem] lg:text-[3.75rem]">
               Hãy để Linh Nhi hiểu bạn trước{' '}
               <span className="inline-block text-[0.85em]" aria-hidden="true">✨</span>
             </h1>
@@ -66,11 +64,11 @@ export default function MbtiStartScreen({
                   key={main}
                   className="rounded-[1.25rem] border border-[#E8DFCF]/80 bg-[#FFFCF8]/72 px-3 py-4 text-center shadow-[0_16px_40px_-32px_rgba(36,83,62,0.55)] backdrop-blur-md"
                 >
-                  <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#E8F0D9] text-[#5E7E37]">
-                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#E8F0D9] text-[#5E7E37]">
+                    <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
                   </span>
-                  <p className="mt-3 font-display text-xl font-bold leading-tight text-[#24533E] sm:text-2xl">{main}</p>
-                  <p className="mt-1 font-sans text-xs font-medium text-[#68736E]">{sub}</p>
+                  <p className="mt-3 font-display text-[1.15rem] font-semibold leading-tight tracking-[-0.3px] text-[#24533E] sm:text-[1.28rem]">{main}</p>
+                  <p className="mt-1 font-sans text-[0.78rem] font-medium text-[#68736E]">{sub}</p>
                 </div>
               ))}
             </div>
@@ -79,7 +77,7 @@ export default function MbtiStartScreen({
               <button
                 type="button"
                 onClick={() => navigateToAssessment('push')}
-                className="mbti-start-cta group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.35rem] px-6 py-4 font-sans text-lg font-bold text-white transition hover:-translate-y-0.5 active:scale-[0.98]"
+                className="mbti-start-cta group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.35rem] px-6 py-4 font-sans text-base font-bold text-white transition hover:-translate-y-0.5 active:scale-[0.98] sm:text-[1.05rem]"
               >
                 <span className="pointer-events-none absolute -left-3 bottom-0 h-12 w-12 rounded-full bg-[#7EAA5A]/35 blur-sm" aria-hidden="true" />
                 <span className="pointer-events-none absolute -right-3 bottom-0 h-12 w-12 rounded-full bg-[#7EAA5A]/35 blur-sm" aria-hidden="true" />
@@ -92,13 +90,13 @@ export default function MbtiStartScreen({
               <button
                 type="button"
                 onClick={() => setShowManualModal(true)}
-                className="flex w-full min-h-[52px] items-center justify-center gap-3 rounded-[1.2rem] border border-[#D5CBB8] bg-[#FFFCF8]/62 px-6 font-sans text-base font-bold text-[#24533E] shadow-sm backdrop-blur transition hover:bg-[#FFFCF8]/85 active:scale-[0.98]"
+                className="flex w-full min-h-[52px] items-center justify-center gap-3 rounded-[1.2rem] border border-[#D5CBB8] bg-[#FFFCF8]/62 px-6 font-sans text-[0.95rem] font-bold text-[#24533E] shadow-sm backdrop-blur transition hover:bg-[#FFFCF8]/85 active:scale-[0.98]"
               >
                 <Edit3 className="h-5 w-5" />
                 Tôi đã có kết quả MBTI
               </button>
 
-              <p className="flex items-center justify-center gap-2 pt-1 font-sans text-xs font-medium text-[#68736E] sm:justify-start">
+              <p className="flex items-center justify-center gap-2 pt-1 font-sans text-[0.78rem] font-medium text-[#68736E] sm:justify-start">
                 <LockKeyhole className="h-3.5 w-3.5" />
                 Kết quả của bạn được bảo mật tuyệt đối
               </p>
@@ -110,7 +108,7 @@ export default function MbtiStartScreen({
             <img
               src={APP_ASSETS.linhNhiMbtiMascot}
               alt="Linh Nhi"
-              className="relative z-10 h-auto w-[94vw] max-w-[500px] object-contain drop-shadow-[0_32px_58px_rgba(74,92,38,0.28)] sm:max-w-[620px] lg:w-full lg:max-w-[700px]"
+              className="relative z-10 h-auto w-[94vw] max-w-[600px] object-contain drop-shadow-[0_32px_58px_rgba(74,92,38,0.28)] sm:max-w-[744px] lg:w-full lg:max-w-[840px]"
             />
           </div>
         </section>

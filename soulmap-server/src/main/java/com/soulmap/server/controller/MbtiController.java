@@ -7,7 +7,6 @@ import com.soulmap.server.dto.response.MbtiResultResponse;
 import com.soulmap.server.service.MbtiService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,14 +26,14 @@ public class MbtiController {
     }
 
     @GetMapping("/questions")
-    public ResponseEntity<ApiResponse<MbtiQuestionsResponse>> getQuestions() {
+    public ApiResponse<MbtiQuestionsResponse> getQuestions() {
         MbtiQuestionsResponse response = mbtiService.getQuestions();
-        return ResponseEntity.ok(ApiResponse.of(HttpStatus.OK.value(), "Get MBTI questions successfully", response));
+        return ApiResponse.of(HttpStatus.OK.value(), "Get MBTI questions successfully", response);
     }
 
     @PostMapping("/results")
-    public ResponseEntity<ApiResponse<MbtiResultResponse>> calculateResult(@Valid @RequestBody MbtiResultRequest request) {
+    public ApiResponse<MbtiResultResponse> calculateResult(@Valid @RequestBody MbtiResultRequest request) {
         MbtiResultResponse response = mbtiService.calculateResult(request);
-        return ResponseEntity.ok(ApiResponse.of(HttpStatus.OK.value(), "Calculate MBTI result successfully", response));
+        return ApiResponse.of(HttpStatus.OK.value(), "Calculate MBTI result successfully", response);
     }
 }

@@ -21,7 +21,7 @@ interface ChatQuickActionsProps {
 /** Pill-shaped suggestion chips shown beneath the latest assistant reply. */
 export default function ChatQuickActions({ actions = DEFAULT_QUICK_ACTIONS, onSelect }: ChatQuickActionsProps) {
   return (
-    <div className="flex w-full max-w-[720px] flex-wrap gap-2 pl-11">
+    <div className="mt-8 flex w-full max-w-[820px] flex-wrap justify-center gap-2 md:gap-3 md:pl-16">
       {actions.map((action) => {
         const Icon = action.icon;
         return (
@@ -29,7 +29,7 @@ export default function ChatQuickActions({ actions = DEFAULT_QUICK_ACTIONS, onSe
             key={action.label}
             type="button"
             onClick={() => onSelect(action.prompt)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#E8DFCF] bg-white px-4 py-2 font-sans text-[0.8rem] font-semibold text-[#24533E] shadow-sm transition hover:-translate-y-0.5 hover:border-[#C8A15A]/60 hover:bg-[#C8A15A]/8 active:translate-y-0"
+            className="inline-flex items-center gap-2 rounded-full border border-[#D9CFBE] bg-[#F7F4EC] px-4 py-2.5 font-sans text-[0.78rem] font-bold text-[#2E5D46] shadow-[0_8px_20px_-18px_rgba(33,77,59,0.45)] transition hover:-translate-y-0.5 hover:border-[#CBBFAE] hover:bg-[#FBF8F1] hover:shadow-[0_12px_24px_-18px_rgba(33,77,59,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5C7C69]/25 active:translate-y-0 md:px-5 md:py-3 md:text-[0.84rem]"
           >
             <Icon className="h-3.5 w-3.5 text-[#B68A2F]" />
             {action.label}

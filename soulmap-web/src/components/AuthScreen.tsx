@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -8,6 +9,7 @@ import {
   Eye, 
   EyeOff 
 } from 'lucide-react';
+import type { AppScreen } from '../types';
 
 interface AuthScreenProps {
   authMode: 'login' | 'register';
@@ -34,7 +36,7 @@ interface AuthScreenProps {
   setAgreeTerms: (agree: boolean) => void;
   handleAuthSubmit: (e: React.FormEvent) => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
-  setCurrentScreen: (screen: 'landing' | 'test_intro' | 'assessment' | 'result' | 'auth') => void;
+  setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   setCurrentUser: (user: { name: string; email: string } | null) => void;
@@ -70,6 +72,15 @@ export default function AuthScreen({
   setIsLoggedIn,
   setCurrentUser,
 }: AuthScreenProps) {
+  const router = useRouter();
+
+  const goToJourneysAfterAuth = () => {
+    setAuthSuccessMsg('');
+    router.push('/journeys');
+    setCurrentScreen('four_journeys');
+    setTransitionDirection('push');
+  };
+
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-[#F8F4EB]">
       {/* Decorative background image blurred */}
@@ -335,9 +346,7 @@ export default function AuthScreen({
                     setCurrentUser(userObj);
                     setAuthSuccessMsg('Đăng nhập bằng Google thành công!');
                     setTimeout(() => {
-                      setAuthSuccessMsg('');
-                      setCurrentScreen('landing');
-                      setTransitionDirection('push_back');
+                      goToJourneysAfterAuth();
                     }, 1200);
                   }, 1500);
                 }}
@@ -364,9 +373,7 @@ export default function AuthScreen({
                     setCurrentUser(userObj);
                     setAuthSuccessMsg('Đăng nhập bằng Apple thành công!');
                     setTimeout(() => {
-                      setAuthSuccessMsg('');
-                      setCurrentScreen('landing');
-                      setTransitionDirection('push_back');
+                      goToJourneysAfterAuth();
                     }, 1200);
                   }, 1500);
                 }}
@@ -390,9 +397,7 @@ export default function AuthScreen({
                     setCurrentUser(userObj);
                     setAuthSuccessMsg('Đăng nhập bằng Facebook thành công!');
                     setTimeout(() => {
-                      setAuthSuccessMsg('');
-                      setCurrentScreen('landing');
-                      setTransitionDirection('push_back');
+                      goToJourneysAfterAuth();
                     }, 1200);
                   }, 1500);
                 }}

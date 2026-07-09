@@ -1,4 +1,4 @@
-/** Types for the dedicated SoulMap AI Chat page (ChatGPT-style layout). */
+/** Types for the dedicated chat page (ChatGPT-style layout). */
 
 export type ChatSender = 'user' | 'assistant';
 
@@ -15,8 +15,5 @@ export interface ChatConversationSummary {
   title: string;
   preview: string;
   group: ChatHistoryGroup;
-  /** Static mock transcript for past conversations (phase 1 — no backend yet).
-   *  The live/active session (`isLive: true`) instead reads from App.tsx state. */
-  messages?: ChatMessage[];
-  isLive?: boolean;
+  time?: string;
 }
