@@ -49,6 +49,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Xu ly loi tu AI provider hoac response AI.
+     */
+    @ExceptionHandler(AiServiceException.class)
+    public ResponseEntity<ProblemDetail> handleAiServiceException(AiServiceException exception, Locale locale) {
+        log.warn("AI service exception: code={}", exception.getErrorCode().name(), exception);
+
+        return buildErrorResponse(
+                exception.getErrorCode(),
+                Collections.emptyList(),
+                locale
+        );
+    }
+
+    /**
      * Xu ly loi nghiep vu da duoc code chu dong throw ra.
      */
     @ExceptionHandler(BusinessException.class)

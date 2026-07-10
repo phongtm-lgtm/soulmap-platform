@@ -3,21 +3,22 @@ package com.soulmap.server.service.impl;
 import com.soulmap.server.common.error.TuViSourceException;
 import com.soulmap.server.dto.request.TuViRequest;
 import com.soulmap.server.dto.response.CungDto;
+import com.soulmap.server.dto.response.LaSoResponse;
+import com.soulmap.server.dto.response.LuanGiaiDto;
+import com.soulmap.server.dto.response.tuvi.CungModel;
+import com.soulmap.server.dto.response.tuvi.LuanGiai;
+import com.soulmap.server.dto.response.tuvi.SaoInfo;
+import com.soulmap.server.dto.response.tuvi.TuHoa;
+import com.soulmap.server.dto.response.tuvi.TuViData;
+import com.soulmap.server.dto.response.tuvi.TuViResponse;
 import com.soulmap.server.service.TuViService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TuViServiceImpl implements TuViService {
@@ -36,203 +37,194 @@ public class TuViServiceImpl implements TuViService {
             Map.entry("Tuất", "tuat"),
             Map.entry("Hợi", "hoi")
     );
-    private static final int TUVI_RESPONSE_BUFFER_SIZE = 2 * 1024 * 1024;
+    private static final List<String> ORDERED_KEYS = Arrays.asList(
+            "ty", "ngo", "mui", "than", "dau", "tuat", "hoi", "ty_b", "suu", "dan", "mao", "thin"
+    );
 
     private final WebClient webClient;
 
     public TuViServiceImpl(WebClient.Builder webClientBuilder) {
-        ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(TUVI_RESPONSE_BUFFER_SIZE))
-                .build();
-
         this.webClient = webClientBuilder
-                .baseUrl("https://tuvi.vn")
+                .baseUrl("https://tuvi.vn/api/v1")
                 .defaultHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .exchangeStrategies(exchangeStrategies)
                 .build();
     }
 
     @Override
-    public Map<String, CungDto> getLaSo(TuViRequest request) {
-        MultiValueMap<String, String> formData = buildFormData(request);
-
+    public LaSoResponse getLaSo(TuViRequest request) {
         try {
-            String responseBody = webClient.post()
+            TuViResponse createResponse = webClient.post()
                     .uri("/la-so")
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .bodyValue(formData)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(buildRequestBody(request))
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(TuViResponse.class)
                     .block();
 
-            if (responseBody == null || responseBody.isBlank()) {
-                throw new TuViSourceException("Không nhận được dữ liệu từ server nguồn.");
+            if (createResponse == null || createResponse.getData() == null || createResponse.getData().getSlug() == null) {
+                throw new TuViSourceException("Khong the khoi tao la so tu tuvi.vn.");
             }
 
-            return parseHtmlToLaSo(responseBody);
+            TuViResponse detailResponse = webClient.get()
+                    .uri("/la-so/{slug}", createResponse.getData().getSlug())
+                    .retrieve()
+                    .bodyToMono(TuViResponse.class)
+                    .block();
+
+            if (detailResponse == null || detailResponse.getData() == null) {
+                throw new TuViSourceException("Khong the lay chi tiet la so tu tuvi.vn.");
+            }
+
+            return transformToLaSoResponse(detailResponse.getData());
         } catch (WebClientResponseException exception) {
-            if (exception.getCause() instanceof DataBufferLimitException) {
-                throw new TuViSourceException("Du lieu tra ve tu server nguon qua lon cho cau hinh hien tai.", exception);
-            }
-
             throw new TuViSourceException("Server nguon tra ve loi HTTP: " + exception.getStatusCode().value(), exception);
+        } catch (TuViSourceException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new TuViSourceException("Loi ket noi API tuvi.vn: " + exception.getMessage(), exception);
         }
     }
 
-    private Map<String, CungDto> parseHtmlToLaSo(String html) {
-        Document doc = Jsoup.parse(html);
-        Map<String, CungDto> tempMap = new HashMap<>();
+    private Map<String, Object> buildRequestBody(TuViRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", request.getName());
+        body.put("day", request.getDay());
+        body.put("month", request.getMonth());
+        body.put("year", request.getYear());
+        body.put("solar_calendar", "solar".equalsIgnoreCase(request.getCalendar()) || "true".equalsIgnoreCase(request.getCalendar()));
+        body.put("hour_id", getHourId(request.getHour()));
+        body.put("male", "male".equalsIgnoreCase(request.getGender()) || "true".equalsIgnoreCase(request.getGender()));
+        body.put("nam_xem", request.getViewYear());
+        body.put("thang_xem", Calendar.getInstance().get(Calendar.MONTH) + 1);
+        return body;
+    }
 
-        Elements tds = doc.select("td.cung");
-        for (Element td : tds) {
-            String fullCungName = normalizeCungName(td.attr("data-cung-full-name"));
-            if (fullCungName == null) {
-                continue;
+    private LaSoResponse transformToLaSoResponse(TuViData data) {
+        Map<String, CungDto> tempMap = Optional.ofNullable(data.getCungModel()).orElseGet(Collections::emptyList).stream()
+                .filter(cungModel -> CUNG_KEYS.containsKey(cungModel.getName()))
+                .collect(Collectors.toMap(cungModel -> CUNG_KEYS.get(cungModel.getName()), this::toCungDto, (first, second) -> first));
+
+        List<CungDto> cungs = new ArrayList<>();
+        for (String key : ORDERED_KEYS) {
+            if (tempMap.containsKey(key)) {
+                cungs.add(tempMap.get(key));
             }
-
-            String key = resolveCungKey(fullCungName);
-            if (key == null) {
-                continue;
-            }
-
-            //TODO: parse cung thân, tràng sinh, tuần - triệt,
-            tempMap.put(key, parseCung(td, fullCungName, key));
         }
 
-        return orderLaSoMap(tempMap);
-    }
-
-    private MultiValueMap<String, String> buildFormData(TuViRequest request) {
-        String calendar = "lunar".equalsIgnoreCase(request.getCalendar()) || "false".equalsIgnoreCase(request.getCalendar()) ? "false" : "true";
-        String gender = "male".equalsIgnoreCase(request.getGender()) || "true".equalsIgnoreCase(request.getGender()) ? "true" : "false";
-
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("name", request.getName());
-        formData.add("dayOfDOB", String.valueOf(request.getDay()));
-        formData.add("monthOfDOB", String.valueOf(request.getMonth()));
-        formData.add("yearOfDOB", String.valueOf(request.getYear()));
-        formData.add("calendar", calendar);
-        formData.add("gender", gender);
-        formData.add("hourOfDOB", String.valueOf(request.getHour()));
-        formData.add("minOfDOB", String.valueOf(request.getMin()));
-        formData.add("timezone", String.valueOf(request.getTimezone()));
-        formData.add("viewYear", String.valueOf(request.getViewYear()));
-        return formData;
-    }
-
-    private CungDto parseCung(Element td, String fullCungName, String key) {
-        return CungDto.builder()
-                .gridClass("cung-" + key.replace("_", "-"))
-                .name(readCungName(td))
-                .diaChi(fullCungName)
-                .hanhCung(readHanhCung(td))
-                .daiVan(cleanText(td.attr("data-dai-van")))
-                .tieuVan(readTieuVan(td))
-                .chinhTinh(readChinhTinh(td))
-                .catTinh(readSaoList(td.selectFirst(".sao-tot")))
-                .hungTinh(readSaoList(td.selectFirst(".sao-xau")))
+        return LaSoResponse.builder()
+                .summary(data.getLaSoBrief())
+                .gender(data.getGender())
+                .timeFull(data.getTimeFull())
+                .solarFull(data.getSolarFull())
+                .currentTimeFull(data.getCurrentTimeFull())
+                .canChiFull(data.getCanChiFull())
+                .cucFull(data.getCucFull())
+                .amDuong(data.getAmDuong())
+                .loaiHanh(data.getLoaiHanh())
+                .viTriCungMenh(data.getViTriCungMenh())
+                .viTriCungThan(data.getViTriCungThan())
+                .canXuong(data.getCanXuong())
+                .laiNhanCung(data.getLaiNhanCung())
+                .cungs(cungs)
+                .cungXau(emptyIfNull(data.getCungXau()))
+                .cungXauDetail(emptyIfNull(data.getCungXauDetail()))
+                .daiVanXau(data.getDaiVanXau())
+                .tieuVanXau(data.getTieuVanXau())
+                .generalLuanGiai(toLuanGiaiDtos(data.getGeneralLg()))
+                .menhLuanGiai(toLuanGiaiDtos(data.getMenhLg()))
+                .daiVanLuanGiai(toLuanGiaiDtos(data.getDaiVanLg()))
                 .build();
     }
 
-    private String normalizeCungName(String fullCungName) {
-        if (fullCungName == null) {
-            return null;
-        }
+    private CungDto toCungDto(CungModel cungModel) {
+        String key = CUNG_KEYS.get(cungModel.getName());
 
-        String normalized = fullCungName.trim();
-        return normalized.isEmpty() ? null : normalized;
+        return CungDto.builder()
+                .key(key)
+                .gridClass("cung-" + key.replace("_", "-"))
+                .name(cungModel.getCung() != null ? cungModel.getCung().getName() : "")
+                .diaChi(cungModel.getFullName())
+                .hanhCung(readHanhCung(cungModel))
+                .daiVan(String.valueOf(cungModel.getDaiVan()))
+                .daiVanText(cungModel.getDaiVanText())
+                .tieuVan(cungModel.getLuuNien())
+                .trangSinh(cungModel.getTrangSinh() != null ? cungModel.getTrangSinh().getName() : "")
+                .chinhTinh(readStarNames(cungModel.getChinhTinh()))
+                .catTinh(readStarsByStatus(cungModel.getSao(), "C"))
+                .hungTinh(readStarsExceptStatus(cungModel.getSao(), "C"))
+                .tuHoa(readTuHoa(cungModel.getTuHoaPhais()))
+                .build();
     }
 
-    private String readCungName(Element td) {
-        Element nameEl = td.selectFirst(".text-sao-chinh-tinh");
-        return nameEl != null ? cleanText(nameEl.text()) : "";
+    private List<LuanGiaiDto> toLuanGiaiDtos(List<LuanGiai> luanGiaiList) {
+        return Optional.ofNullable(luanGiaiList).orElseGet(Collections::emptyList).stream()
+                .filter(luanGiai -> luanGiai.getTitle() != null || luanGiai.getContent() != null)
+                .map(luanGiai -> LuanGiaiDto.builder()
+                        .id(luanGiai.getId())
+                        .title(luanGiai.getTitle())
+                        .content(luanGiai.getContent())
+                        .sourceId(luanGiai.getLuanGiaiSource() != null && luanGiai.getLuanGiaiSource().getId() > 0
+                                ? luanGiai.getLuanGiaiSource().getId()
+                                : null)
+                        .sourceName(luanGiai.getLuanGiaiSource() != null ? luanGiai.getLuanGiaiSource().getName() : null)
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    private String readHanhCung(Element td) {
-        Elements diaChiEls = td.select(".text-dia-chi");
-        if (diaChiEls.size() <= 1) {
-            return null;
-        }
-
-        String rawHanh = cleanText(diaChiEls.get(1).text());
-        return rawHanh.replaceAll("^[+-]+", "");
+    private List<String> readTuHoa(List<TuHoa> tuHoaList) {
+        return Optional.ofNullable(tuHoaList).orElseGet(Collections::emptyList).stream()
+                .filter(tuHoa -> tuHoa.getSao() != null && tuHoa.getSao().getName() != null)
+                .map(tuHoa -> tuHoa.getSao().getName() + (tuHoa.getCung() != null ? " - " + tuHoa.getCung() : ""))
+                .collect(Collectors.toList());
     }
 
-    private String readTieuVan(Element td) {
-        String tieuVan = findTieuVan(td.select(".text-dia-chi.txt-tiny-mid"));
-        if (!tieuVan.isEmpty()) {
-            return tieuVan;
-        }
-
-        return findTieuVan(td.select("p[id^=KNH]"));
+    private List<String> emptyIfNull(List<String> values) {
+        return values == null ? Collections.emptyList() : values;
     }
 
-    private String findTieuVan(Elements elements) {
-        for (Element element : elements) {
-            String text = cleanText(element.text());
-            if (text.startsWith("Th.")) {
-                return text;
-            }
+    private String readHanhCung(CungModel cungModel) {
+        if (cungModel.getCung() == null || cungModel.getCung().getNguHanh() == null) {
+            return "";
         }
 
-        return "";
+        return cungModel.getCung().getNguHanh().getName();
     }
 
-    private List<String> readChinhTinh(Element td) {
-        List<String> chinhTinh = new ArrayList<>();
-        Elements chinhEls = td.select(".text-chinh-chinh, .text-chinh-phu");
-        for (Element el : chinhEls) {
-            String txt = cleanText(el.text()).replaceAll("^[+-]+", "");
-            if (!txt.isEmpty()) {
-                chinhTinh.add(txt);
-            }
-        }
-        return chinhTinh;
+    private List<String> readStarNames(List<SaoInfo> saoInfos) {
+        return Optional.ofNullable(saoInfos).orElseGet(Collections::emptyList).stream()
+                .filter(saoInfo -> saoInfo.getSao() != null && saoInfo.getSao().getName() != null)
+                .map(saoInfo -> saoInfo.getSao().getName())
+                .collect(Collectors.toList());
     }
 
-    private List<String> readSaoList(Element container) {
-        List<String> saoList = new ArrayList<>();
-        if (container == null) {
-            return saoList;
-        }
-
-        Elements elements = container.select(".text-sao-xau-tot");
-        for (Element element : elements) {
-            String text = cleanText(element.text());
-            if (!text.isEmpty()) {
-                saoList.add(text);
-            }
-        }
-
-        return saoList;
+    private List<String> readStarsByStatus(List<SaoInfo> saoInfos, String status) {
+        return Optional.ofNullable(saoInfos).orElseGet(Collections::emptyList).stream()
+                .filter(saoInfo -> saoInfo.getSao() != null && status.equals(saoInfo.getSao().getStatus()))
+                .map(saoInfo -> saoInfo.getSao().getName())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private Map<String, CungDto> orderLaSoMap(Map<String, CungDto> tempMap) {
-        List<String> orderedKeys = Arrays.asList(
-                "ty", "ngo", "mui", "than", "dau", "tuat", "hoi", "ty_b", "suu", "dan", "mao", "thin"
-        );
-        Map<String, CungDto> laSoMap = new LinkedHashMap<>();
-        for (String key : orderedKeys) {
-            if (tempMap.containsKey(key)) {
-                laSoMap.put(key, tempMap.get(key));
-            }
-        }
-
-        return laSoMap;
+    private List<String> readStarsExceptStatus(List<SaoInfo> saoInfos, String status) {
+        return Optional.ofNullable(saoInfos).orElseGet(Collections::emptyList).stream()
+                .filter(saoInfo -> saoInfo.getSao() != null && !status.equals(saoInfo.getSao().getStatus()))
+                .map(saoInfo -> saoInfo.getSao().getName())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private String cleanText(String text) {
-        if (text == null) return "";
-        return text.replaceAll("\\s+", " ").trim();
-    }
-
-    private String resolveCungKey(String fullCungName) {
-        for (Map.Entry<String, String> entry : CUNG_KEYS.entrySet()) {
-            if (fullCungName.endsWith(entry.getKey())) {
-                return entry.getValue();
-            }
-        }
-
-        return null;
+    private int getHourId(int hour) {
+        if (hour >= 23 || hour < 1) return 1;
+        if (hour >= 1 && hour < 3) return 2;
+        if (hour >= 3 && hour < 5) return 3;
+        if (hour >= 5 && hour < 7) return 4;
+        if (hour >= 7 && hour < 9) return 5;
+        if (hour >= 9 && hour < 11) return 6;
+        if (hour >= 11 && hour < 13) return 7;
+        if (hour >= 13 && hour < 15) return 8;
+        if (hour >= 15 && hour < 17) return 9;
+        if (hour >= 17 && hour < 19) return 10;
+        if (hour >= 19 && hour < 21) return 11;
+        return 12;
     }
 }

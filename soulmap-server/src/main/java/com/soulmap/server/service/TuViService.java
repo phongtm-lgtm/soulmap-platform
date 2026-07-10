@@ -2,11 +2,9 @@ package com.soulmap.server.service;
 
 
 import com.soulmap.server.dto.request.TuViRequest;
-import com.soulmap.server.dto.response.CungDto;
-
-import java.util.Map;
+import com.soulmap.server.dto.response.LaSoResponse;
 
 public interface TuViService {
 
-    Map<String, CungDto> getLaSo(TuViRequest request);
+    LaSoResponse getLaSo(TuViRequest request);
 }

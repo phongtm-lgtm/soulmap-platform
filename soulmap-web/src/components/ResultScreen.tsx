@@ -32,6 +32,7 @@ import JourneyDetailScreen from './journey/JourneyDetailScreen';
 import FourJourneysScreen from './FourJourneysScreen';
 import { buildMockJourneys } from '../data/mockJourneys';
 import type { SoulMapJourney } from '../types/journey';
+import { generateCareerReading } from '../lib/aiReadingsApi';
 
 interface ResultScreenProps {
   profile: PersonalityProfile;
@@ -91,6 +92,15 @@ export default function ResultScreen({
   navigateToJourneys,
 }: ResultScreenProps) {
   const [selectedJourney, setSelectedJourney] = React.useState<SoulMapJourney | null>(null);
+  const [careerReadingId, setCareerReadingId] = React.useState<number | null>(() => {
+    const savedId = Number(localStorage.getItem('soulmap_ai_reading_career_chapter_01_id'));
+    return savedId || null;
+  });
+  const [generationError, setGenerationError] = React.useState<string | null>(null);
+  const [isCareerReadingPending, setIsCareerReadingPending] = React.useState(
+    () => localStorage.getItem('soulmap_ai_reading_career_pending') === 'true',
+  );
+  const [careerReadingToast, setCareerReadingToast] = React.useState<string | null>(null);
 
   const openJourneyDetail = (journey: SoulMapJourney) => {
     setSelectedJourney(journey);
@@ -125,22 +135,105 @@ export default function ResultScreen({
 
   const showSoulMapNavbar = resultStep !== 'generating';
 
+  const buildCareerReadingInput = () => {
+    const [year, month, day] = birthDate.split('-').map(Number);
+    const [hour, min] = birthTime.split(':').map(Number);
+    const name = currentUser?.name ?? 'Bạn';
+    const viewYear = new Date().getFullYear();
+    const birthKey = [birthDate, birthCalendar, birthTime, gender, viewYear].join('|');
+
+    return {
+      input: {
+        userId: currentUser?.email,
+        mbtiType: profile.type,
+        name,
+        day,
+        month,
+        year,
+        calendar: birthCalendar,
+        gender: gender === 'Nam' ? 'male' as const : 'female' as const,
+        hour,
+        min,
+        timezone: 1,
+        viewYear,
+      },
+      birthInfo: {
+        name,
+        birthDate,
+        birthCalendar,
+        birthTime,
+        gender,
+        timezone: 1,
+        viewYear,
+      },
+      birthKey,
+    };
+  };
+
+  const persistCareerReading = (readingId: number, birthKey: string, birthInfo: object) => {
+    localStorage.setItem('soulmap_ai_reading_career_chapter_01_id', String(readingId));
+    localStorage.setItem('soulmap_ai_reading_career_birth_key', birthKey);
+    localStorage.setItem('soulmap_birth_info', JSON.stringify(birthInfo));
+    localStorage.removeItem('soulmap_ai_reading_career_pending');
+    setIsCareerReadingPending(false);
+    setCareerReadingId(readingId);
+  };
+
+  const refreshCareerReadingInBackground = (showToast = true) => {
+    const { input, birthKey, birthInfo } = buildCareerReadingInput();
+    localStorage.setItem('soulmap_ai_reading_career_pending', 'true');
+    setIsCareerReadingPending(true);
+    generateCareerReading(input)
+      .then((reading) => {
+        persistCareerReading(reading.id, birthKey, birthInfo);
+        if (showToast) {
+          setCareerReadingToast('Bản đồ sự nghiệp của bạn đã sẵn sàng.');
+          window.setTimeout(() => setCareerReadingToast(null), 5000);
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('soulmap_ai_reading_career_pending');
+        setIsCareerReadingPending(false);
+        if (showToast) {
+          setCareerReadingToast('Linh Nhi chưa thể cập nhật bản đồ sự nghiệp. Bạn có thể thử lại sau.');
+          window.setTimeout(() => setCareerReadingToast(null), 5000);
+        }
+      });
+  };
+
   const startGeneration = () => {
     setResultStep('generating');
     setGenerationProgress(0);
+    setGenerationError(null);
+
     let cur = 0;
+    let progressDone = false;
     const t = setInterval(() => {
       cur += 1;
       setGenerationProgress(cur);
       if (cur >= 6) {
         clearInterval(t);
-        setZoomMap(false);
+        progressDone = true;
       }
     }, 1200);
+
+    const existingReadingId = Number(localStorage.getItem('soulmap_ai_reading_career_chapter_01_id'));
+    if (existingReadingId) {
+      const { birthKey, birthInfo } = buildCareerReadingInput();
+      persistCareerReading(existingReadingId, birthKey, birthInfo);
+    }
+
+    refreshCareerReadingInBackground(true);
+
+    window.setTimeout(() => {
+      if (!progressDone) clearInterval(t);
+      setGenerationProgress(6);
+      setZoomMap(false);
+    }, 1400);
   };
 
   const generationPercent = Math.min(100, Math.round((generationProgress / 6) * 100));
-  const isGenerationComplete = generationProgress >= 6;
+  const isGenerationComplete = generationProgress >= 6 && !generationError;
 
   const generationSteps = [
     { title: 'MBTI', subtitle: 'Phân tích tính cách', icon: Grid2X2 },
@@ -154,6 +247,13 @@ export default function ResultScreen({
   return (
     <div className={`flex flex-col min-h-screen relative ${selectedJourney ? 'overflow-x-hidden bg-[#FAF6EE]' : `overflow-hidden ${isFlowStep ? 'bg-[#FAF6EE]' : 'bg-[#FAF6EE]'}`}`}>
       {!selectedJourney && isFlowStep && <MbtiTestBackground />}
+
+      {careerReadingToast && (
+        <div className="fixed right-5 top-24 z-50 max-w-sm rounded-2xl border border-[#E8DFCF] bg-[#FFFCF8] px-5 py-4 text-left shadow-[0_22px_60px_-36px_rgba(33,77,59,0.5)]">
+          <p className="font-sans text-[0.9rem] font-extrabold text-[#214D3B]">{careerReadingToast}</p>
+          <p className="mt-1 font-sans text-[0.78rem] text-[#6A6E69]">Bạn có thể mở lại chương Sự nghiệp để xem bản cập nhật mới nhất.</p>
+        </div>
+      )}
 
       {/* Background for other steps */}
       {!selectedJourney && !isFlowStep && (
@@ -252,12 +352,12 @@ export default function ResultScreen({
                 <div className="mt-4 text-center">
                   <p className="font-display text-[1.2rem] leading-none text-[#C8A15A]">✦</p>
                   <h2 className="mt-1 font-display text-[2.5rem] font-bold leading-tight text-[#214D3B] md:text-[3.25rem]">
-                    {isGenerationComplete ? 'SoulMap Đã Sẵn Sàng' : 'AI Đang Kiến Tạo SoulMap'}
+                    {isGenerationComplete ? 'Bạn Có Thể Bắt Đầu Hành Trình' : 'Linh Nhi Đang Tạo SoulMap'}
                   </h2>
                   <p className="mt-2 font-sans text-[0.94rem] font-medium text-[#636A64] md:text-[1rem]">
                     {isGenerationComplete
-                      ? 'Bốn hành trình cá nhân hóa của bạn đã được khởi tạo.'
-                      : 'Vui lòng chờ giây lát để thuật toán hợp nhất dữ liệu của bạn...'}
+                      ? 'Chapter sẽ tiếp tục được cập nhật ở nền. Linh Nhi sẽ báo khi bản đồ sự nghiệp sẵn sàng.'
+                      : 'Bạn không cần chờ ở màn này. Linh Nhi vẫn sẽ tiếp tục tạo bản đồ ở nền.'}
                   </p>
                 </div>
 
@@ -291,21 +391,36 @@ export default function ResultScreen({
                       />
                       <div className="min-w-0 flex-1">
                         <p className="font-sans text-[0.98rem] font-extrabold text-[#214D3B]">
-                          {isGenerationComplete ? 'Bản đồ đã sẵn sàng cho bạn ✨' : 'Linh Nhi đang chuẩn bị bản đồ dành riêng cho bạn ✨'}
+                          {isGenerationComplete ? 'Bạn có thể rời đi ngay ✨' : 'Linh Nhi đang chuẩn bị bản đồ dành riêng cho bạn ✨'}
                         </p>
                         <p className="mt-1.5 font-sans text-[0.82rem] leading-relaxed text-[#6A6E69]">
-                          Mỗi người là một vũ trụ riêng biệt. SoulMap đang thấu hiểu bạn sâu sắc nhất.
+                          {isCareerReadingPending
+                            ? 'Khi bản đồ hoàn tất, chương Sự nghiệp sẽ tự dùng nội dung mới nhất.'
+                            : 'Bản đồ hiện có đã sẵn sàng, Linh Nhi vẫn có thể cập nhật thêm ở nền.'}
                         </p>
                       </div>
                     </div>
 
-                    {isGenerationComplete && (
+                    {generationError && (
+                      <div className="mt-5 w-full rounded-2xl border border-red-200 bg-red-50/90 p-4 text-left">
+                        <p className="font-sans text-[0.9rem] font-bold text-red-700">{generationError}</p>
+                        <button
+                          type="button"
+                          onClick={startGeneration}
+                          className="mt-3 inline-flex items-center justify-center rounded-full bg-[#24533E] px-5 py-2.5 font-sans text-[0.88rem] font-extrabold text-white shadow-sm"
+                        >
+                          Thử lại
+                        </button>
+                      </div>
+                    )}
+
+                    {isGenerationComplete && !generationError && (
                       <button
                         type="button"
                         onClick={continueToJourneys}
                         className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#24533E] px-7 py-3.5 font-sans text-[0.95rem] font-extrabold text-white shadow-[0_16px_30px_-16px_rgba(33,77,59,0.58)]"
                       >
-                        Chuyển đến hành trình
+                        Vào Journey ngay
                         <ArrowRight className="h-4 w-4" />
                       </button>
                     )}

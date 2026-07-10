@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     COMMON_ERROR_0001(HttpStatus.BAD_REQUEST, "0001.common.validation-error"),
     COMMON_ERROR_0002(HttpStatus.NOT_FOUND, "0002.common.resource-not-found"),
-    COMMON_ERROR_0003(HttpStatus.INTERNAL_SERVER_ERROR, "0003.common.internal-error");
+    COMMON_ERROR_0003(HttpStatus.INTERNAL_SERVER_ERROR, "0003.common.internal-error"),
+    AI_ERROR_0001(HttpStatus.BAD_GATEWAY, "0001.ai.provider-error"),
+    AI_ERROR_0002(HttpStatus.BAD_GATEWAY, "0002.ai.response-parse-error"),
+    AI_ERROR_0003(HttpStatus.BAD_GATEWAY, "0003.ai.response-validation-error"),
+    AI_ERROR_0004(HttpStatus.GATEWAY_TIMEOUT, "0004.ai.timeout");
 
     private final HttpStatus httpStatus;
     private final String messageKey;

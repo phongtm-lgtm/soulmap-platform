@@ -82,13 +82,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- HTML Parser Jsoup -->
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.17.2</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>
