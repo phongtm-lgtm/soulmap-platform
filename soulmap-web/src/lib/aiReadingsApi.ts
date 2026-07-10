@@ -64,6 +64,7 @@ async function request<T>(path: string, init?: RequestInit & { timeoutMs?: numbe
     signal: signal ?? controller.signal,
     headers: {
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...requestInit.headers,
     },
   }).finally(() => {

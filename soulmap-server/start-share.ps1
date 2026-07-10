@@ -125,31 +125,56 @@ try {
         throw "Backend did not become healthy within 120 seconds. Check $serverErrorLog and $serverLog."
     }
 
-    Write-Host "Backend is healthy. Starting ngrok..."
-    $ngrokProcess = Start-Process -FilePath "ngrok" `
-        -ArgumentList @("http", "$port", "--log=stdout") `
-        -WorkingDirectory $PSScriptRoot `
-        -RedirectStandardOutput $ngrokLog `
-        -RedirectStandardError $ngrokErrorLog `
-        -WindowStyle Hidden `
-        -PassThru
-
     $publicUrl = $null
-    for ($attempt = 0; $attempt -lt 30; $attempt++) {
-        if ($ngrokProcess.HasExited) {
-            throw "ngrok stopped during startup. Check $ngrokErrorLog and $ngrokLog."
-        }
+    try {
+        $existingTunnels = Invoke-RestMethod -Uri "http://127.0.0.1:4040/api/tunnels" -TimeoutSec 2
+        $matchingTunnel = $existingTunnels.tunnels |
+            Where-Object { $_.proto -eq "https" -and $_.config.addr -match ":$port/?$" } |
+            Select-Object -First 1
 
-        try {
-            $tunnels = Invoke-RestMethod -Uri "http://127.0.0.1:4040/api/tunnels" -TimeoutSec 2
-            $publicUrl = $tunnels.tunnels |
-                Where-Object { $_.proto -eq "https" } |
-                Select-Object -First 1 -ExpandProperty public_url
+        if ($matchingTunnel) {
+            $publicUrl = $matchingTunnel.public_url
+            Write-Host "Backend is healthy. Reusing the existing ngrok tunnel for port $port..."
+        }
+        elseif ($existingTunnels.tunnels.Count -gt 0) {
+            $addresses = ($existingTunnels.tunnels | ForEach-Object { $_.config.addr }) -join ", "
+            throw "ngrok is already forwarding to $addresses instead of port $port. Stop that ngrok session, then run this script again."
+        }
+    }
+    catch {
+        if ($_.Exception.Message -like "ngrok is already forwarding*") {
+            throw
+        }
+    }
+
+    if (-not $publicUrl) {
+        Write-Host "Backend is healthy. Starting ngrok..."
+        $ngrokProcess = Start-Process -FilePath "ngrok" `
+            -ArgumentList @("http", "$port", "--log=stdout") `
+            -WorkingDirectory $PSScriptRoot `
+            -RedirectStandardOutput $ngrokLog `
+            -RedirectStandardError $ngrokErrorLog `
+            -WindowStyle Hidden `
+            -PassThru
+
+        for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            if ($ngrokProcess.HasExited) {
+                throw "ngrok stopped during startup. Check $ngrokErrorLog and $ngrokLog."
+            }
+
+            try {
+                $tunnels = Invoke-RestMethod -Uri "http://127.0.0.1:4040/api/tunnels" -TimeoutSec 2
+                $publicUrl = $tunnels.tunnels |
+                    Where-Object { $_.proto -eq "https" -and $_.config.addr -match ":$port/?$" } |
+                    Select-Object -First 1 -ExpandProperty public_url
+            }
+            catch {
+                # ngrok's local API may not be ready yet.
+            }
+
             if ($publicUrl) {
                 break
             }
-        }
-        catch {
             Start-Sleep -Seconds 1
         }
     }
@@ -169,14 +194,16 @@ try {
     Write-Host "Health:   $publicUrl/api/v1/actuator/health"
     Write-Host "Press Ctrl+C to stop the backend and ngrok."
 
-    while (-not $serverProcess.HasExited -and -not $ngrokProcess.HasExited) {
+    while (-not $serverProcess.HasExited -and ($null -eq $ngrokProcess -or -not $ngrokProcess.HasExited)) {
         Start-Sleep -Seconds 2
     }
 
     if ($serverProcess.HasExited) {
         throw "Backend stopped unexpectedly. Check $serverErrorLog and $serverLog."
     }
-    throw "ngrok stopped unexpectedly. Check $ngrokErrorLog and $ngrokLog."
+    if ($null -ne $ngrokProcess) {
+        throw "ngrok stopped unexpectedly. Check $ngrokErrorLog and $ngrokLog."
+    }
 }
 finally {
     Write-Host "Stopping backend and ngrok..."
