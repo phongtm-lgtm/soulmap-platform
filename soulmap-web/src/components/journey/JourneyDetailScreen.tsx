@@ -719,11 +719,11 @@ function CareerTalentChapter({ aiReading, isLoading, error }: { aiReading: AiRea
         <CareerSectionTitle icon={<Zap className="h-7 w-7" />} number="2" title="Khi các năng lực đi cùng nhau" tone="blue" />
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.25fr_1fr]">
           <div className="rounded-2xl bg-[#123D5A] p-6 text-white shadow-sm">
-            <p className="font-display text-[1.35rem] font-bold">Cách bạn tạo ra giá trị riêng</p>
+            <p className="font-display text-[1.35rem] font-bold !text-white">Cách bạn tạo ra giá trị riêng</p>
             <p className="mt-3 font-reading text-[1rem] leading-[1.8] text-white/85">{aiReading.combinationInsight}</p>
           </div>
           <div className="rounded-2xl border border-[#F0D9D2] bg-[#FFF5F1] p-5">
-            <p className="font-display text-[1.2rem] font-bold text-[#B84D43]">Khi dùng quá tay</p>
+            <p className="font-display text-[1.2rem] font-bold !text-[#B84D43]">Khi dùng quá tay</p>
             <div className="mt-4 space-y-3">
               {aiReading.balanceRisks?.map((risk) => (
                 <div key={risk.title} className="flex gap-3">
