@@ -16,6 +16,7 @@ import {
   Sparkles,
   Target,
   Trophy,
+  WandSparkles,
   Zap,
 } from 'lucide-react';
 import type { SoulMapJourney } from '../../types/journey';
@@ -26,11 +27,13 @@ import JourneyDetailHero from './JourneyDetailHero';
 import JourneyNavPanel from './JourneyNavPanel';
 import JourneyTabNav from './JourneyTabNav';
 import JourneySectionBlock from './JourneySectionBlock';
-import { fetchAiReading, type AiReading } from '../../lib/aiReadingsApi';
+import { fetchAiReading, generateCareerTalentReading, type AiReading, type CareerReadingRequest } from '../../lib/aiReadingsApi';
 
 interface JourneyDetailScreenProps {
   journey: SoulMapJourney;
   onBack: () => void;
+  initialCareerChapter?: 1 | 3;
+  onCareerChapterChange?: (chapter: 1 | 3) => void;
 }
 
 /**
@@ -38,7 +41,7 @@ interface JourneyDetailScreenProps {
  * desktop and a horizontal tab bar on mobile. Content is resolved from the
  * mock registry by slug (no API in phase 1).
  */
-export default function JourneyDetailScreen({ journey, onBack }: JourneyDetailScreenProps) {
+export default function JourneyDetailScreen({ journey, onBack, initialCareerChapter = 1, onCareerChapterChange }: JourneyDetailScreenProps) {
   const content = useMemo(() => getJourneyContent(journey.slug), [journey.slug]);
   const { sections, tagline, accentColor } = content;
   const isCareerJourney = journey.slug === 'career';
@@ -47,6 +50,8 @@ export default function JourneyDetailScreen({ journey, onBack }: JourneyDetailSc
   const [aiReading, setAiReading] = useState<AiReading | null>(null);
   const [isAiReadingLoading, setIsAiReadingLoading] = useState(false);
   const [aiReadingError, setAiReadingError] = useState<string | null>(null);
+  const [activeCareerChapter, setActiveCareerChapter] = useState<1 | 3>(initialCareerChapter);
+  const activeCareerChapterRef = useRef<1 | 3>(1);
   const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
   const isProgrammaticScroll = useRef(false);
 
@@ -102,7 +107,7 @@ export default function JourneyDetailScreen({ journey, onBack }: JourneyDetailSc
     setAiReadingError(null);
     fetchAiReading(readingId)
       .then((reading) => {
-        if (!cancelled) setAiReading(reading);
+        if (!cancelled && initialCareerChapter === 1 && activeCareerChapterRef.current === 1) setAiReading(reading);
       })
       .catch(() => {
         if (!cancelled) setAiReadingError('Linh Nhi chưa thể tải bản đồ sự nghiệp lúc này. Bạn thử lại nhé.');
@@ -114,7 +119,79 @@ export default function JourneyDetailScreen({ journey, onBack }: JourneyDetailSc
     return () => {
       cancelled = true;
     };
-  }, [isCareerJourney]);
+  }, [initialCareerChapter, isCareerJourney]);
+
+  const loadCareerChapter = useCallback(async (chapter: 1 | 3, updateUrl = true) => {
+    activeCareerChapterRef.current = chapter;
+    setActiveCareerChapter(chapter);
+    if (updateUrl) onCareerChapterChange?.(chapter);
+    if (chapter === 1) {
+      const readingId = Number(localStorage.getItem('soulmap_ai_reading_career_chapter_01_id'));
+      if (!readingId) return;
+      setIsAiReadingLoading(true);
+      setAiReadingError(null);
+      try {
+        const reading = await fetchAiReading(readingId);
+        if (activeCareerChapterRef.current === chapter) setAiReading(reading);
+      } catch {
+        setAiReadingError('Linh Nhi chưa thể tải bản đồ sự nghiệp lúc này. Bạn thử lại nhé.');
+      } finally {
+        setIsAiReadingLoading(false);
+      }
+      return;
+    }
+
+    setIsAiReadingLoading(true);
+    setAiReadingError(null);
+    try {
+      const savedId = Number(localStorage.getItem('soulmap_ai_reading_career_chapter_03_v2_id'));
+      if (savedId) {
+        const reading = await fetchAiReading(savedId);
+        if (activeCareerChapterRef.current === chapter) setAiReading(reading);
+        return;
+      }
+      const rawBirthInfo = localStorage.getItem('soulmap_birth_info');
+      if (!rawBirthInfo) throw new Error('missing birth info');
+      const birthInfo = JSON.parse(rawBirthInfo) as {
+        name: string;
+        birthDate: string;
+        birthCalendar: 'solar' | 'lunar';
+        birthTime: string;
+        gender: 'Nam' | 'Nữ';
+        timezone?: number;
+        viewYear?: number;
+      };
+      const [year, month, day] = birthInfo.birthDate.split('-').map(Number);
+      const [hour, min] = birthInfo.birthTime.split(':').map(Number);
+      const input: CareerReadingRequest = {
+        name: birthInfo.name || 'Bạn',
+        day,
+        month,
+        year,
+        calendar: birthInfo.birthCalendar,
+        gender: birthInfo.gender === 'Nam' ? 'male' : 'female',
+        hour,
+        min,
+        timezone: birthInfo.timezone ?? 1,
+        viewYear: birthInfo.viewYear ?? new Date().getFullYear(),
+      };
+      const reading = await generateCareerTalentReading(input);
+      localStorage.setItem('soulmap_ai_reading_career_chapter_03_v2_id', String(reading.id));
+      if (activeCareerChapterRef.current === chapter) setAiReading(reading);
+    } catch {
+      if (activeCareerChapterRef.current === chapter) {
+        setAiReading(null);
+        setAiReadingError('Chưa thể tạo chương Thiên phú lúc này. Hãy chắc rằng bạn đã tạo SoulMap trước đó rồi thử lại.');
+      }
+    } finally {
+      if (activeCareerChapterRef.current === chapter) setIsAiReadingLoading(false);
+    }
+  }, [onCareerChapterChange]);
+
+  useEffect(() => {
+    if (!isCareerJourney || initialCareerChapter === activeCareerChapterRef.current) return;
+    void loadCareerChapter(initialCareerChapter, false);
+  }, [initialCareerChapter, isCareerJourney, loadCareerChapter]);
 
   const handleNavigate = useCallback((id: JourneySectionId) => {
     const el = sectionRefs.current.get(id);
@@ -139,6 +216,8 @@ export default function JourneyDetailScreen({ journey, onBack }: JourneyDetailSc
             aiReading={aiReading}
             isAiReadingLoading={isAiReadingLoading}
             aiReadingError={aiReadingError}
+            activeChapter={activeCareerChapter}
+            onSelectChapter={loadCareerChapter}
             onBack={onBack}
             onNavigate={handleNavigate}
             registerRef={registerRef}
@@ -245,6 +324,8 @@ interface CareerJourneyDetailProps {
   aiReading: AiReading | null;
   isAiReadingLoading: boolean;
   aiReadingError: string | null;
+  activeChapter: 1 | 3;
+  onSelectChapter: (chapter: 1 | 3) => void;
   onBack: () => void;
   onNavigate: (id: JourneySectionId) => void;
   registerRef: (id: string, el: HTMLElement | null) => void;
@@ -253,7 +334,7 @@ interface CareerJourneyDetailProps {
 const CAREER_CHAPTERS = [
   'Bản đồ sự nghiệp',
   'DNA nghề nghiệp',
-  'Năng lực bẩm sinh',
+  'Thiên phú & năng lực',
   'Động lực bên trong',
   'Môi trường phù hợp',
   'Nhóm nghề nghiệp',
@@ -272,28 +353,29 @@ function CareerJourneyDetail({
   aiReading,
   isAiReadingLoading,
   aiReadingError,
+  activeChapter,
+  onSelectChapter,
   onBack,
   onNavigate,
   registerRef,
 }: CareerJourneyDetailProps) {
   return (
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-[250px_minmax(0,1fr)_300px]">
-      <CareerLeftRail sections={sections} activeId={activeId} onBack={onBack} onNavigate={onNavigate} />
+      <CareerLeftRail activeChapter={activeChapter} onBack={onBack} onSelectChapter={onSelectChapter} />
 
       <main className="min-w-0 rounded-[1.75rem] border border-[#E8DFCF] bg-[#FFFCF8] p-4 shadow-[0_24px_70px_-52px_rgba(62,41,22,0.38)] md:p-6">
-        <CareerHero journey={journey} tagline={tagline} />
+        <CareerHero journey={journey} tagline={tagline} activeChapter={activeChapter} />
 
         <div className="mt-8 space-y-8">
-          <CareerPathSection section={sections[0]} aiReading={aiReading} registerRef={registerRef} />
-          <CareerGrowthSection section={sections[1]} aiReading={aiReading} registerRef={registerRef} />
-          <CareerAiReadingSection
-            section={sections[2]}
-            aiReading={aiReading}
-            isAiReadingLoading={isAiReadingLoading}
-            aiReadingError={aiReadingError}
-            onBack={onBack}
-            registerRef={registerRef}
-          />
+          {activeChapter === 1 ? (
+            <>
+              <CareerPathSection section={sections[0]} aiReading={aiReading} registerRef={registerRef} />
+              <CareerGrowthSection section={sections[1]} aiReading={aiReading} registerRef={registerRef} />
+              <CareerAiReadingSection section={sections[2]} aiReading={aiReading} isAiReadingLoading={isAiReadingLoading} aiReadingError={aiReadingError} onBack={onBack} registerRef={registerRef} />
+            </>
+          ) : (
+            <CareerTalentChapter aiReading={aiReading} isLoading={isAiReadingLoading} error={aiReadingError} />
+          )}
         </div>
       </main>
 
@@ -303,21 +385,14 @@ function CareerJourneyDetail({
 }
 
 function CareerLeftRail({
-  sections,
-  activeId,
+  activeChapter,
   onBack,
-  onNavigate,
+  onSelectChapter,
 }: {
-  sections: JourneySection[];
-  activeId: JourneySectionId;
+  activeChapter: 1 | 3;
   onBack: () => void;
-  onNavigate: (id: JourneySectionId) => void;
+  onSelectChapter: (chapter: 1 | 3) => void;
 }) {
-  const chapterSections = CAREER_CHAPTERS.map((title, index) => ({
-    title,
-    section: sections[index] ?? null,
-  }));
-
   return (
     <aside className="space-y-5 xl:sticky xl:top-24 xl:self-start">
       <section className="rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFFCF8] p-4 shadow-[0_20px_60px_-48px_rgba(62,41,22,0.35)]">
@@ -352,19 +427,21 @@ function CareerLeftRail({
         <div className="mt-7">
           <p className="mb-3 font-sans text-[0.82rem] font-extrabold text-[#22251F]">Danh sách chương</p>
           <div className="space-y-1.5">
-            {chapterSections.map(({ title, section }, index) => {
-              const isActive = section?.id === activeId || (!section && index === 0 && activeId === 'intro');
-              const isDone = index > 0 && index < 4;
-              const isLocked = index >= 4;
+            {CAREER_CHAPTERS.map((title, index) => {
+              const chapterNumber = index + 1;
+              const isAvailable = chapterNumber === 1 || chapterNumber === 3;
+              const isActive = chapterNumber === activeChapter;
+              const isDone = isAvailable && !isActive;
+              const isLocked = !isAvailable;
               return (
                 <button
                   key={title}
                   type="button"
-                  disabled={!section}
-                  onClick={() => section && onNavigate(section.id)}
+                  disabled={!isAvailable}
+                  onClick={() => isAvailable && onSelectChapter(chapterNumber as 1 | 3)}
                   className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left font-sans text-[0.82rem] transition ${
                     isActive ? 'bg-[#F8ECDC] text-[#9A5D24] shadow-sm' : 'text-[#22251F] hover:bg-[#FAF6EE]'
-                  } ${!section ? 'cursor-default opacity-65' : ''}`}
+                  } ${!isAvailable ? 'cursor-default opacity-65' : ''}`}
                 >
                   <span className="grid h-5 w-5 shrink-0 place-items-center text-[#9A5D24]">
                     {isLocked ? <Lock className="h-4 w-4 text-[#A8A194]" /> : <Sparkles className="h-4 w-4" />}
@@ -399,7 +476,8 @@ function CareerLeftRail({
   );
 }
 
-function CareerHero({ journey, tagline }: { journey: SoulMapJourney; tagline: string }) {
+function CareerHero({ journey, tagline, activeChapter }: { journey: SoulMapJourney; tagline: string; activeChapter: 1 | 3 }) {
+  const isTalentChapter = activeChapter === 3;
   return (
     <header className="relative min-h-[300px] overflow-hidden rounded-[1.5rem] bg-[#D7B77E] p-7 text-[#36251A] md:min-h-[330px] md:p-8">
       <img src={journey.imagePath} alt="" className="absolute inset-0 h-full w-full object-cover opacity-100" draggable={false} />
@@ -408,7 +486,7 @@ function CareerHero({ journey, tagline }: { journey: SoulMapJourney; tagline: st
       <div className="relative z-[1] flex min-h-[244px] flex-col justify-between">
         <div className="flex items-start justify-between gap-4">
           <span className="rounded-full border border-[#E7C98E] bg-[#FFF8ED]/80 px-4 py-2 font-sans text-[0.78rem] font-extrabold uppercase tracking-[0.08em] text-[#9A5D24] shadow-sm">
-            Chapter 01
+            Chapter {String(activeChapter).padStart(2, '0')}
           </span>
           <button type="button" className="inline-flex items-center gap-2 rounded-xl bg-white/86 px-4 py-3 font-sans text-[0.82rem] font-extrabold text-[#22251F] shadow-sm transition hover:bg-white">
             <Bookmark className="h-4 w-4" />
@@ -418,10 +496,10 @@ function CareerHero({ journey, tagline }: { journey: SoulMapJourney; tagline: st
 
         <div>
           <h1 className="max-w-[520px] font-display text-[3rem] font-bold leading-[1.02] tracking-[-0.03em] md:text-[4rem]">
-            Bản đồ sự nghiệp
+            {isTalentChapter ? 'Thiên phú và năng lực nổi bật' : 'Bản đồ sự nghiệp'}
           </h1>
           <p className="mt-7 max-w-[520px] font-display text-[1.18rem] italic leading-relaxed text-[#5D4A37]">
-            “{tagline || 'Sự nghiệp của bạn không sinh ra để đi theo một con đường bằng phẳng.'}”
+            “{isTalentChapter ? 'Nhìn ra điều bạn làm tốt một cách tự nhiên.' : tagline || 'Sự nghiệp của bạn không sinh ra để đi theo một con đường bằng phẳng.'}”
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#E7C98E] bg-[#FFF8ED]/75 px-4 py-2 font-sans text-[0.82rem] font-bold text-[#6D4A25]">
@@ -591,6 +669,83 @@ function CareerAiReadingSection({
         )}
       </div>
     </section>
+  );
+}
+
+function CareerTalentChapter({ aiReading, isLoading, error }: { aiReading: AiReading | null; isLoading: boolean; error: string | null }) {
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFF9F0] text-center">
+        <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#E8DFCF] border-t-[#9A5D24]" />
+        <p className="mt-5 font-display text-[1.35rem] font-bold text-[#214D3B]">Linh Nhi đang tìm ba năng lực nổi bật của bạn...</p>
+        <p className="mt-2 max-w-md font-sans text-sm leading-relaxed text-[#6F756F]">Chương này được tạo riêng từ dữ liệu SoulMap và có thể mất một chút thời gian.</p>
+      </div>
+    );
+  }
+
+  if (error || !aiReading) {
+    return (
+      <div className="flex min-h-[360px] flex-col items-center justify-center rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFF9F0] px-6 text-center">
+        <WandSparkles className="h-10 w-10 text-[#C2873B]" />
+        <h2 className="mt-4 font-display text-2xl font-bold text-[#214D3B]">Chương thiên phú chưa sẵn sàng</h2>
+        <p className="mt-3 max-w-lg font-reading leading-relaxed text-[#5E625F]">{error || 'Bạn thử mở lại chương này sau nhé.'}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <section>
+        <CareerSectionTitle icon={<WandSparkles className="h-7 w-7" />} number="1" title="Ba năng lực nổi bật" tone="gold" />
+        <p className="mt-5 max-w-3xl font-reading text-[1.03rem] leading-[1.8] text-[#4c534d]">{aiReading.talentIntro}</p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {aiReading.talents?.map((talent, index) => (
+            <article key={talent.title} className="relative overflow-hidden rounded-2xl border border-[#E8DFCF] bg-[#FCF5EA] p-5 shadow-sm">
+              <span className="absolute right-4 top-3 font-display text-5xl font-bold text-[#E8D2AE]">0{index + 1}</span>
+              <Sparkles className="h-7 w-7 text-[#9A5D24]" />
+              <h3 className="mt-4 pr-10 font-display text-[1.4rem] font-bold text-[#3A2A1E]">{talent.title}</h3>
+              <p className="mt-3 font-reading leading-relaxed text-[#5E625F]">{talent.description}</p>
+              <div className="mt-5 border-t border-[#E4D6C2] pt-4">
+                <p className="font-sans text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-[#9A5D24]">Trong công việc</p>
+                <p className="mt-2 font-sans text-sm leading-relaxed text-[#3A2A1E]">{talent.workExpression}</p>
+              </div>
+              <p className="mt-4 rounded-xl bg-white/70 p-3 font-sans text-[0.82rem] leading-relaxed text-[#24533E]">{talent.developmentTip}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <CareerSectionTitle icon={<Zap className="h-7 w-7" />} number="2" title="Khi các năng lực đi cùng nhau" tone="blue" />
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+          <div className="rounded-2xl bg-[#123D5A] p-6 text-white shadow-sm">
+            <p className="font-display text-[1.35rem] font-bold">Cách bạn tạo ra giá trị riêng</p>
+            <p className="mt-3 font-reading text-[1rem] leading-[1.8] text-white/85">{aiReading.combinationInsight}</p>
+          </div>
+          <div className="rounded-2xl border border-[#F0D9D2] bg-[#FFF5F1] p-5">
+            <p className="font-display text-[1.2rem] font-bold text-[#B84D43]">Khi dùng quá tay</p>
+            <div className="mt-4 space-y-3">
+              {aiReading.balanceRisks?.map((risk) => (
+                <div key={risk.title} className="flex gap-3">
+                  <span className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white text-[#D05248]">!</span>
+                  <div>
+                    <p className="font-sans text-sm font-extrabold text-[#3A2A1E]">{risk.title}</p>
+                    <p className="mt-1 font-sans text-[0.82rem] leading-relaxed text-[#6F756F]">{risk.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <CareerSectionTitle icon={<BookOpen className="h-7 w-7" />} number="3" title="Linh Nhi luận sâu về năng lực của bạn" tone="gold" />
+        <div className="mt-5 rounded-2xl border border-[#E8DFCF] bg-[#FFF9F0] p-5 md:p-7">
+          <MarkdownReading content={aiReading.deepReadingMarkdown || aiReading.content} />
+        </div>
+      </section>
+    </div>
   );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, PersonalityProfile, AppScreen, Question } from './types';
 
 // Import modular subcomponents
@@ -26,6 +26,7 @@ interface AppProps {
 
 export default function App({ initialScreen = 'landing' }: AppProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   type Screen = AppScreen;
   const [currentScreen, setCurrentScreen] = useState<Screen>(initialScreen);
   const [transitionDirection, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
@@ -330,15 +331,34 @@ export default function App({ initialScreen = 'landing' }: AppProps) {
   // Journey detail overlay for the standalone four_journeys screen
   const [journeyDetail, setJourneyDetail] = useState<SoulMapJourney | null>(null);
 
+  useEffect(() => {
+    if (initialScreen !== 'four_journeys' || !isAuthReady) return;
+
+    const slug = searchParams.get('journey');
+    if (!slug) {
+      setJourneyDetail(null);
+      return;
+    }
+    const journeys = buildMockJourneys(profile || PERSONALITY_PROFILES.DEFAULT);
+    setJourneyDetail(journeys.find((journey) => journey.slug === slug) ?? null);
+  }, [initialScreen, isAuthReady, profile, searchParams]);
+
   const handleExploreJourney = (journey: SoulMapJourney) => {
     setTransitionDirection('push');
     setJourneyDetail(journey);
+    const chapter = journey.slug === 'career' ? '&chapter=1' : '';
+    router.push(`/journeys?journey=${journey.slug}${chapter}`);
   };
 
   const handleBackFromJourneyDetail = () => {
     setTransitionDirection('push_back');
     setJourneyDetail(null);
+    router.push('/journeys');
   };
+
+  const handleCareerChapterChange = useCallback((chapter: 1 | 3) => {
+    router.push(`/journeys?journey=career&chapter=${chapter}`, { scroll: false });
+  }, [router]);
 
   const buildAnswersFromMbtiType = (mbtiType: string): Record<number, 'A' | 'B'> => {
     const letters = new Set(mbtiType.split(''));
@@ -618,7 +638,12 @@ export default function App({ initialScreen = 'landing' }: AppProps) {
       )}
 
       {currentScreen === 'four_journeys' && journeyDetail && (
-        <JourneyDetailScreen journey={journeyDetail} onBack={handleBackFromJourneyDetail} />
+        <JourneyDetailScreen
+          journey={journeyDetail}
+          initialCareerChapter={searchParams.get('chapter') === '3' ? 3 : 1}
+          onCareerChapterChange={handleCareerChapterChange}
+          onBack={handleBackFromJourneyDetail}
+        />
       )}
 
       {currentScreen === 'four_journeys' && !journeyDetail && (

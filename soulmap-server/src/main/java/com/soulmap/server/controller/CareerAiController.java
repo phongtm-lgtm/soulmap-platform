@@ -3,6 +3,7 @@ package com.soulmap.server.controller;
 import com.soulmap.server.dto.request.ai.CareerReadingRequest;
 import com.soulmap.server.dto.response.ApiResponse;
 import com.soulmap.server.dto.response.ai.CareerReadingResponse;
+import com.soulmap.server.dto.response.ai.CareerTalentReadingResponse;
 import com.soulmap.server.service.CareerAiService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,5 +27,11 @@ public class CareerAiController {
     public ApiResponse<CareerReadingResponse> generateCareerReading(@Valid @RequestBody CareerReadingRequest request) {
         CareerReadingResponse response = careerAiService.generateCareerReading(request);
         return ApiResponse.of(HttpStatus.OK.value(), "Generate career reading successfully", response);
+    }
+
+    @PostMapping("/chapters/03/readings")
+    public ApiResponse<CareerTalentReadingResponse> generateCareerTalentReading(@Valid @RequestBody CareerReadingRequest request) {
+        CareerTalentReadingResponse response = careerAiService.generateCareerTalentReading(request);
+        return ApiResponse.of(HttpStatus.OK.value(), "Generate career talent reading successfully", response);
     }
 }

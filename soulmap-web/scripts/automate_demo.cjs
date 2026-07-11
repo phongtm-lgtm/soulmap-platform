@@ -1,154 +1,111 @@
 const { chromium } = require('playwright');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const baseUrl = process.env.DEMO_BASE_URL || 'http://localhost:3000';
+const outputDir = path.resolve(__dirname, '../../artifacts/demo-video/raw');
+
+const pause = (page, milliseconds = 1800) => page.waitForTimeout(milliseconds);
+
+async function smoothScroll(page, top, duration = 1200) {
+  await page.evaluate(({ top, duration }) => {
+    const start = window.scrollY;
+    const distance = top - start;
+    const startedAt = performance.now();
+    const tick = (now) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 0.5 - Math.cos(progress * Math.PI) / 2;
+      window.scrollTo(0, start + distance * eased);
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, { top, duration });
+  await pause(page, duration + 500);
+}
 
 (async () => {
-  console.log('Khởi chạy trình duyệt chromium...');
-  
-  // Mở trình duyệt ở chế độ có giao diện (headed mode)
-  // slowMo: 600ms giúp các thao tác click/nhập liệu chậm rãi để người dùng kịp quay video
-  const browser = await chromium.launch({
-    headless: false,
-    slowMo: 700
-  });
-
-  // Tạo ngữ cảnh trình duyệt với kích thước chuẩn Full HD 1920x1080
+  fs.mkdirSync(outputDir, { recursive: true });
+  const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
-    deviceScaleFactor: 1
+    deviceScaleFactor: 1,
+    recordVideo: { dir: outputDir, size: { width: 1920, height: 1080 } },
   });
-
   const page = await context.newPage();
+  const video = page.video();
 
-  console.log('Kết nối tới localhost:3000...');
-  try {
-    await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
-  } catch (e) {
-    console.error('Không thể kết nối tới http://localhost:3000. Bạn đã chạy lệnh `npm run dev` chưa?');
-    await browser.close();
-    process.exit(1);
+  console.log(`Opening ${baseUrl}`);
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await pause(page, 9000);
+
+  console.log('Scene 1: Landing');
+  await smoothScroll(page, 760, 3000);
+  await pause(page, 9000);
+  await smoothScroll(page, 1500, 3000);
+  await pause(page, 9000);
+  await smoothScroll(page, 0, 2500);
+  await pause(page, 7000);
+
+  console.log('Scene 2: MBTI shortcut');
+  await page.getByRole('button', { name: 'Bắt đầu hành trình' }).first().click();
+  await pause(page, 10000);
+  const existingResult = page.getByRole('button', { name: 'Tôi đã có kết quả MBTI' });
+  if (!(await existingResult.isVisible())) {
+    // Logged-out landing enters demo auth. Use local demo auth, then return to onboarding.
+    await page.locator('.grid-cols-3 button').first().click();
+    await pause(page, 2200);
+    await page.goto(`${baseUrl}/mbti-test`, { waitUntil: 'domcontentloaded' });
   }
+  await page.getByRole('button', { name: 'Tôi đã có kết quả MBTI' }).click();
+  await pause(page, 6000);
+  await page.getByRole('combobox', { name: 'Chọn loại MBTI của bạn' }).selectOption('INFJ');
+  await pause(page, 5000);
+  await page.getByRole('button', { name: 'Tiếp tục với kết quả này' }).click();
+  await pause(page, 10000);
 
-  // Chờ trang tải hoàn tất
-  await page.waitForTimeout(1000);
+  console.log('Scene 3: MBTI result and birth profile');
+  await smoothScroll(page, 520, 2000);
+  await pause(page, 10000);
+  await page.getByRole('button', { name: 'Mở khóa SoulMap' }).click();
+  await pause(page, 12000);
+  await page.getByRole('button', { name: 'Tạo SoulMap' }).click();
+  await pause(page, 18000);
 
-  // 1. Cuộn trang Landing mượt mà để giới thiệu tính năng
-  console.log('1. Cuộn trang Landing...');
-  for (let i = 1; i <= 3; i++) {
-    await page.evaluate((scrollAmount) => {
-      window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
-    }, 500);
-    await page.waitForTimeout(1500);
+  console.log('Scene 4: Journeys');
+  await page.getByRole('button', { name: /Vào Journey ngay/i }).click();
+  await pause(page, 12000);
+  await smoothScroll(page, 520, 2500);
+  await pause(page, 10000);
+  const careerCard = page.locator('article, div').filter({ hasText: /^Sự nghiệp/ }).last();
+  const careerButton = careerCard.getByRole('button', { name: /Tiếp tục hành trình/i });
+  if (await careerButton.isVisible()) {
+    await careerButton.click();
+  } else {
+    await page.getByRole('button', { name: /Tiếp tục hành trình/i }).nth(1).click();
   }
+  await pause(page, 12000);
+  await smoothScroll(page, 700, 2500);
+  await pause(page, 9000);
+  await smoothScroll(page, 1350, 2500);
+  await pause(page, 9000);
 
-  // Cuộn ngược lên đầu trang
-  await page.evaluate(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-  await page.waitForTimeout(1500);
+  console.log('Scene 5: AI Mentor');
+  const mentorLink = page.getByText('AI Mentor', { exact: true }).first();
+  await mentorLink.click();
+  await pause(page, 12000);
+  const composer = page.getByPlaceholder('Hãy hỏi Linh Nhi về sự nghiệp, tình yêu hoặc cuộc sống...');
+  await composer.fill('Tôi cảm thấy mất động lực trong công việc hiện tại. Tôi nên bắt đầu thay đổi từ đâu?');
+  await pause(page, 5000);
+  await composer.press('Enter');
+  await pause(page, 18000);
 
-  // 2. Click "Bắt đầu hành trình" để chuyển sang trang Đăng nhập (Auth)
-  console.log('2. Click Bắt đầu hành trình -> Chuyển sang Đăng nhập...');
-  await page.click('button:has-text("Bắt đầu hành trình")');
-  await page.waitForTimeout(1500);
-
-  // 3. Đăng nhập bằng Google Mockup để thao tác nhanh
-  console.log('3. Chọn Đăng nhập qua Google (Mockup)...');
-  // Click vào nút đầu tiên trong các biểu tượng social login (nút Google)
-  await page.click('.grid-cols-3 button:nth-child(1)');
-  
-  // Chờ hiệu ứng chuyển cảnh của đăng nhập thành công
-  await page.waitForTimeout(3000);
-
-  // 4. Bắt đầu làm bài test MBTI
-  console.log('4. Bắt đầu làm bài trắc nghiệm MBTI...');
-  await page.click('button:has-text("Bắt đầu hành trình")');
-  await page.waitForTimeout(1500);
-  await page.click('button:has-text("Bắt đầu làm MBTI")');
-  await page.waitForTimeout(1500);
-
-  // 5. Trả lời 10 câu hỏi trắc nghiệm
-  // Tự động chọn Option A cho tất cả 10 câu để ra kết quả mẫu là INFJ
-  console.log('5. Tự động trả lời 10 câu hỏi...');
-  for (let questionNum = 1; questionNum <= 10; questionNum++) {
-    console.log(`- Trả lời câu hỏi ${questionNum}/10...`);
-    // Click vào lựa chọn đầu tiên (Phương án A)
-    await page.locator('div.mx-auto.mt-6.grid button').first().click();
-    await page.waitForTimeout(600);
-    
-    // Bấm nút chuyển câu hỏi
-    const nextBtn = page.locator('button', { hasText: /Câu tiếp theo|Khám phá kết quả/ });
-    await nextBtn.click();
-    await page.waitForTimeout(1000);
-  }
-
-  // 6. Nhận kết quả MBTI và tiếp tục mở khóa
-  console.log('6. Nhận kết quả MBTI (INFJ) -> Chuyển qua nhập ngày sinh...');
-  await page.waitForSelector('button:has-text("Mở khóa SoulMap")');
-  await page.waitForTimeout(1500);
-  await page.click('button:has-text("Mở khóa SoulMap")');
-  await page.waitForTimeout(1500);
-
-  // 7. Nhập thông tin Ngày sinh & Tạo bản đồ
-  console.log('7. Nhập ngày sinh và tạo bản đồ...');
-  // Giữ nguyên các thông tin mặc định có sẵn (Nam/Nữ, Ngày sinh mẫu)
-  // Click "Tạo SoulMap"
-  await page.click('button:has-text("Tạo SoulMap")');
-  
-  // Chờ hiệu ứng vẽ bản đồ sao / sinh mệnh (khoảng 8-9 giây)
-  console.log('Đang chờ thuật toán AI dệt Bản đồ sao (8s)...');
-  await page.waitForTimeout(9000);
-
-  // 8. Tương tác với Dashboard kết quả & AI Chatbot Linh Nhi
-  console.log('8. Bản đồ Soulmap đã mở khóa! Bắt đầu chat với AI Mentor Linh Nhi...');
-  
-  // Cuộn xuống phần Trò chuyện AI mượt mà
-  try {
-    await page.locator('.glass-card', { hasText: 'AI Mentor Linh Nhi' }).scrollIntoViewIfNeeded();
-  } catch (e) {
-    await page.evaluate(() => window.scrollBy({ top: 600, behavior: 'smooth' }));
-  }
-  await page.waitForTimeout(1500);
-
-  // Nhập câu hỏi vào khung chat
-  const inputSelector = 'input[placeholder*="Hỏi Linh Nhi"]';
-  await page.fill(inputSelector, 'Tôi có phù hợp làm Product Manager không?');
-  await page.waitForTimeout(1000);
-  // Bấm phím Enter để gửi câu hỏi
-  await page.press(inputSelector, 'Enter');
-  
-  // Chờ Linh Nhi phân tích trả lời (3.5s)
-  console.log('Linh Nhi đang phân hồi câu hỏi 1...');
-  await page.waitForTimeout(3500);
-
-  // Click chọn tiếp chủ đề gợi ý: "Tình duyên của tôi thế nào?"
-  console.log('Click chủ đề gợi ý tình duyên...');
-  await page.click('button:has-text("Tình duyên của tôi thế nào?")');
-  
-  // Chờ Linh Nhi trả lời (3.5s)
-  console.log('Linh Nhi đang phản hồi câu hỏi 2...');
-  await page.waitForTimeout(3500);
-
-  // 9. Xem Bản đồ hành trình (Scenic Map)
-  console.log('9. Chuyển sang xem sơ đồ 4 Chặng Đường hành trình...');
-  // Cuộn lên đầu trang
-  await page.evaluate(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-  await page.waitForTimeout(1000);
-
-  // Click vào nút "Hành trình" trên Navbar để hiển thị Bản đồ 4 chặng đường
-  await page.locator('nav').locator('text=Hành trình').first().click();
-  await page.waitForTimeout(2000);
-
-  // Cuộn nhẹ xuống để ngắm bản đồ
-  await page.evaluate(() => {
-    window.scrollBy({ top: 300, behavior: 'smooth' });
-  });
-  
-  // Chờ thêm 4 giây để kết thúc video ghi hình
-  console.log('Hoàn thành quá trình demo! Video kết thúc sau 4 giây.');
-  await page.waitForTimeout(4000);
-
-  // Đóng trình duyệt
+  await context.close();
   await browser.close();
-  console.log('Đã kết thúc tự động hóa.');
-})();
+  const recordedPath = await video.path();
+  const finalPath = path.join(outputDir, 'soulmap-product-demo.webm');
+  fs.renameSync(recordedPath, finalPath);
+  console.log(`Recorded: ${finalPath}`);
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

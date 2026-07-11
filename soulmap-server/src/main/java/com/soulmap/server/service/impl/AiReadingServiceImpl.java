@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soulmap.server.common.error.ResourceNotFoundException;
 import com.soulmap.server.dto.response.ai.AiReadingResponse;
 import com.soulmap.server.dto.response.ai.CareerReadingResponse;
+import com.soulmap.server.dto.response.ai.CareerTalentReadingResponse;
 import com.soulmap.server.entity.AiReading;
 import com.soulmap.server.repository.AiReadingRepository;
 import com.soulmap.server.service.AiReadingService;
@@ -47,6 +48,16 @@ public class AiReadingServiceImpl implements AiReadingService {
         }
 
         try {
+            if ("career-chapter-03".equals(reading.getChapterId())) {
+                CareerTalentReadingResponse talentReading = objectMapper.readValue(reading.getContent(), CareerTalentReadingResponse.class);
+                response.setTalentIntro(talentReading.getIntro());
+                response.setTalents(talentReading.getTalents());
+                response.setCombinationInsight(talentReading.getCombinationInsight());
+                response.setBalanceRisks(talentReading.getBalanceRisks());
+                response.setDeepReadingMarkdown(talentReading.getDeepReadingMarkdown());
+                response.setContent(talentReading.getDeepReadingMarkdown());
+                return;
+            }
             CareerReadingResponse careerReading = objectMapper.readValue(reading.getContent(), CareerReadingResponse.class);
             response.setCareerPath(careerReading.getCareerPath());
             response.setGrowthDrivers(careerReading.getGrowthDrivers());

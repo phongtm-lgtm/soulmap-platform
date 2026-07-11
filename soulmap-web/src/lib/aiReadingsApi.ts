@@ -13,6 +13,10 @@ export type AiReading = {
   content: string;
   careerPath?: CareerPath;
   growthDrivers?: GrowthDrivers;
+  talentIntro?: string;
+  talents?: CareerTalent[];
+  combinationInsight?: string;
+  balanceRisks?: CareerCard[];
   deepReadingMarkdown?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -32,6 +36,13 @@ export type CareerPath = {
 export type GrowthDrivers = {
   strongWhen: CareerCard[];
   notFitWith: CareerCard[];
+};
+
+export type CareerTalent = {
+  title: string;
+  description: string;
+  workExpression: string;
+  developmentTip: string;
 };
 
 export type CareerReadingRequest = {
@@ -81,6 +92,14 @@ async function request<T>(path: string, init?: RequestInit & { timeoutMs?: numbe
 
 export async function generateCareerReading(input: CareerReadingRequest): Promise<AiReading> {
   return request<AiReading>('/ai/career/readings', {
+    method: 'POST',
+    body: JSON.stringify(input),
+    timeoutMs: AI_READING_TIMEOUT_MS,
+  });
+}
+
+export async function generateCareerTalentReading(input: CareerReadingRequest): Promise<AiReading> {
+  return request<AiReading>('/ai/career/chapters/03/readings', {
     method: 'POST',
     body: JSON.stringify(input),
     timeoutMs: AI_READING_TIMEOUT_MS,

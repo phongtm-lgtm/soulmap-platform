@@ -171,6 +171,10 @@ export default function ResultScreen({
   };
 
   const persistCareerReading = (readingId: number, birthKey: string, birthInfo: object) => {
+    const previousBirthKey = localStorage.getItem('soulmap_ai_reading_career_birth_key');
+    if (previousBirthKey && previousBirthKey !== birthKey) {
+      localStorage.removeItem('soulmap_ai_reading_career_chapter_03_v2_id');
+    }
     localStorage.setItem('soulmap_ai_reading_career_chapter_01_id', String(readingId));
     localStorage.setItem('soulmap_ai_reading_career_birth_key', birthKey);
     localStorage.setItem('soulmap_birth_info', JSON.stringify(birthInfo));

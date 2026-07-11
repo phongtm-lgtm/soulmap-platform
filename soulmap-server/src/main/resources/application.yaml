@@ -47,7 +47,7 @@ soulmap:
     provider: ${SOULMAP_AI_PROVIDER:9router}
     base-url: ${SOULMAP_AI_BASE_URL:https://api.9router.com/v1}
     api-key: ${SOULMAP_AI_API_KEY:}
-    model: ${SOULMAP_AI_MODEL:gpt-4.1-mini}
+    model: ${SOULMAP_AI_MODEL:cx/gpt-5.6-luna}
     timeout-seconds: ${SOULMAP_AI_TIMEOUT_SECONDS:300}
     temperature: ${SOULMAP_AI_TEMPERATURE:0.4}
     structured-output-mode: ${SOULMAP_AI_STRUCTURED_OUTPUT_MODE:json_object}
