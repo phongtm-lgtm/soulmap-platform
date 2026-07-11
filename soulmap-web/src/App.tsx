@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { Suspense, useCallback, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, PersonalityProfile, AppScreen, Question } from './types';
 
@@ -24,7 +24,15 @@ interface AppProps {
   initialScreen?: AppScreen;
 }
 
-export default function App({ initialScreen = 'landing' }: AppProps) {
+export default function App(props: AppProps) {
+  return (
+    <Suspense fallback={null}>
+      <AppContent {...props} />
+    </Suspense>
+  );
+}
+
+function AppContent({ initialScreen = 'landing' }: AppProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   type Screen = AppScreen;
