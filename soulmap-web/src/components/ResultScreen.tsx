@@ -12,7 +12,6 @@ import {
   Droplet, 
   Mountain, 
   Quote, 
-  ArrowRight,
   Compass, 
   CheckCircle2,
   Lock,
@@ -32,13 +31,15 @@ import JourneyDetailScreen from './journey/JourneyDetailScreen';
 import FourJourneysScreen from './FourJourneysScreen';
 import { buildMockJourneys } from '../data/mockJourneys';
 import type { SoulMapJourney } from '../types/journey';
-import { generateCareerReading } from '../lib/aiReadingsApi';
+import { generateCareerReading, generateTuViReading } from '../lib/aiReadingsApi';
 
 interface ResultScreenProps {
   profile: PersonalityProfile;
   answers: Record<number, 'A' | 'B'>;
   resultStep: 'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map';
   setResultStep: (step: 'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map') => void;
+  birthName: string;
+  setBirthName: (name: string) => void;
   birthDate: string;
   setBirthDate: (date: string) => void;
   birthCalendar: 'solar' | 'lunar';
@@ -68,6 +69,8 @@ export default function ResultScreen({
   profile,
   resultStep,
   setResultStep,
+  birthName,
+  setBirthName,
   birthDate,
   setBirthDate,
   birthCalendar,
@@ -138,9 +141,9 @@ export default function ResultScreen({
   const buildCareerReadingInput = () => {
     const [year, month, day] = birthDate.split('-').map(Number);
     const [hour, min] = birthTime.split(':').map(Number);
-    const name = currentUser?.name ?? 'Bạn';
+    const name = birthName.trim();
     const viewYear = new Date().getFullYear();
-    const birthKey = [birthDate, birthCalendar, birthTime, gender, viewYear].join('|');
+    const birthKey = [name.toLocaleLowerCase('vi'), birthDate, birthCalendar, birthTime, gender, viewYear].join('|');
 
     return {
       input: {
@@ -168,6 +171,19 @@ export default function ResultScreen({
       },
       birthKey,
     };
+  };
+
+  const refreshTuViReadingInBackground = () => {
+    const { input } = buildCareerReadingInput();
+    localStorage.setItem('soulmap_ai_reading_tuvi_pending', 'true');
+    generateTuViReading(input)
+      .then((reading) => {
+        localStorage.setItem('soulmap_ai_reading_tuvi_id', String(reading.id));
+        localStorage.removeItem('soulmap_ai_reading_tuvi_pending');
+      })
+      .catch(() => {
+        localStorage.removeItem('soulmap_ai_reading_tuvi_pending');
+      });
   };
 
   const persistCareerReading = (readingId: number, birthKey: string, birthInfo: object) => {
@@ -228,6 +244,7 @@ export default function ResultScreen({
     }
 
     refreshCareerReadingInBackground(true);
+    refreshTuViReadingInBackground();
 
     window.setTimeout(() => {
       if (!progressDone) clearInterval(t);
@@ -240,12 +257,12 @@ export default function ResultScreen({
   const isGenerationComplete = generationProgress >= 6 && !generationError;
 
   const generationSteps = [
-    { title: 'MBTI', subtitle: 'Phân tích tính cách', icon: Grid2X2 },
-    { title: 'Tử Vi', subtitle: 'Lá số tử vi đầu số', icon: Compass },
-    { title: 'Phân tích', subtitle: 'AI phân tích dữ liệu', icon: BarChart3 },
-    { title: 'Xây dựng Core Self', subtitle: 'Xác định bản ngã cốt lõi', icon: Trees },
-    { title: 'Tạo 4 Journey', subtitle: 'Đang xây dựng 4 hành trình của bạn', icon: Compass },
-    { title: 'Khởi tạo AI Mentor', subtitle: 'Chuẩn bị người đồng hành AI', icon: Bot },
+    { title: 'MBTI', icon: Grid2X2 },
+    { title: 'Tử Vi', icon: Compass },
+    { title: 'Phân tích', icon: BarChart3 },
+    { title: 'Xây dựng Core Self', icon: Trees },
+    { title: 'Tạo 4 Journey', icon: Compass },
+    { title: 'Khởi tạo AI Mentor', icon: Bot },
   ];
 
   return (
@@ -298,6 +315,8 @@ export default function ResultScreen({
 
         {resultStep === 'birth_form' && (
           <BirthFormStep
+            name={birthName}
+            setName={setBirthName}
             birthDate={birthDate}
             setBirthDate={setBirthDate}
             birthCalendar={birthCalendar}
@@ -425,7 +444,6 @@ export default function ResultScreen({
                         className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#24533E] px-7 py-3.5 font-sans text-[0.95rem] font-extrabold text-white shadow-[0_16px_30px_-16px_rgba(33,77,59,0.58)]"
                       >
                         Vào Journey ngay
-                        <ArrowRight className="h-4 w-4" />
                       </button>
                     )}
                   </div>
@@ -449,7 +467,6 @@ export default function ResultScreen({
                             }`}>
                               {idx + 1}. {step.title}
                             </p>
-                            <p className="mt-0.5 font-sans text-[0.82rem] text-[#6A6E69]">{step.subtitle}</p>
                           </div>
                           <div className="flex min-w-[92px] items-center justify-end gap-2">
                             {isDone ? (
@@ -708,7 +725,6 @@ export default function ResultScreen({
                   >
                     <MessageCircle className="h-4 w-4" />
                     Mở cuộc trò chuyện
-                    <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </div>

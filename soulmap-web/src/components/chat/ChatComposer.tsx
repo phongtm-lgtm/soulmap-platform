@@ -74,8 +74,8 @@ export default function ChatComposer({
           aria-label="Gửi tin nhắn"
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#24533E]/25 ${
             canSend
-              ? 'border-none bg-[#173124] text-white hover:scale-105 active:scale-90'
-              : 'border-none bg-[#173124] text-white opacity-45'
+              ? 'border-none bg-[#173124] text-white hover:scale-105 active:scale-90 cursor-pointer'
+              : 'border-none bg-[#EEE7DD] text-[#B5ADA0] cursor-not-allowed'
           }`}
         >
           <ArrowUp className="h-[17px] w-[17px]" />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Check, Map, LayoutGrid, Sparkles, User, Briefcase, Heart, Globe } from 'lucide-react';
+import { Check, Map, LayoutGrid, Sparkles, User, Briefcase, Heart, Globe } from 'lucide-react';
 import { APP_ASSETS } from '../../assets';
 import type { SoulMapJourney, JourneyIcon } from '../../types/journey';
 import JourneyMapNode from './JourneyMapNode';
@@ -12,6 +12,7 @@ const ICON_MAP: Record<JourneyIcon, typeof User> = {
   briefcase: Briefcase,
   heart: Heart,
   globe: Globe,
+  sparkles: Sparkles,
 };
 
 const MAP_POSITIONS: Record<SoulMapJourney['slug'], { left: string; top: string }> = {
@@ -19,6 +20,7 @@ const MAP_POSITIONS: Record<SoulMapJourney['slug'], { left: string; top: string 
   career: { left: '73%', top: '18%' },
   love: { left: '15%', top: '64%' },
   life: { left: '75%', top: '58%' },
+  tuvi: { left: '44%', top: '42%' },
 };
 
 interface JourneysMapViewProps {
@@ -44,7 +46,7 @@ export default function JourneysMapView({ journeys, onExplore }: JourneysMapView
         </span>
 
         <h1 className="mt-2 font-display text-4xl font-bold leading-tight tracking-tight text-[#214D3B] md:text-5xl">
-          4 Chặng Đường SoulMap
+          Các Chặng Đường SoulMap
         </h1>
 
         <p className="mx-auto mt-3 max-w-[38rem] font-serif text-sm leading-relaxed text-[#5E625F] md:text-base">
@@ -245,7 +247,6 @@ export default function JourneysMapView({ journeys, onExplore }: JourneysMapView
                 >
                   {activeJourney.title}
                 </h2>
-                <p className="font-sans text-[0.88rem] font-semibold text-[#5E625F]">{activeJourney.subtitle}</p>
                 <p className="line-clamp-3 font-serif text-[0.86rem] leading-relaxed text-[#5E625F]">
                   {activeJourney.summary}
                 </p>
@@ -272,7 +273,6 @@ export default function JourneysMapView({ journeys, onExplore }: JourneysMapView
                   className={`mt-auto inline-flex w-fit items-center gap-2 rounded-full px-5 py-3 font-sans text-[0.88rem] font-extrabold text-white shadow-[0_10px_24px_-12px_rgba(33,77,59,0.45)] transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${activeJourney.buttonClass}`}
                 >
                   Bắt đầu chặng {activeJourney.id}
-                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </article>

@@ -1,7 +1,9 @@
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { APP_ASSETS } from '../../assets';
 
 interface BirthFormStepProps {
+  name: string;
+  setName: (name: string) => void;
   birthDate: string;
   setBirthDate: (date: string) => void;
   birthCalendar: 'solar' | 'lunar';
@@ -15,6 +17,8 @@ interface BirthFormStepProps {
 }
 
 export default function BirthFormStep({
+  name,
+  setName,
   birthDate,
   setBirthDate,
   birthCalendar,
@@ -26,6 +30,8 @@ export default function BirthFormStep({
   onSubmit,
   onBack,
 }: BirthFormStepProps) {
+  const canSubmit = name.trim().length > 0 && birthDate.length > 0;
+
   return (
     <section className="relative mx-auto w-full max-w-[560px] overflow-hidden rounded-[1.75rem] border border-[#E8DFCF]/90 bg-[#FFFCF8]/94 px-5 py-8 shadow-[0_24px_80px_-48px_rgba(33,77,59,0.45)] backdrop-blur-sm animate-fade-in sm:px-8 sm:py-10">
       <img
@@ -43,13 +49,33 @@ export default function BirthFormStep({
             Nhập ngày sinh &amp; Tử Vi
           </h2>
           <p className="mt-2 font-sans text-sm font-medium leading-relaxed text-[#5E625F]">
-            Ngày sinh là mảnh ghép cuối cùng để SoulMap tạo nên bức tranh toàn diện về chính bạn.
+            Họ tên và ngày sinh là những mảnh ghép cuối để SoulMap tạo nên bức tranh dành riêng cho bạn.
           </p>
         </div>
 
         <div className="h-px bg-[#E8DFCF]" />
 
         <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="birth-name"
+              className="flex items-center gap-1.5 font-sans text-xs font-bold uppercase tracking-wider text-[#24533E]"
+            >
+              <span className="material-symbols-outlined text-sm font-bold text-[#C8A15A]">person</span>
+              Họ và tên
+            </label>
+            <input
+              id="birth-name"
+              type="text"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Nhập họ và tên của bạn"
+              autoComplete="name"
+              maxLength={100}
+              className="w-full rounded-xl border border-[#24533E]/10 bg-[#FFFCF8] px-4 py-3 font-sans text-sm text-[#24533E] shadow-sm placeholder:text-[#9A9F9B] focus:border-[#C8A15A] focus:outline-none focus:ring-1 focus:ring-[#C8A15A]"
+            />
+          </div>
+
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <label
@@ -159,12 +185,12 @@ export default function BirthFormStep({
           )}
           <button
             type="button"
-            onClick={onSubmit}
-            className={`inline-flex items-center justify-center gap-2 rounded-full bg-[#24533E] px-8 py-3.5 font-sans text-base font-bold text-white shadow-[0_16px_32px_-18px_rgba(33,77,59,0.75)] transition hover:-translate-y-0.5 hover:bg-[#214D3B] active:scale-[0.98] ${onBack ? 'sm:flex-[1.4]' : 'w-full'}`}
+            onClick={() => canSubmit && onSubmit()}
+            disabled={!canSubmit}
+            className={`inline-flex items-center justify-center gap-2 rounded-full bg-[#24533E] px-8 py-3.5 font-sans text-base font-bold text-white shadow-[0_16px_32px_-18px_rgba(33,77,59,0.75)] transition hover:-translate-y-0.5 hover:bg-[#214D3B] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 ${onBack ? 'sm:flex-[1.4]' : 'w-full'}`}
           >
             <Sparkles className="h-5 w-5" />
             Tạo SoulMap
-            <ArrowRight className="h-5 w-5" />
           </button>
         </div>
       </div>

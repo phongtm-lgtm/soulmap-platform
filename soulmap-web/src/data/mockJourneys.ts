@@ -3,7 +3,7 @@ import type { PersonalityProfile } from '../types';
 import type { SoulMapJourney, JourneysGenerationResult } from '../types/journey';
 
 /**
- * Build the 4 SoulMap journeys from a personality profile.
+ * Build the SoulMap journeys from a personality profile.
  * Phase 1 mock — summaries are pulled directly from `profile.pillars.*`.
  */
 export function buildMockJourneys(profile: PersonalityProfile): SoulMapJourney[] {
@@ -59,6 +59,19 @@ export function buildMockJourneys(profile: PersonalityProfile): SoulMapJourney[]
       accentColor: '#7B6AA8',
       accentBg: 'bg-[#7B6AA8]',
       buttonClass: 'bg-[#7D70A5] hover:bg-[#685B92]',
+    },
+    {
+      id: 5,
+      slug: 'tuvi',
+      title: 'Tử Vi',
+      subtitle: 'Hành trình đọc sâu lá số và vận trình cá nhân',
+      summary: 'Luận giải Mệnh, Thân, các cung trọng yếu, đại vận và lưu niên theo lá số của bạn.',
+      status: 'ready',
+      icon: 'sparkles',
+      imagePath: APP_ASSETS.soulmapIsland,
+      accentColor: '#A66D24',
+      accentBg: 'bg-[#A66D24]',
+      buttonClass: 'bg-[#A66D24] hover:bg-[#87571B]',
     },
   ];
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import {
-  ArrowRight, Timer, CalendarDays, Star, Leaf,
+  Timer, CalendarDays, Star, Leaf,
   Search,
 } from 'lucide-react';
 import type { SoulMapJourney } from '../types/journey';
@@ -13,6 +13,7 @@ const JOURNEY_ORNAMENTS: Record<string, string> = {
   career: '/pillars/branch/journey-mountain-ornament.png',
   love: '/pillars/branch/journey-love-ornament.png',
   life: '/pillars/branch/journey-life-ornament.png',
+  tuvi: '/pillars/branch/journey-life-ornament.png',
 };
 
 const JOURNEY_INSIGHTS: Record<string, string> = {
@@ -20,6 +21,7 @@ const JOURNEY_INSIGHTS: Record<string, string> = {
   career: '11 / 25 Insight',
   love: '7 / 25 Insight',
   life: '4 / 25 Insight',
+  tuvi: '7 / 7 Bước luận',
 };
 
 const JOURNEY_CARD_STYLES: Record<string, { bg: string; icon: string }> = {
@@ -27,6 +29,7 @@ const JOURNEY_CARD_STYLES: Record<string, { bg: string; icon: string }> = {
   career: { bg: 'linear-gradient(180deg, #EEF5F8 0%, #FFFDF8 70%, #F3E8D8 100%)', icon: '△' },
   love: { bg: 'linear-gradient(180deg, #FFE7E1 0%, #FFF7F0 70%, #F5E0D3 100%)', icon: '♡' },
   life: { bg: 'linear-gradient(180deg, #F0EADB 0%, #FFFDF8 70%, #EFE0D1 100%)', icon: '♌' },
+  tuvi: { bg: 'linear-gradient(180deg, #FFF1D6 0%, #FFFDF8 70%, #EFE0C3 100%)', icon: '✦' },
 };
 
 const FILTERS = ['Tất cả', 'Đang học', 'Đã hoàn thành', 'Khóa', 'Đề xuất'] as const;
@@ -40,6 +43,7 @@ function JourneyCard({
   const cardStyle = JOURNEY_CARD_STYLES[journey.slug];
   const insightText = JOURNEY_INSIGHTS[journey.slug] ?? '0 / 25 Insight';
   const ornamentPath = JOURNEY_ORNAMENTS[journey.slug];
+  const isContinueDisabled = ['identity', 'life'].includes(journey.slug);
 
   return (
     <article
@@ -72,10 +76,6 @@ function JourneyCard({
         <h3 className="mt-1 flex min-h-[82px] items-center justify-center font-display text-[1.88rem] font-bold leading-tight max-[430px]:min-h-[70px] max-[430px]:text-[1.65rem]" style={{ color: journey.accentColor }}>
           {journey.title}
         </h3>
-        <p className="mt-2 flex min-h-[58px] max-w-[14rem] items-center justify-center font-sans text-[0.95rem] font-medium leading-snug text-[#5F625E] max-[430px]:min-h-[52px] max-[430px]:text-[0.88rem]">
-          {journey.subtitle}
-        </p>
-
         <div className="mb-4 mt-3 flex w-full items-center justify-center border-t border-[#E8DFCF] pt-3 max-[430px]:mb-3">
           <span className="font-sans text-[0.88rem] font-bold text-[#7A7E78] max-[430px]:text-[0.82rem]">
             ◎ {insightText}
@@ -84,12 +84,12 @@ function JourneyCard({
 
         <button
           type="button"
-          onClick={() => onExplore(journey)}
-          className="relative z-10 mt-auto flex w-[86%] items-center justify-center gap-2 rounded-full px-4 py-2.5 font-sans text-[0.95rem] font-extrabold text-white shadow-[0_12px_22px_-12px_rgba(33,77,59,0.55)] max-[430px]:w-[82%] max-[430px]:py-2 max-[430px]:text-[0.86rem]"
+          disabled={isContinueDisabled}
+          onClick={() => !isContinueDisabled && onExplore(journey)}
+          className="relative z-10 mt-auto flex w-[86%] items-center justify-center gap-2 rounded-full px-4 py-2.5 font-sans text-[0.95rem] font-extrabold text-white shadow-[0_12px_22px_-12px_rgba(33,77,59,0.55)] disabled:cursor-not-allowed disabled:opacity-45 max-[430px]:w-[82%] max-[430px]:py-2 max-[430px]:text-[0.86rem]"
           style={{ background: journey.accentColor }}
         >
           Tiếp tục hành trình
-          <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
     </article>
@@ -120,7 +120,7 @@ export default function FourJourneysScreen({ journeys, onExplore, userName }: Fo
       activeFilter === 'Tất cả' ||
       (activeFilter === 'Đang học' && journey.status === 'ready') ||
       (activeFilter === 'Khóa' && journey.status === 'locked') ||
-      (activeFilter === 'Đề xuất' && ['identity', 'love'].includes(journey.slug));
+      (activeFilter === 'Đề xuất' && ['identity', 'love', 'tuvi'].includes(journey.slug));
 
     return matchesSearch && matchesFilter;
   });
@@ -176,7 +176,6 @@ export default function FourJourneysScreen({ journeys, onExplore, userName }: Fo
             </p>
             <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#E4C891] bg-[#FFFDF8] px-3 py-2 font-sans text-[0.76rem] font-extrabold text-[#B17922] shadow-sm" type="button">
               Đọc thêm insight
-              <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 

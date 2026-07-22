@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState } from 'react';
 import {
-  ArrowRight,
   CalendarDays,
   ChevronDown,
   ChevronLeft,
@@ -453,7 +452,6 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
               className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#E8DFCF] bg-[#FFFDF8] px-3 py-2 font-sans text-[0.76rem] font-bold text-[#3E7A50] transition-colors hover:bg-[#F3F7F0]"
             >
               Xem chi tiết
-              <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 
@@ -514,9 +512,6 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
               Nhật ký hành trình
               <NotebookPen className="h-5 w-5 text-[#B68A2F]" />
             </h1>
-            <p className="mt-1 font-sans text-[0.92rem] text-[#6A6E69]">
-              Nơi bạn lắng nghe, thấu hiểu và ghi lại hành trình phát triển của chính mình.
-            </p>
           </div>
 
           {/* Composer */}
@@ -702,7 +697,6 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
               className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#E8DFCF] bg-[#FFFDF8] px-3 py-2.5 font-sans text-[0.78rem] font-bold text-[#3E7A50] transition-colors hover:bg-[#F3F7F0]"
             >
               Xem phân tích chi tiết
-              <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 

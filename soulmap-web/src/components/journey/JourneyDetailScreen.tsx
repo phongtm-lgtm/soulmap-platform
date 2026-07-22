@@ -8,6 +8,7 @@ import {
   Check,
   Crown,
   Edit3,
+  Heart,
   Lock,
   Map as MapIcon,
   MessageCircle,
@@ -27,7 +28,16 @@ import JourneyDetailHero from './JourneyDetailHero';
 import JourneyNavPanel from './JourneyNavPanel';
 import JourneyTabNav from './JourneyTabNav';
 import JourneySectionBlock from './JourneySectionBlock';
-import { fetchAiReading, generateCareerTalentReading, type AiReading, type CareerReadingRequest } from '../../lib/aiReadingsApi';
+import MarkdownReading from './MarkdownReading';
+import TuViJourneyDetail from './TuViJourneyDetail';
+import {
+  fetchAiReading,
+  generateCareerTalentReading,
+  generateLoveReading,
+  type AiReading,
+  type CareerReadingRequest,
+  type LoveReadingRequest,
+} from '../../lib/aiReadingsApi';
 
 interface JourneyDetailScreenProps {
   journey: SoulMapJourney;
@@ -45,11 +55,16 @@ export default function JourneyDetailScreen({ journey, onBack, initialCareerChap
   const content = useMemo(() => getJourneyContent(journey.slug), [journey.slug]);
   const { sections, tagline, accentColor } = content;
   const isCareerJourney = journey.slug === 'career';
+  const isLoveJourney = journey.slug === 'love';
+  const isTuViJourney = journey.slug === 'tuvi';
 
   const [activeId, setActiveId] = useState<JourneySectionId>(sections[0]?.id ?? 'intro');
   const [aiReading, setAiReading] = useState<AiReading | null>(null);
   const [isAiReadingLoading, setIsAiReadingLoading] = useState(false);
   const [aiReadingError, setAiReadingError] = useState<string | null>(null);
+  const [loveReading, setLoveReading] = useState<AiReading | null>(null);
+  const [isLoveReadingLoading, setIsLoveReadingLoading] = useState(false);
+  const [loveReadingError, setLoveReadingError] = useState<string | null>(null);
   const [activeCareerChapter, setActiveCareerChapter] = useState<1 | 3>(initialCareerChapter);
   const activeCareerChapterRef = useRef<1 | 3>(1);
   const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -120,6 +135,64 @@ export default function JourneyDetailScreen({ journey, onBack, initialCareerChap
       cancelled = true;
     };
   }, [initialCareerChapter, isCareerJourney]);
+
+  const loadLoveReading = useCallback(async () => {
+    setIsLoveReadingLoading(true);
+    setLoveReadingError(null);
+    try {
+      const savedId = Number(localStorage.getItem('soulmap_ai_reading_love_v2_id'));
+      if (savedId) {
+        try {
+          const reading = await fetchAiReading(savedId);
+          setLoveReading(reading);
+          return;
+        } catch {
+          localStorage.removeItem('soulmap_ai_reading_love_v2_id');
+        }
+      }
+
+      const rawBirthInfo = localStorage.getItem('soulmap_birth_info');
+      if (!rawBirthInfo) throw new Error('missing birth info');
+      const birthInfo = JSON.parse(rawBirthInfo) as {
+        name: string;
+        birthDate: string;
+        birthCalendar: 'solar' | 'lunar';
+        birthTime: string;
+        gender: 'Nam' | 'Nữ';
+        timezone?: number;
+        viewYear?: number;
+      };
+      const [year, month, day] = birthInfo.birthDate.split('-').map(Number);
+      const [hour, min] = birthInfo.birthTime.split(':').map(Number);
+      const input: LoveReadingRequest = {
+        name: birthInfo.name || 'Bạn',
+        day,
+        month,
+        year,
+        calendar: birthInfo.birthCalendar,
+        gender: birthInfo.gender === 'Nam' ? 'male' : 'female',
+        hour,
+        min,
+        timezone: birthInfo.timezone ?? 1,
+        viewYear: birthInfo.viewYear ?? new Date().getFullYear(),
+      };
+      localStorage.setItem('soulmap_ai_reading_love_pending', 'true');
+      const reading = await generateLoveReading(input);
+      localStorage.setItem('soulmap_ai_reading_love_v2_id', String(reading.id));
+      localStorage.removeItem('soulmap_ai_reading_love_pending');
+      setLoveReading(reading);
+    } catch {
+      localStorage.removeItem('soulmap_ai_reading_love_pending');
+      setLoveReadingError('Chưa thể tạo Bản đồ tình yêu lúc này. Hãy chắc rằng bạn đã tạo SoulMap trước đó rồi thử lại.');
+    } finally {
+      setIsLoveReadingLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoveJourney) return;
+    void loadLoveReading();
+  }, [isLoveJourney, loadLoveReading]);
 
   const loadCareerChapter = useCallback(async (chapter: 1 | 3, updateUrl = true) => {
     activeCareerChapterRef.current = chapter;
@@ -205,6 +278,9 @@ export default function JourneyDetailScreen({ journey, onBack, initialCareerChap
   }, []);
 
   return (
+    isTuViJourney ? (
+      <TuViJourneyDetail journey={journey} onBack={onBack} />
+    ) : (
     <div className="min-h-screen bg-[#FAF6EE] pt-20 pb-16">
       <div className={`mx-auto w-full px-4 md:px-6 ${isCareerJourney ? 'max-w-[1840px]' : 'max-w-[1200px]'}`}>
         {isCareerJourney ? (
@@ -221,6 +297,16 @@ export default function JourneyDetailScreen({ journey, onBack, initialCareerChap
             onBack={onBack}
             onNavigate={handleNavigate}
             registerRef={registerRef}
+          />
+        ) : isLoveJourney ? (
+          <LoveJourneyDetail
+            journey={journey}
+            tagline={tagline}
+            reading={loveReading}
+            isLoading={isLoveReadingLoading}
+            error={loveReadingError}
+            onBack={onBack}
+            onRetry={loadLoveReading}
           />
         ) : (
           <>
@@ -312,6 +398,95 @@ export default function JourneyDetailScreen({ journey, onBack, initialCareerChap
           </>
         )}
       </div>
+    </div>
+    )
+  );
+}
+
+interface LoveJourneyDetailProps {
+  journey: SoulMapJourney;
+  tagline: string;
+  reading: AiReading | null;
+  isLoading: boolean;
+  error: string | null;
+  onBack: () => void;
+  onRetry: () => void;
+}
+
+function LoveJourneyDetail({
+  journey,
+  tagline,
+  reading,
+  isLoading,
+  error,
+  onBack,
+  onRetry,
+}: LoveJourneyDetailProps) {
+  const accentColor = journey.accentColor || '#B95F75';
+
+  return (
+    <div className="mx-auto max-w-[1120px]">
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E6D8D5] bg-white px-4 py-2.5 font-sans text-[0.86rem] font-extrabold text-[#332927] shadow-sm transition hover:-translate-y-0.5"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Quay lại Journey
+      </button>
+
+      <section className="overflow-hidden rounded-[2rem] border border-[#EADAD7] bg-[#FFFCF8] shadow-[0_26px_80px_-58px_rgba(93,42,57,0.5)]">
+        <div className="relative overflow-hidden border-b border-[#EFE2DF] px-6 py-8 md:px-10 md:py-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(185,95,117,0.18),transparent_44%),linear-gradient(135deg,#fff9f6_0%,#fffdf9_60%)]" />
+          <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-[700px]">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F8E9EC] px-3.5 py-2 font-sans text-[0.76rem] font-extrabold uppercase tracking-[0.1em] text-[#9E4D63]">
+                <Heart className="h-4 w-4 fill-current" />
+                Love Journey
+              </div>
+              <h1 className="font-display text-[2.5rem] font-bold leading-none text-[#4A2832] md:text-[3.6rem]">
+                {journey.title}
+              </h1>
+              <p className="mt-4 max-w-[640px] font-reading text-[1.02rem] leading-relaxed text-[#665A58]">{tagline}</p>
+            </div>
+            <img
+              src={journey.imagePath}
+              alt=""
+              className="h-32 w-32 self-center object-contain drop-shadow-[0_18px_25px_rgba(120,55,73,0.2)] md:h-40 md:w-40"
+              draggable={false}
+            />
+          </div>
+        </div>
+
+        <div className="px-5 py-7 md:px-10 md:py-10">
+          {isLoading ? (
+            <div className="grid min-h-[360px] place-items-center text-center">
+              <div>
+                <div className="mx-auto h-11 w-11 animate-spin rounded-full border-4 border-[#F0DADD] border-t-[#B95F75]" />
+                <h2 className="mt-5 font-display text-[1.7rem] font-bold text-[#4A2832]">Linh Nhi đang viết Bản đồ tình yêu</h2>
+                <p className="mt-2 font-reading text-[#766A67]">Bản đọc cần một chút thời gian để đi đủ sâu và giữ đúng câu chuyện của bạn.</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="grid min-h-[320px] place-items-center text-center">
+              <div className="max-w-md">
+                <Heart className="mx-auto h-10 w-10 text-[#B95F75]" />
+                <p className="mt-4 font-reading leading-relaxed text-[#665A58]">{error}</p>
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="mt-5 rounded-full px-5 py-3 font-sans text-[0.88rem] font-extrabold text-white shadow-md transition hover:-translate-y-0.5"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  Thử lại
+                </button>
+              </div>
+            </div>
+          ) : reading ? (
+            <MarkdownReading content={reading.content} accentColor={accentColor} />
+          ) : null}
+        </div>
+      </section>
     </div>
   );
 }
@@ -429,6 +604,7 @@ function CareerLeftRail({
           <div className="space-y-1.5">
             {CAREER_CHAPTERS.map((title, index) => {
               const chapterNumber = index + 1;
+              if (chapterNumber === 3) return null;
               const isAvailable = chapterNumber === 1 || chapterNumber === 3;
               const isActive = chapterNumber === activeChapter;
               const isDone = isAvailable && !isActive;
@@ -481,7 +657,7 @@ function CareerHero({ journey, tagline, activeChapter }: { journey: SoulMapJourn
   return (
     <header className="relative min-h-[300px] overflow-hidden rounded-[1.5rem] bg-[#D7B77E] p-7 text-[#36251A] md:min-h-[330px] md:p-8">
       <img src={journey.imagePath} alt="" className="absolute inset-0 h-full w-full object-cover opacity-100" draggable={false} />
-      <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(251,236,201,0.96)_0%,rgba(250,230,193,0.64)_34%,rgba(250,230,193,0.16)_58%,rgba(22,35,45,0)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(255,244,215,0.98)_0%,rgba(252,235,196,0.82)_34%,rgba(250,230,193,0.28)_58%,rgba(22,35,45,0)_100%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(255,255,255,0.06),transparent_26%)]" />
       <div className="relative z-[1] flex min-h-[244px] flex-col justify-between">
         <div className="flex items-start justify-between gap-4">
@@ -495,10 +671,10 @@ function CareerHero({ journey, tagline, activeChapter }: { journey: SoulMapJourn
         </div>
 
         <div>
-          <h1 className="max-w-[520px] font-display text-[3rem] font-bold leading-[1.02] tracking-[-0.03em] md:text-[4rem]">
+          <h1 className="max-w-[520px] font-display text-[3rem] font-bold leading-[1.02] tracking-[-0.03em] !text-[#214D3B] [text-shadow:0_2px_12px_rgba(255,248,226,0.7)] md:text-[4rem]">
             {isTalentChapter ? 'Thiên phú và năng lực nổi bật' : 'Bản đồ sự nghiệp'}
           </h1>
-          <p className="mt-7 max-w-[520px] font-display text-[1.18rem] italic leading-relaxed text-[#5D4A37]">
+          <p className="mt-7 max-w-[520px] font-display text-[1.18rem] italic leading-relaxed !text-[#55402D] [text-shadow:0_1px_8px_rgba(255,248,226,0.85)]">
             “{isTalentChapter ? 'Nhìn ra điều bạn làm tốt một cách tự nhiên.' : tagline || 'Sự nghiệp của bạn không sinh ra để đi theo một con đường bằng phẳng.'}”
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
@@ -664,7 +840,9 @@ function CareerAiReadingSection({
             <p className="font-sans text-[0.78rem] font-extrabold uppercase tracking-[0.14em] text-[#9A5D24]">
               {aiReading.chapterTitle || 'Phân tích cá nhân hóa'}
             </p>
-            <MarkdownReading content={aiReading.deepReadingMarkdown || aiReading.content} />
+            <div className="mt-4">
+              <MarkdownReading content={aiReading.deepReadingMarkdown || aiReading.content} scrollable />
+            </div>
           </article>
         )}
       </div>
@@ -742,38 +920,9 @@ function CareerTalentChapter({ aiReading, isLoading, error }: { aiReading: AiRea
       <section>
         <CareerSectionTitle icon={<BookOpen className="h-7 w-7" />} number="3" title="Linh Nhi luận sâu về năng lực của bạn" tone="gold" />
         <div className="mt-5 rounded-2xl border border-[#E8DFCF] bg-[#FFF9F0] p-5 md:p-7">
-          <MarkdownReading content={aiReading.deepReadingMarkdown || aiReading.content} />
+          <MarkdownReading content={aiReading.deepReadingMarkdown || aiReading.content} scrollable />
         </div>
       </section>
-    </div>
-  );
-}
-
-function MarkdownReading({ content }: { content: string }) {
-  const lines = content.split('\n');
-
-  return (
-    <div className="mt-4 max-h-[520px] overflow-y-auto pr-2 font-reading text-[0.98rem] leading-[1.8] text-[#4c534d] custom-scrollbar">
-      {lines.map((rawLine, index) => {
-        const line = rawLine.trim();
-        if (!line) return <div key={index} className="h-3" />;
-        if (line.startsWith('## ')) {
-          return <h3 key={index} className="mt-4 font-display text-[1.55rem] font-bold leading-tight text-[#214D3B] first:mt-0">{line.replace(/^##\s+/, '')}</h3>;
-        }
-        if (line.startsWith('### ')) {
-          return <h4 key={index} className="mt-4 font-sans text-[1rem] font-extrabold text-[#9A5D24]">{line.replace(/^###\s+/, '')}</h4>;
-        }
-        if (line.startsWith('>')) {
-          return <blockquote key={index} className="my-2 border-l-4 border-[#C2873B] bg-[#FCF5EA] px-4 py-2 font-display text-[1.08rem] font-semibold italic text-[#4A2D1F]">{line.replace(/^>\s?/, '')}</blockquote>;
-        }
-        if (/^\d+\.\s+/.test(line)) {
-          return <p key={index} className="pl-4 font-sans text-[0.95rem] font-semibold text-[#3A2A1E]">{line}</p>;
-        }
-        if (line.startsWith('- ')) {
-          return <p key={index} className="pl-4 font-sans text-[0.95rem] text-[#4c534d]">• {line.replace(/^-\s+/, '')}</p>;
-        }
-        return <p key={index}>{line}</p>;
-      })}
     </div>
   );
 }

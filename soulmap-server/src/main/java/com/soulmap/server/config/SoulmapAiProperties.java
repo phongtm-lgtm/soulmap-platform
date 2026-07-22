@@ -21,6 +21,6 @@ public class SoulmapAiProperties {
     @Getter
     @Setter
     public static class PromptProperties {
-        private String basePath = "../docs/promt";
+        private String basePath = "classpath:prompts";
     }
 }

@@ -53,4 +53,4 @@ soulmap:
     structured-output-mode: ${SOULMAP_AI_STRUCTURED_OUTPUT_MODE:json_object}
     career-prompt-pack: ${SOULMAP_AI_CAREER_PROMPT_PACK:core}
     prompts:
-      base-path: ${SOULMAP_PROMPT_BASE_PATH:../docs/promt}
+      base-path: ${SOULMAP_PROMPT_BASE_PATH:classpath:prompts}

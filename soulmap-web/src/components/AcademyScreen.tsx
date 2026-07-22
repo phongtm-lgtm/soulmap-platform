@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowRight,
   Bookmark,
   BriefcaseBusiness,
   Flame,
@@ -161,7 +160,6 @@ export default function AcademyScreen({ currentUser: _currentUser }: AcademyScre
             <h2 className="font-display text-[1.35rem] font-bold tracking-[-0.03em] text-[#214D3B] sm:text-[1.55rem]">Bài học mới nhất</h2>
             <button className="hidden items-center gap-2 font-sans text-[0.82rem] font-bold text-[#4F5A52] transition-colors hover:text-[#24533E] sm:inline-flex">
               Xem tất cả
-              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 

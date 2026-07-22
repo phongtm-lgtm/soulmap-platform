@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, BookOpen, Check, Leaf, RotateCcw, Sparkles, Star, UserRound } from 'lucide-react';
+import { Bot, BookOpen, Check, Leaf, RotateCcw, Sparkles, Star, UserRound } from 'lucide-react';
 import { APP_ASSETS } from '../../assets';
 import type { PersonalityProfile } from '../../types';
 import { getMbtiArchetypeLabel, getMbtiHighlights, getMbtiShortDescription } from './mbtiSummaryData';
@@ -163,8 +163,8 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
                 <span className="h-8 border-l border-dashed border-[#C8D1C4]" />
               </div>
               <div className="pt-1.5">
-                <div className="font-sans text-base font-bold text-[#24533E]">Ngày sinh</div>
-                <div className="mt-1 font-sans text-xs font-semibold text-[#C8A15A]">Chỉ cần ngày sinh</div>
+                <div className="font-sans text-base font-bold text-[#24533E]">Thông tin cá nhân</div>
+                <div className="mt-1 font-sans text-xs font-semibold text-[#C8A15A]">Họ tên và ngày sinh</div>
               </div>
             </div>
 
@@ -216,7 +216,6 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
             >
               Mở khóa SoulMap
               <Sparkles className="h-4 w-4 text-[#F6D98A]" />
-              <ArrowRight className="h-5 w-5" />
             </button>
             <img
               src={APP_ASSETS.linhNhiMbtiMascot}

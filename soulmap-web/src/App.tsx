@@ -239,10 +239,17 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
   const [resultStep, setResultStep] = useState<'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map'>('mbti_summary');
   
   // Birth Information State
+  const [birthName, setBirthName] = useState<string>('');
   const [birthDate, setBirthDate] = useState<string>('1998-08-15');
   const [birthCalendar, setBirthCalendar] = useState<'solar' | 'lunar'>('solar');
-  const [birthTime, setBirthTime] = useState<string>('08:30');
+  const [birthTime, setBirthTime] = useState<string>('08:00');
   const [gender, setGender] = useState<'Nam' | 'Nữ'>('Nữ');
+
+  useEffect(() => {
+    if (currentUser?.name) {
+      setBirthName((currentName) => currentName || currentUser.name);
+    }
+  }, [currentUser]);
 
   // Generation Animation Progress
   const [generationProgress, setGenerationProgress] = useState<number>(0);
@@ -619,6 +626,8 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
           answers={answers}
           resultStep={resultStep}
           setResultStep={setResultStep}
+          birthName={birthName}
+          setBirthName={setBirthName}
           birthDate={birthDate}
           setBirthDate={setBirthDate}
           birthCalendar={birthCalendar}
@@ -646,10 +655,10 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
       )}
 
       {currentScreen === 'four_journeys' && journeyDetail && (
-        <JourneyDetailScreen
-          journey={journeyDetail}
-          initialCareerChapter={searchParams.get('chapter') === '3' ? 3 : 1}
-          onCareerChapterChange={handleCareerChapterChange}
+          <JourneyDetailScreen
+            journey={journeyDetail}
+            initialCareerChapter={1}
+            onCareerChapterChange={handleCareerChapterChange}
           onBack={handleBackFromJourneyDetail}
         />
       )}

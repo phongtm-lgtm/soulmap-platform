@@ -8,10 +8,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
 management:
   endpoint:
@@ -20,5 +20,5 @@ management:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF

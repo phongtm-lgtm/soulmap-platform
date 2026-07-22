@@ -1,13 +1,13 @@
 import type { PersonalityProfile } from '../types';
 
-export type JourneySlug = 'identity' | 'career' | 'love' | 'life';
+export type JourneySlug = 'identity' | 'career' | 'love' | 'life' | 'tuvi';
 
-export type JourneyIcon = 'user' | 'briefcase' | 'heart' | 'globe';
+export type JourneyIcon = 'user' | 'briefcase' | 'heart' | 'globe' | 'sparkles';
 
 export type JourneyStatus = 'ready' | 'generating' | 'locked';
 
 export interface SoulMapJourney {
-  id: 1 | 2 | 3 | 4;
+  id: number;
   slug: JourneySlug;
   title: string;
   subtitle: string;

@@ -19,6 +19,30 @@ Sản phẩm giúp người dùng tổng hợp dữ liệu tính cách, thông t
 - Không đưa ra chẩn đoán y tế hoặc tâm lý.
 - Ưu tiên tự nhận thức, phản chiếu và hành động thực tế.
 
+## Share Backend Cho Netlify
+
+Backend local có thể được chia sẻ qua ngrok cho frontend tại
+`https://soulmap-patform.netlify.app`. Các API controller hiện cho phép CORS từ
+mọi domain để phục vụ giai đoạn test.
+
+Yêu cầu: Java 21, PostgreSQL, ngrok đã đăng nhập và `soulmap-server/.env` đã
+được cấu hình đầy đủ. Chạy trong PowerShell:
+
+```powershell
+cd "D:\Manh Phong\soulmap-platform\soulmap-server"
+powershell -ExecutionPolicy Bypass -File .\start-share.ps1
+```
+
+Script sẽ chạy backend, kiểm tra health, mở ngrok và in giá trị cần khai báo
+trên Netlify:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=https://<ngrok-domain>.ngrok-free.app/api/v1
+```
+
+Sau khi cập nhật biến môi trường, redeploy frontend trên Netlify. Giữ terminal
+chạy trong suốt thời gian test; nhấn `Ctrl+C` để dừng backend và ngrok.
+
 ## License
 
 Dự án riêng tư. All rights reserved.

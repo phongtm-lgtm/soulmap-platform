@@ -1,4 +1,4 @@
-import { User, Briefcase, Heart, Globe, Check, ArrowRight } from 'lucide-react';
+import { User, Briefcase, Heart, Globe, Check, Sparkles } from 'lucide-react';
 import type { SoulMapJourney, JourneyIcon } from '../../types/journey';
 
 const ICON_MAP: Record<JourneyIcon, typeof User> = {
@@ -6,6 +6,7 @@ const ICON_MAP: Record<JourneyIcon, typeof User> = {
   briefcase: Briefcase,
   heart: Heart,
   globe: Globe,
+  sparkles: Sparkles,
 };
 
 interface JourneyMapNodeProps {
@@ -83,7 +84,6 @@ export default function JourneyMapNode({
           >
             {journey.title}
           </h3>
-          <p className="mt-1 font-sans text-[0.82rem] font-semibold text-[#5E625F]">{journey.subtitle}</p>
           <p className="mt-2 line-clamp-3 font-serif text-[0.82rem] leading-relaxed text-[#5E625F]">
             {journey.summary}
           </p>
@@ -94,7 +94,6 @@ export default function JourneyMapNode({
             className={`mt-3 flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 font-sans text-[0.82rem] font-extrabold text-white shadow-md transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${journey.buttonClass}`}
           >
             Khám phá chặng này
-            <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </article>

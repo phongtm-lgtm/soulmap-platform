@@ -51,10 +51,7 @@ export default function JourneyDetailHero({ journey, tagline, accentColor, onBac
         </div>
 
         <div className="max-w-[42rem]">
-          <p className="font-sans text-[0.8rem] font-bold uppercase tracking-[0.18em] text-white/80">
-            {journey.subtitle}
-          </p>
-          <h1 className="mt-2 font-display text-[2.75rem] font-bold leading-[1.02] text-white drop-shadow-sm md:text-[3.5rem]">
+          <h1 className="font-display text-[2.75rem] font-bold leading-[1.02] text-white drop-shadow-sm md:text-[3.5rem]">
             {journey.title}
           </h1>
           <p className="mt-3 max-w-[36rem] font-reading text-[1.02rem] leading-relaxed text-white/90 md:text-[1.1rem]">

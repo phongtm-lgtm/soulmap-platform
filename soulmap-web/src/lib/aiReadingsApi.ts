@@ -60,6 +60,9 @@ export type CareerReadingRequest = {
   viewYear: number;
 };
 
+export type TuViReadingRequest = Omit<CareerReadingRequest, 'mbtiType'>;
+export type LoveReadingRequest = TuViReadingRequest;
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090/api/v1';
 const AI_READING_TIMEOUT_MS = 300_000;
 
@@ -92,6 +95,22 @@ async function request<T>(path: string, init?: RequestInit & { timeoutMs?: numbe
 
 export async function generateCareerReading(input: CareerReadingRequest): Promise<AiReading> {
   return request<AiReading>('/ai/career/readings', {
+    method: 'POST',
+    body: JSON.stringify(input),
+    timeoutMs: AI_READING_TIMEOUT_MS,
+  });
+}
+
+export async function generateTuViReading(input: TuViReadingRequest): Promise<AiReading> {
+  return request<AiReading>('/ai/tuvi/readings', {
+    method: 'POST',
+    body: JSON.stringify(input),
+    timeoutMs: AI_READING_TIMEOUT_MS,
+  });
+}
+
+export async function generateLoveReading(input: LoveReadingRequest): Promise<AiReading> {
+  return request<AiReading>('/ai/love/readings', {
     method: 'POST',
     body: JSON.stringify(input),
     timeoutMs: AI_READING_TIMEOUT_MS,

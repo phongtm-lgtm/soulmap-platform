@@ -1,4 +1,4 @@
-import { User, Briefcase, Heart, Globe, ArrowRight } from 'lucide-react';
+import { User, Briefcase, Heart, Globe, Sparkles } from 'lucide-react';
 import type { SoulMapJourney, JourneyIcon } from '../../types/journey';
 
 const ICON_MAP: Record<JourneyIcon, typeof User> = {
@@ -6,6 +6,7 @@ const ICON_MAP: Record<JourneyIcon, typeof User> = {
   briefcase: Briefcase,
   heart: Heart,
   globe: Globe,
+  sparkles: Sparkles,
 };
 
 interface JourneyReadyCardProps {
@@ -29,10 +30,6 @@ export default function JourneyReadyCard({ journey, index, onExplore }: JourneyR
       <h4 className="pillar-title uppercase" style={{ color: journey.accentColor }}>
         {journey.title}
       </h4>
-      <p className="font-sans text-sm font-medium leading-snug text-[#214D3B]/75">
-        {journey.subtitle}
-      </p>
-
       <div className="pillar-image-wrap mt-7">
         <img
           src={journey.imagePath}
@@ -52,9 +49,6 @@ export default function JourneyReadyCard({ journey, index, onExplore }: JourneyR
         className={`relative z-10 mt-auto flex w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 font-sans text-base font-bold text-white shadow-md shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${journey.buttonClass}`}
       >
         Khám phá
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
-          <ArrowRight className="h-4 w-4" />
-        </span>
       </button>
     </article>
   );

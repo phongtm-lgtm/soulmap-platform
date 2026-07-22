@@ -2,7 +2,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
-  ArrowRight, 
   User, 
   Mail, 
   Lock, 
@@ -320,7 +319,6 @@ export default function AuthScreen({
               ) : (
                 <>
                   {authMode === 'login' ? 'Đăng nhập vào SoulMap' : 'Khởi tạo SoulMap của tôi'}
-                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>

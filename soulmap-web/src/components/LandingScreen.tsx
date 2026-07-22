@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  ArrowRight,
   ArrowUp,
   Briefcase,
   Check,
@@ -123,7 +122,7 @@ export default function LandingScreen({
                                            setTransitionDirection,
                                             setCurrentScreen,
                                             navigateToTestIntro,
-                                        }: LandingScreenProps) {
+                                         }: LandingScreenProps) {
     const [landingChatMessages, setLandingChatMessages] = React.useState(demoChat);
     const [isLandingChatTyping, setIsLandingChatTyping] = React.useState(false);
     const landingChatScrollRef = React.useRef<HTMLDivElement>(null);
@@ -248,27 +247,7 @@ export default function LandingScreen({
                                     className="btn-primary rounded-full flex items-center justify-center gap-2.5 cursor-pointer"
                                 >
                                     Bắt đầu hành trình
-                                    <ArrowRight className="w-5 h-5"/>
                                 </button>
-                            </div>
-
-                            {/* Social Proof Counter */}
-                            <div className="flex items-center gap-4 mt-1">
-                                <div className="flex -space-x-3 overflow-hidden">
-                                    <img className="inline-block h-10 w-10 rounded-full ring-2 ring-[#F8F4EB]"
-                                         src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120"
-                                         alt="User 1" referrerPolicy="no-referrer"/>
-                                    <img className="inline-block h-10 w-10 rounded-full ring-2 ring-[#F8F4EB]"
-                                         src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120"
-                                         alt="User 2" referrerPolicy="no-referrer"/>
-                                    <img className="inline-block h-10 w-10 rounded-full ring-2 ring-[#F8F4EB]"
-                                         src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=120"
-                                         alt="User 3" referrerPolicy="no-referrer"/>
-                                </div>
-                                <p className="font-sans text-xs font-medium text-[#5E625F]">
-                                    Hơn <span className="text-[#24533E] font-bold">50.000+</span> người đang khám phá
-                                    SoulMap mỗi ngày.
-                                </p>
                             </div>
                         </div>
 

@@ -5,11 +5,13 @@ import com.soulmap.server.common.error.AiServiceException;
 import com.soulmap.server.config.SoulmapAiProperties;
 import com.soulmap.server.service.PromptTemplateService;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,7 +31,20 @@ public class PromptTemplateServiceImpl implements PromptTemplateService {
 
     private String readPrompt(String relativePath) {
         try {
-            Path promptPath = Path.of(properties.getPrompts().getBasePath()).resolve(relativePath).normalize();
+            String basePath = properties.getPrompts().getBasePath();
+            if (basePath.startsWith("classpath:")) {
+                String classpathBase = basePath.substring("classpath:".length()).replaceFirst("^/+", "");
+                String resourcePath = classpathBase + "/" + relativePath.replace('\\', '/');
+                ClassPathResource resource = new ClassPathResource(resourcePath);
+                if (!resource.exists()) {
+                    return "";
+                }
+                try (InputStream inputStream = resource.getInputStream()) {
+                    return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                }
+            }
+
+            Path promptPath = Path.of(basePath).resolve(relativePath).normalize();
             if (!Files.exists(promptPath)) {
                 return "";
             }

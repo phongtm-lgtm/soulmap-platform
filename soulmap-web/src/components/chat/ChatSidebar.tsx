@@ -60,7 +60,7 @@ export default function ChatSidebar({
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9AA098]" />
           <input
             type="search"
-            placeholder="Tìm trong lịch sử trò chuyện..."
+            placeholder="Tìm kiếm lịch sử..."
             className="w-full rounded-xl border border-[#EEE7DD] bg-white py-3 pl-10 pr-10 font-sans text-sm text-[#173124] shadow-sm outline-none placeholder:text-[#9AA098] focus:ring-1 focus:ring-[#B68A2F]"
           />
           <SlidersHorizontal className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9AA098]" />

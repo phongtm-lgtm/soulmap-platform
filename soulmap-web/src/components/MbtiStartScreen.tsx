@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   Brain,
   ClipboardList,
   Clock3,
@@ -82,9 +81,6 @@ export default function MbtiStartScreen({
                 <span className="pointer-events-none absolute -left-3 bottom-0 h-12 w-12 rounded-full bg-[#7EAA5A]/35 blur-sm" aria-hidden="true" />
                 <span className="pointer-events-none absolute -right-3 bottom-0 h-12 w-12 rounded-full bg-[#7EAA5A]/35 blur-sm" aria-hidden="true" />
                 <span className="relative z-10">Bắt đầu làm MBTI</span>
-                <span className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-[#FFFCF8]/15 transition group-hover:translate-x-0.5">
-                  <ArrowRight className="h-5 w-5" />
-                </span>
               </button>
 
               <button

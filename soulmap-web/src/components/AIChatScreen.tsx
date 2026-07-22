@@ -185,7 +185,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
     () => [
       {
         title: 'Sự nghiệp',
-        subtitle: 'Định hướng, công việc, phát triển',
         text: 'Mình có nên đổi hướng công việc trong giai đoạn này không?',
         icon: BriefcaseBusiness,
         iconClass: 'bg-[#DFECDC] text-[#24533E]',
@@ -193,7 +192,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
       },
       {
         title: 'Tình yêu',
-        subtitle: 'Mối quan hệ, cảm xúc, kết nối',
         text: 'Vì sao mình dễ bất an trong các mối quan hệ?',
         icon: Heart,
         iconClass: 'bg-[#F7DEDA] text-[#B84D43]',
@@ -201,7 +199,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
       },
       {
         title: 'Tôi là ai',
-        subtitle: 'Hiểu mình, giá trị, điểm mạnh',
         text: 'Điểm mạnh tiềm ẩn lớn nhất của mình là gì?',
         icon: Sparkles,
         iconClass: 'bg-[#F7E7C5] text-[#C78B2B]',
@@ -209,7 +206,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
       },
       {
         title: 'Nhật ký',
-        subtitle: 'Ghi lại, phản chiếu, trưởng thành',
         text: 'Giúp mình nhìn lại cảm xúc gần đây một cách rõ ràng hơn.',
         icon: PenLine,
         iconClass: 'bg-[#E9DDEE] text-[#7C4F82]',
@@ -217,7 +213,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
       },
       {
         title: 'Hành trình',
-        subtitle: 'Tiếp tục hành trình của bạn',
         text: 'Mình đang ở chặng nào trong hành trình phát triển bản thân?',
         icon: BookOpen,
         iconClass: 'bg-[#DDECF1] text-[#2D7182]',
@@ -225,7 +220,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
       },
       {
         title: 'Ra quyết định',
-        subtitle: 'Lựa chọn, mục tiêu, kế hoạch',
         text: 'Giúp mình chọn hướng đi phù hợp nhất lúc này.',
         icon: Target,
         iconClass: 'bg-[#F3E3C9] text-[#B66D24]',
@@ -280,7 +274,7 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
               type="button"
               onClick={() => canSend && onSend()}
               disabled={!canSend}
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#073D2A] text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-45"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#073D2A] text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:bg-[#EEE7DD] disabled:text-[#B5ADA0] disabled:opacity-100"
               aria-label="Gửi câu hỏi"
             >
               <ArrowUp className="h-5 w-5" />
@@ -305,7 +299,6 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
                   </span>
                   <span className="min-w-0 flex-1 pt-1">
                     <span className="block font-display text-[1.55rem] font-semibold leading-none text-[#173124]">{prompt.title}</span>
-                    <span className="mt-2 block font-sans text-[0.78rem] text-[#7B817B]">{prompt.subtitle}</span>
                   </span>
                   <ChevronRight className="mt-2 h-5 w-5 text-[#9A5D24] transition group-hover:translate-x-0.5" />
                 </button>
@@ -327,7 +320,7 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
         </section>
 
         <section className="relative mt-6 overflow-hidden rounded-2xl border border-[#EDE3D4] bg-[#F5F2EA]/88 px-8 py-5 text-center shadow-[0_18px_40px_-34px_rgba(23,49,36,0.55)]">
-          <p className="relative z-[1] mx-auto max-w-[620px] font-display text-[1.1rem] italic leading-relaxed text-[#24533E]">
+          <p className="relative z-[1] mx-auto max-w-[620px] font-display text-[1.1rem] italic leading-[1.8] text-[#24533E]">
             <span className="mr-3 text-3xl text-[#D0A75B]">“</span>
             Bạn không cần phải biết tất cả ngay hôm nay.<br />
             Chỉ cần bước tiếp một bước nhỏ với sự chân thành.
