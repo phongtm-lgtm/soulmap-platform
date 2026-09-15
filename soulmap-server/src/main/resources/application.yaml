@@ -43,6 +43,13 @@ springdoc:
     enabled: true
 
 soulmap:
+  auth:
+    google:
+      client-id: ${SOULMAP_GOOGLE_CLIENT_ID:}
+    session:
+      duration-days: ${SOULMAP_SESSION_DURATION_DAYS:14}
+      secure: ${SOULMAP_SESSION_COOKIE_SECURE:false}
+      same-site: ${SOULMAP_SESSION_COOKIE_SAME_SITE:Lax}
   ai:
     provider: ${SOULMAP_AI_PROVIDER:9router}
     base-url: ${SOULMAP_AI_BASE_URL:https://api.9router.com/v1}

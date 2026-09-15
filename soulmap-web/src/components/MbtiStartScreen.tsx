@@ -41,7 +41,7 @@ export default function MbtiStartScreen({
   };
 
   return (
-    <main className="relative mt-20 min-h-[calc(100vh-5rem)] overflow-hidden bg-[#FAF6EE] text-[#24533E]">
+    <main className="relative mt-20 min-h-[calc(100vh-5rem)] overflow-hidden bg-[#F8F4EB] text-[#24533E]">
       <img
         src={APP_ASSETS.mbtiPreparationBg}
         alt=""
@@ -129,7 +129,7 @@ export default function MbtiStartScreen({
               <button
                 type="button"
                 onClick={() => setShowManualModal(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8DFCF] text-[#24533E] transition hover:bg-[#FAF6EE]"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8DFCF] text-[#24533E] transition hover:bg-[#F8F4EB]"
                 aria-label="Đóng"
               >
                 <X className="h-4 w-4" />
@@ -154,7 +154,7 @@ export default function MbtiStartScreen({
               type="button"
               onClick={submitManualType}
               disabled={!manualType}
-              className="mt-4 flex w-full items-center justify-center rounded-[1rem] bg-[#24533E] px-6 py-3.5 font-sans text-base font-bold text-white transition hover:bg-[#1D4433] disabled:cursor-not-allowed disabled:opacity-45"
+              className="mt-4 flex w-full items-center justify-center rounded-[1rem] bg-[#24533E] px-6 py-3.5 font-sans text-base font-bold text-white transition hover:bg-[#214D3B] disabled:cursor-not-allowed disabled:opacity-45"
             >
               Tiếp tục với kết quả này
             </button>

@@ -26,7 +26,7 @@ export default function JourneyTabNav({ sections, activeId, accentColor, onNavig
   }, [activeId]);
 
   return (
-    <div className="sticky top-16 z-20 -mx-4 border-b border-[#E8DFCF] bg-[#FAF6EE]/95 backdrop-blur-md lg:hidden">
+    <div className="sticky top-16 z-20 -mx-4 border-b border-[#E8DFCF] bg-[#F8F4EB]/95 backdrop-blur-md lg:hidden">
       <div
         ref={listRef}
         className="flex gap-2 overflow-x-auto px-4 py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

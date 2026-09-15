@@ -1,5 +1,6 @@
 package com.soulmap.server.dto.request.ai;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -9,9 +10,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TuViReadingRequest {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userId;
     private String mode = "TUVI_FULL_READING";
     private String language = "vi";
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String mbtiType;
 
     @NotBlank
     private String name;

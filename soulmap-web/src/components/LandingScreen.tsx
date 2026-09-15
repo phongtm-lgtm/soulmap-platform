@@ -2,13 +2,10 @@ import React from 'react';
 import {
   ArrowUp,
   Briefcase,
-  Check,
   Compass,
-  Copy,
   Globe,
   Heart,
   Leaf,
-  MoreHorizontal,
   Send,
   ShieldCheck,
   Sparkles,
@@ -17,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import { APP_ASSETS } from '../assets';
+import ChatMessageBubble, { ChatTypingBubble } from './chat/ChatMessageBubble';
 
 interface LandingScreenProps {
     isLoggedIn: boolean;
@@ -406,7 +404,7 @@ export default function LandingScreen({
             </section>
 
             {/* Pillars Section */}
-            <section id="pillars" className="landing-section bg-[#fbf9f5]/50 border-t border-[#214D3B]/5">
+            <section id="pillars" className="landing-section bg-[#F8F4EB]/50 border-t border-[#214D3B]/5">
                 <div className="max-w-[1200px] mx-auto px-6 w-full">
                     <div className="text-center landing-section-header">
                         <h2 className="font-display text-3xl md:text-[47px] leading-[1.05] tracking-[-1px] text-[#214D3B] font-semibold">Các
@@ -500,7 +498,7 @@ export default function LandingScreen({
             </section>
           
             {/* Chat Demo Section — trò chuyện cùng Linh Nhi */}
-            <section id="chat-demo" className="landing-section bg-[#fbf9f5]/60 border-t border-[#214D3B]/5">
+            <section id="chat-demo" className="landing-section bg-[#F8F4EB]/60 border-t border-[#214D3B]/5">
                 <div className="max-w-[1200px] mx-auto px-6 w-full">
                     <div className="text-center">
               <span
@@ -536,7 +534,7 @@ export default function LandingScreen({
                                 <div className="text-left">
                                     <h4 className="font-display font-semibold text-sm text-[#214D3B]">Linh Nhi</h4>
                                     <span
-                                        className="flex items-center gap-1 text-[9px] font-sans text-emerald-700 font-bold uppercase tracking-wider">
+                                        className="flex items-center gap-1 text-[11px] font-sans text-emerald-700 font-bold uppercase tracking-wider">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                       Đang hoạt động
                     </span>
@@ -547,71 +545,11 @@ export default function LandingScreen({
                         {/* Chat Messages Body */}
                         <div ref={landingChatScrollRef} className="chat-demo-body custom-scrollbar p-6 flex flex-col gap-5 bg-white/20 overflow-y-auto">
                             {landingChatMessages.map((msg, index) => (
-                                <div
-                                    key={index}
-                                    className={`chat-demo-message flex items-start gap-3 max-w-[82%] ${
-                                        msg.sender === 'user' ? 'self-end flex-row-reverse text-right' : 'self-start text-left'
-                                    }`}
-                                >
-                                    {msg.sender === 'assistant' && (
-                                        <div
-                                            className="chat-demo-avatar w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                                            <img
-                                                src={APP_ASSETS.linhNhiMascot}
-                                                alt="Linh Nhi"
-                                                className="chat-demo-avatar-img w-full h-full object-contain"
-                                                referrerPolicy="no-referrer"
-                                            />
-                                        </div>
-                                    )}
-                                    <div className={`p-4 rounded-2xl shadow-sm body-text-sm ${
-                                        msg.sender === 'user'
-                                            ? 'chat-demo-user-bubble rounded-br-none'
-                                            : 'bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none'
-                                    }`}>
-                                        <p className="chat-demo-author">
-                                            {msg.sender === 'user' ? 'Người dùng' : 'Linh Nhi'}
-                                            {msg.sender === 'assistant' && <Leaf className="inline-block w-3 h-3 ml-1 text-[#68A55C]"/>}
-                                        </p>
-                                        <p className="chat-demo-text whitespace-pre-line">{msg.text}</p>
-                                        <div className="chat-demo-meta">
-                                            <span>10:32</span>
-                                            {msg.sender === 'user' && <Check className="w-3.5 h-3.5"/>}
-                                        </div>
-                                        {msg.sender === 'assistant' && (
-                                            <div className="chat-demo-actions" aria-hidden="true">
-                                                <Heart className="w-4 h-4"/>
-                                                <Copy className="w-4 h-4"/>
-                                                <MoreHorizontal className="w-4 h-4"/>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <ChatMessageBubble key={index} message={msg} variant="compact" />
                             ))}
 
                             {/* Typing indicator */}
-                            {isLandingChatTyping && (
-                                <div className="flex items-start gap-3 self-start text-left max-w-[82%]">
-                                    <div
-                                        className="chat-demo-avatar w-12 h-12 rounded-full border border-[#B68A2F]/30 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 mt-1">
-                                        <img
-                                            src={APP_ASSETS.linhNhiMascot}
-                                            alt="Linh Nhi"
-                                            className="chat-demo-avatar-img w-full h-full object-contain"
-                                            referrerPolicy="no-referrer"
-                                        />
-                                    </div>
-                                    <div
-                                        className="p-4 rounded-2xl bg-white border border-[#214D3B]/8 text-[#214D3B] rounded-bl-none flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                              style={{animationDelay: '0ms'}}></span>
-                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                              style={{animationDelay: '150ms'}}></span>
-                                        <span className="w-1.5 h-1.5 bg-[#214D3B] rounded-full animate-bounce"
-                                              style={{animationDelay: '300ms'}}></span>
-                                    </div>
-                                </div>
-                            )}
+                            {isLandingChatTyping && <ChatTypingBubble variant="compact" />}
 
                             <div className="chat-demo-suggestions flex flex-wrap gap-2 pl-14">
                                 {demoChatSuggestions.map((suggestion) => (
@@ -620,7 +558,7 @@ export default function LandingScreen({
                                         type="button"
                                         onClick={() => sendLandingChatMessage(suggestion)}
                                         disabled={isLandingChatTyping}
-                                        className="rounded-full border border-[#E8DFCF] bg-white/85 px-4 py-2 font-sans text-xs font-bold text-[#151A16] shadow-[0_12px_28px_-24px_rgba(33,77,59,0.55)] transition hover:border-[#C8A15A]/60 hover:bg-[#C8A15A]/8"
+                                        className="rounded-full border border-[#E8DFCF] bg-white/85 px-4 py-2 font-sans text-xs font-bold text-[#151A16] shadow-[0_12px_28px_-24px_rgba(33,77,59,0.55)] transition hover:border-[#B68A2F]/60 hover:bg-[#B68A2F]/8"
                                     >
                                         {suggestion}
                                     </button>
@@ -630,7 +568,7 @@ export default function LandingScreen({
 
                         {/* Chat Input Footer (decorative) */}
                         <div className="p-4 bg-white border-t border-[#214D3B]/10 flex gap-3 items-center">
-                            <div className="flex-grow bg-[#fbf9f5] border border-[#214D3B]/10 rounded-full px-5 py-3 text-sm font-sans text-[#636A64]/70 select-none">
+                            <div className="flex-grow bg-[#F8F4EB] border border-[#214D3B]/10 rounded-full px-5 py-3 text-sm font-sans text-[#5E625F]/70 select-none">
                                 Chọn một gợi ý phía trên để mô phỏng trò chuyện...
                             </div>
                             <button
@@ -646,7 +584,7 @@ export default function LandingScreen({
             </section>
 
             {/* Testimonials Section */}
-            <section id="testimonials" className="landing-section bg-[#fbf9f5] border-t border-[#214D3B]/5">
+            <section id="testimonials" className="landing-section bg-[#F8F4EB] border-t border-[#214D3B]/5">
                 <div className="max-w-[1200px] mx-auto px-6 w-full">
                     <div className="text-center landing-section-header">
                         <h2 className="font-display text-4xl md:text-[52px] leading-[1.05] tracking-[-1px] text-[#214D3B] font-semibold">Chia
@@ -666,7 +604,7 @@ export default function LandingScreen({
                                     <Star className="w-4 h-4 fill-[#B68A2F]"/>
                                     <Star className="w-4 h-4 fill-[#B68A2F]"/>
                                 </div>
-                                <p className="body-text text-[#636A64] italic mb-6">
+                                <p className="body-text text-[#5E625F] italic mb-6">
                                     &quot;SoulMap như một tấm gương soi chiếu thấu suốt tâm hồn. Những phản hồi từ AI
                                     Linh Nhi đã giúp tôi vượt qua cuộc khủng hoảng lựa chọn hướng đi công việc một cách
                                     thong dong hơn.&quot;
@@ -693,7 +631,7 @@ export default function LandingScreen({
                                     <Star className="w-4 h-4 fill-[#B68A2F]"/>
                                     <Star className="w-4 h-4 fill-[#B68A2F]"/>
                                 </div>
-                                <p className="body-text text-[#636A64] italic mb-6">
+                                <p className="body-text text-[#5E625F] italic mb-6">
                                     &quot;Tôi đặc biệt yêu thích sự kết hợp nhuần nhuyễn giữa phương pháp khoa học của
                                     phương Tây và huyền học năng lượng tinh tú phương Đông. Thiết kế giao diện thực sự
                                     sang trọng, tinh tế.&quot;
@@ -720,7 +658,7 @@ export default function LandingScreen({
                                     <Star className="w-4 h-4 fill-[#B68A2F]"/>
                                     <Star className="w-4 h-4 fill-[#B68A2F]"/>
                                 </div>
-                                <p className="body-text text-[#636A64] italic mb-6">
+                                <p className="body-text text-[#5E625F] italic mb-6">
                                     &quot;AI Linh Nhi như một người bạn tri âm tri kỷ thầm lặng luôn túc trực lắng nghe.
                                     Cách tư vấn của Linh Nhi vô cùng ngọt ngào, thấu cảm, bám sát các phương pháp trị
                                     liệu tinh thần hiện đại.&quot;

@@ -1,14 +1,17 @@
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef } from 'react';
 import { 
   ArrowLeft, 
   User, 
   Mail, 
   Lock, 
   Eye, 
-  EyeOff 
+  EyeOff,
+  Leaf,
+  AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import type { AppScreen } from '../types';
+import Button from './ui/Button';
 
 interface AuthScreenProps {
   authMode: 'login' | 'register';
@@ -34,11 +37,34 @@ interface AuthScreenProps {
   agreeTerms: boolean;
   setAgreeTerms: (agree: boolean) => void;
   handleAuthSubmit: (e: React.FormEvent) => void;
+  handleGoogleSignIn: (credential: string) => void;
   navigateToLanding: (direction?: 'push_back' | 'none') => void;
   setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
-  setIsLoggedIn: (isLoggedIn: boolean) => void;
-  setCurrentUser: (user: { name: string; email: string } | null) => void;
+}
+
+interface GoogleCredentialResponse {
+  credential: string;
+}
+
+interface GoogleAccountsId {
+  initialize: (config: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+  }) => void;
+  prompt: (listener?: (notification: GooglePromptMomentNotification) => void) => void;
+}
+
+interface GooglePromptMomentNotification {
+  isNotDisplayed: () => boolean;
+  isSkippedMoment: () => boolean;
+  isDismissedMoment: () => boolean;
+}
+
+declare global {
+  interface Window {
+    google?: { accounts: { id: GoogleAccountsId } };
+  }
 }
 
 export default function AuthScreen({
@@ -65,41 +91,77 @@ export default function AuthScreen({
   agreeTerms,
   setAgreeTerms,
   handleAuthSubmit,
+  handleGoogleSignIn,
   navigateToLanding,
   setCurrentScreen,
   setTransitionDirection,
-  setIsLoggedIn,
-  setCurrentUser,
 }: AuthScreenProps) {
-  const router = useRouter();
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const googleInitialized = useRef(false);
 
-  const goToJourneysAfterAuth = () => {
+  useEffect(() => {
+    if (!googleClientId) return;
+
+    const initializeGoogle = () => {
+      if (!window.google || googleInitialized.current) return;
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: ({ credential }) => handleGoogleSignIn(credential),
+      });
+      googleInitialized.current = true;
+    };
+
+    const existingScript = document.getElementById('google-identity-services');
+    if (existingScript) {
+      initializeGoogle();
+      existingScript.addEventListener('load', initializeGoogle);
+      return () => existingScript.removeEventListener('load', initializeGoogle);
+    }
+
+    const script = document.createElement('script');
+    script.id = 'google-identity-services';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.onload = initializeGoogle;
+    document.head.appendChild(script);
+    return () => script.removeEventListener('load', initializeGoogle);
+  }, [googleClientId, handleGoogleSignIn]);
+
+  const startGoogleSignIn = () => {
+    setAuthError('');
     setAuthSuccessMsg('');
-    router.push('/journeys');
-    setCurrentScreen('four_journeys');
-    setTransitionDirection('push');
+
+    if (!googleClientId) {
+      setAuthError('Đăng nhập Google chưa được cấu hình. Vui lòng liên hệ quản trị viên.');
+      return;
+    }
+    if (!window.google || !googleInitialized.current) {
+      setAuthError('Google đang được tải. Vui lòng thử lại sau giây lát.');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
+        setIsAuthLoading(false);
+      }
+    });
   };
 
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-[#F8F4EB]">
-      {/* Decorative background image blurred */}
-      <div className="absolute inset-0 z-0 opacity-10 mix-blend-multiply pointer-events-none">
-        <img 
-          src="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&q=80&w=1200" 
-          alt="Starry Celestial Background" 
-          className="w-full h-full object-cover filter blur-[2px]"
-        />
-      </div>
+      {/* Warm daytime forest glow — consistent with the rest of the app */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#F8F4EB]/90 via-[#F8F4EB]/80 to-[#FFFDF9]/60 z-0 pointer-events-none"></div>
-      {/* Subtle Warm Sunlight glow */}
       <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-gradient-to-bl from-[#B68A2F]/10 via-[#B68A2F]/3 to-transparent rounded-full blur-3xl z-0 pointer-events-none"></div>
       <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-[#35684D]/8 via-[#35684D]/2 to-transparent rounded-full blur-3xl z-0 pointer-events-none"></div>
 
-      {/* Top Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-[#F8F4EB]/80 backdrop-blur-md border-b border-[#E8DFCF] h-20">
+      {/* Top Navbar — logo consistent with global <Navbar/> (Leaf badge) */}
+      <nav className="fixed top-0 w-full z-50 bg-[#F8F4EB]/90 backdrop-blur-xl border-b border-[#E8DFCF]/70 h-20">
         <div className="flex justify-between items-center h-full px-6 max-w-[1200px] mx-auto w-full">
           <div className="font-display text-2xl font-semibold text-[#214D3B] flex items-center gap-2 cursor-pointer" onClick={() => navigateToLanding('push_back')}>
-            <span className="material-symbols-outlined text-[#B68A2F] text-3xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
+            <span className="w-10 h-10 rounded-2xl bg-[#24533E]/7 flex items-center justify-center text-[#35684D]">
+              <Leaf className="w-5 h-5" strokeWidth={2} />
+            </span>
             <span className="tracking-wide">SoulMap</span>
           </div>
           <button 
@@ -121,7 +183,7 @@ export default function AuthScreen({
           {/* Header and Branding */}
           <div className="text-center flex flex-col items-center gap-2 border-b border-[#E8DFCF]/50 pb-5">
             <div className="w-12 h-12 rounded-full bg-[#B68A2F]/10 border border-[#B68A2F]/20 flex items-center justify-center text-[#B68A2F] mb-1">
-              <span className="material-symbols-outlined text-2xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
+              <Leaf className="w-6 h-6" strokeWidth={2} />
             </div>
             <h1 className="font-display text-3xl font-bold text-[#214D3B] tracking-wide">
               {authMode === 'login' ? 'Chào Bạn Lữ Hành' : 'Khởi Tạo Hành Trình'}
@@ -170,13 +232,13 @@ export default function AuthScreen({
           {/* Error & Success Messages */}
           {authError && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-xs font-sans font-medium flex items-start gap-2 animate-fade-in">
-              <span className="material-symbols-outlined text-base flex-shrink-0 mt-0.5">error</span>
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <span>{authError}</span>
             </div>
           )}
           {authSuccessMsg && (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl p-3 text-xs font-sans font-medium flex items-start gap-2 animate-fade-in">
-              <span className="material-symbols-outlined text-base flex-shrink-0 mt-0.5 animate-spin">autorenew</span>
+              <Loader2 className="w-4 h-4 flex-shrink-0 mt-0.5 animate-spin" />
               <span>{authSuccessMsg}</span>
             </div>
           )}
@@ -306,10 +368,12 @@ export default function AuthScreen({
             )}
 
             {/* Submit button with magical cosmic loading states */}
-            <button
+            <Button
               type="submit"
               disabled={isAuthLoading}
-              className="w-full bg-[#35684D] hover:bg-[#214D3B] text-[#FFFDF9] disabled:opacity-75 py-3.5 rounded-full font-sans font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-md shadow-[#35684D]/15 cursor-pointer mt-2"
+              fullWidth
+              size="lg"
+              className="mt-2"
             >
               {isAuthLoading ? (
                 <>
@@ -321,34 +385,20 @@ export default function AuthScreen({
                   {authMode === 'login' ? 'Đăng nhập vào SoulMap' : 'Khởi tạo SoulMap của tôi'}
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
           {/* Guest or Skip Mode Option */}
           <div className="flex flex-col items-center gap-4 border-t border-[#E8DFCF]/50 pt-5">
             <span className="font-sans text-[11px] text-[#5E625F]/50 uppercase tracking-widest font-bold">Hoặc tiếp tục với</span>
             
-            {/* Social Login Icons Grid */}
-            <div className="grid grid-cols-3 gap-3 w-full">
+            <div className="w-full">
               <button 
                 type="button"
-                onClick={() => {
-                  setIsAuthLoading(true);
-                  setAuthError('');
-                  setTimeout(() => {
-                    setIsAuthLoading(false);
-                    const userObj = { name: 'Google Explorer', email: 'explorer@google.com' };
-                    localStorage.setItem('soulmap_logged_in', 'true');
-                    localStorage.setItem('soulmap_user', JSON.stringify(userObj));
-                    setIsLoggedIn(true);
-                    setCurrentUser(userObj);
-                    setAuthSuccessMsg('Đăng nhập bằng Google thành công!');
-                    setTimeout(() => {
-                      goToJourneysAfterAuth();
-                    }, 1200);
-                  }, 1500);
-                }}
-                className="flex items-center justify-center py-2.5 px-4 border border-[#E8DFCF] hover:border-[#B68A2F]/50 bg-[#FFFDF9] rounded-2xl hover:bg-[#35684D]/5 transition-all duration-300 cursor-pointer active:scale-95"
+                onClick={startGoogleSignIn}
+                disabled={isAuthLoading}
+                aria-label="Đăng nhập bằng Google"
+                className="flex w-full items-center justify-center gap-2 py-2.5 px-4 border border-[#E8DFCF] hover:border-[#B68A2F]/50 bg-[#FFFDF9] rounded-2xl hover:bg-[#35684D]/5 transition-all duration-300 cursor-pointer active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#EA4335" d="M12 5.04c1.61 0 3.06.55 4.2 1.64l3.15-3.15C17.45 1.68 14.93 1 12 1 7.35 1 3.37 3.67 1.39 7.56l3.85 2.99c.92-2.75 3.48-4.51 6.76-4.51z"/>
@@ -356,54 +406,7 @@ export default function AuthScreen({
                   <path fill="#FBBC05" d="M5.24 14.55c-.24-.72-.38-1.5-.38-2.3s.14-1.58.38-2.3L1.39 6.96C.5 8.74 0 10.74 0 12.8s.5 4.06 1.39 5.84l3.85-2.99z"/>
                   <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.11.74-2.52 1.18-4.3 1.18-3.28 0-5.84-1.76-6.76-4.51L1.39 16.8c1.98 3.89 5.96 6.56 10.61 6.56z"/>
                 </svg>
-              </button>
-              <button 
-                type="button"
-                onClick={() => {
-                  setIsAuthLoading(true);
-                  setAuthError('');
-                  setTimeout(() => {
-                    setIsAuthLoading(false);
-                    const userObj = { name: 'Apple Explorer', email: 'explorer@apple.com' };
-                    localStorage.setItem('soulmap_logged_in', 'true');
-                    localStorage.setItem('soulmap_user', JSON.stringify(userObj));
-                    setIsLoggedIn(true);
-                    setCurrentUser(userObj);
-                    setAuthSuccessMsg('Đăng nhập bằng Apple thành công!');
-                    setTimeout(() => {
-                      goToJourneysAfterAuth();
-                    }, 1200);
-                  }, 1500);
-                }}
-                className="flex items-center justify-center py-2.5 px-4 border border-[#E8DFCF] hover:border-[#B68A2F]/50 bg-[#FFFDF9] rounded-2xl hover:bg-[#35684D]/5 transition-all duration-300 cursor-pointer active:scale-95"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.05 20.28c-.98.95-2.05 1.88-3.08 1.88-1.05 0-1.39-.63-2.59-.63-1.22 0-1.59.61-2.59.65-1.03.04-2.22-.99-3.21-1.95-2.02-1.96-3.56-5.54-3.56-8.9 0-5.32 3.46-8.15 6.87-8.15 1.08 0 2.1.67 2.76.67.65 0 1.89-.81 3.2-.81 1.37 0 2.63.49 3.46 1.45-1.73 1.04-2.89 2.94-2.89 5.2 0 2.77 1.54 4.58 3.63 5.44-1.22 3.44-4.22 6.8-5.7 6.8zm-2.89-18.17c1.33-1.61 2.22-3.85 1.97-6.11-1.95.08-4.32 1.3-5.72 2.93-1.2 1.39-2.25 3.67-1.96 5.88 2.18.17 4.38-1.09 5.71-2.7z"/>
-                </svg>
-              </button>
-              <button 
-                type="button"
-                onClick={() => {
-                  setIsAuthLoading(true);
-                  setAuthError('');
-                  setTimeout(() => {
-                    setIsAuthLoading(false);
-                    const userObj = { name: 'Facebook Explorer', email: 'explorer@facebook.com' };
-                    localStorage.setItem('soulmap_logged_in', 'true');
-                    localStorage.setItem('soulmap_user', JSON.stringify(userObj));
-                    setIsLoggedIn(true);
-                    setCurrentUser(userObj);
-                    setAuthSuccessMsg('Đăng nhập bằng Facebook thành công!');
-                    setTimeout(() => {
-                      goToJourneysAfterAuth();
-                    }, 1200);
-                  }, 1500);
-                }}
-                className="flex items-center justify-center py-2.5 px-4 border border-[#E8DFCF] hover:border-[#B68A2F]/50 bg-[#FFFDF9] rounded-2xl hover:bg-[#35684D]/5 transition-all duration-300 cursor-pointer active:scale-95"
-              >
-                <svg className="w-5 h-5 text-[#1877F2]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
+                <span className="font-sans text-sm font-semibold text-[#214D3B]">Google</span>
               </button>
             </div>
 

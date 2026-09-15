@@ -4,7 +4,7 @@ import { APP_ASSETS } from '../assets';
 export default function MbtiTestBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-      <div className="absolute inset-0 bg-[#FAF6EE]" />
+      <div className="absolute inset-0 bg-[#F8F4EB]" />
       <img
         src={APP_ASSETS.mbtiTestBg}
         alt=""

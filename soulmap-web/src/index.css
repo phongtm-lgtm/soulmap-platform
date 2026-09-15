@@ -6,15 +6,17 @@
   --font-display: "EB Garamond", serif;
   --font-reading: "Inter", sans-serif;
 
-  --color-primary: #24533E;
-  --color-forest: #35684D;
-  --color-dark-green: #214D3B;
-  --color-gold: #B68A2F;
+  /* --- Semantic color tokens (single source of truth) --- */
+  --color-primary: #24533E;      /* brand green — buttons, primary accents */
+  --color-forest: #35684D;       /* mid green — hover/secondary */
+  --color-dark-green: #214D3B;   /* heading green — H1/H2, bold text */
+  --color-heading: #214D3B;      /* alias for headings */
+  --color-gold: #B68A2F;         /* single accent gold (icons, highlights) */
   --color-text-main: #214D3B;
-  --color-body-text: #5E625F;
-  --color-card-bg: #FFFDF8;
-  --color-border-custom: #E8DFCF;
-  --color-bg-base: #F8F4EB;
+  --color-body-text: #5E625F;    /* body copy */
+  --color-card-bg: #FFFDF8;      /* card surface */
+  --color-border-custom: #E8DFCF;/* standard border */
+  --color-bg-base: #F8F4EB;      /* global cream background */
   --heading-weight: 500;
   --heading-tracking: -0.6px;
   --heading-line-height: 1.06;
@@ -581,7 +583,7 @@ h1, h2, h3, .font-display {
 }
 .journey-tag .eyebrow {
   font-family: "Inter", sans-serif;
-  font-size: 7.2px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -618,7 +620,7 @@ h1, h2, h3, .font-display {
 }
 .core-tag .core-sub {
   font-family: "Inter", sans-serif;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 500;
   color: rgba(251, 239, 201, 0.8);
   line-height: 1.1;
@@ -1703,4 +1705,315 @@ h1, h2, h3, .font-display {
   .journey-banner-scenery {
     display: none;
   }
+}
+
+/* =====================================================
+   TUVI JOURNEY — PRINT / PDF EXPORT STYLES
+   Activated by: document.body.classList.add('tuvi-printing')
+   ===================================================== */
+@media print {
+  /* Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 16mm 14mm 18mm 14mm;
+  }
+
+  /* Only apply when user triggered from Tử Vi page */
+  body.tuvi-printing {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    font-size: 10.5pt !important;
+  }
+
+  /* Hide navbar, all asides (sidebars + chat panel), and the export button */
+  body.tuvi-printing nav,
+  body.tuvi-printing aside,
+  body.tuvi-printing .tuvi-no-print {
+    display: none !important;
+  }
+
+  /* Remove sticky positioning from everything */
+  body.tuvi-printing [class*="sticky"],
+  body.tuvi-printing [class*="fixed"] {
+    position: static !important;
+  }
+
+  /* Kill animations */
+  body.tuvi-printing * {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Grid → single column */
+  body.tuvi-printing .grid {
+    display: block !important;
+  }
+
+  /* Main content — full width */
+  body.tuvi-printing main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Remove top padding added for the fixed navbar */
+  body.tuvi-printing .pt-20 {
+    padding-top: 4pt !important;
+  }
+
+  /* Hero header: keep colours, make it compact */
+  body.tuvi-printing header {
+    border-radius: 10pt !important;
+    min-height: auto !important;
+    page-break-after: avoid;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Reading content card */
+  body.tuvi-printing section {
+    border-radius: 8pt !important;
+    padding: 14pt !important;
+    margin-top: 8pt !important;
+    background: #ffffff !important;
+    page-break-inside: auto;
+  }
+
+  /* Typography for print */
+  body.tuvi-printing h1,
+  body.tuvi-printing h2,
+  body.tuvi-printing h3 {
+    page-break-after: avoid;
+  }
+
+  body.tuvi-printing p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  body.tuvi-printing blockquote {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  body.tuvi-printing table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 9pt !important;
+  }
+
+  body.tuvi-printing th,
+  body.tuvi-printing td {
+    border: 1px solid #ddd !important;
+    padding: 4pt 8pt !important;
+  }
+
+  body.tuvi-printing thead {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Numbered / bullet list dots — keep accent colour */
+  body.tuvi-printing span[style*="background"] {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Overflow wrappers */
+  body.tuvi-printing [class*="overflow"] {
+    overflow: visible !important;
+  }
+}
+
+/* =====================================================
+   LOVE JOURNEY — PRINT / PDF EXPORT STYLES
+   Activated by: document.body.classList.add('love-printing')
+   ===================================================== */
+@media print {
+  body.love-printing {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    font-size: 10.5pt !important;
+  }
+
+  body.love-printing nav,
+  body.love-printing aside,
+  body.love-printing .love-no-print {
+    display: none !important;
+  }
+
+  body.love-printing [class*="sticky"],
+  body.love-printing [class*="fixed"] {
+    position: static !important;
+  }
+
+  body.love-printing * {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+
+  body.love-printing .grid {
+    display: block !important;
+  }
+
+  body.love-printing main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  body.love-printing .pt-20 {
+    padding-top: 4pt !important;
+  }
+
+  body.love-printing section {
+    border-radius: 8pt !important;
+    padding: 14pt !important;
+    margin-top: 8pt !important;
+    background: #ffffff !important;
+    page-break-inside: auto;
+    overflow: visible !important;
+  }
+
+  body.love-printing header {
+    border-radius: 10pt !important;
+    min-height: auto !important;
+    page-break-after: avoid;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  body.love-printing h1,
+  body.love-printing h2,
+  body.love-printing h3 {
+    page-break-after: avoid;
+  }
+
+  body.love-printing p { orphans: 3; widows: 3; }
+
+  body.love-printing blockquote {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  body.love-printing table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 9pt !important;
+  }
+
+  body.love-printing th,
+  body.love-printing td {
+    border: 1px solid #ddd !important;
+    padding: 4pt 8pt !important;
+  }
+
+  body.love-printing thead {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  body.love-printing [class*="overflow"] { overflow: visible !important; }
+}
+
+/* =====================================================
+   CAREER JOURNEY — PRINT / PDF EXPORT STYLES
+   Activated by: document.body.classList.add('career-printing')
+   ===================================================== */
+@media print {
+  body.career-printing {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    font-size: 10.5pt !important;
+  }
+
+  body.career-printing nav,
+  body.career-printing aside,
+  body.career-printing .career-no-print {
+    display: none !important;
+  }
+
+  body.career-printing [class*="sticky"],
+  body.career-printing [class*="fixed"] {
+    position: static !important;
+  }
+
+  body.career-printing * {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+  }
+
+  body.career-printing .grid {
+    display: block !important;
+  }
+
+  body.career-printing main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 8pt !important;
+  }
+
+  body.career-printing .pt-20 {
+    padding-top: 4pt !important;
+  }
+
+  body.career-printing header {
+    border-radius: 10pt !important;
+    min-height: auto !important;
+    page-break-after: avoid;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  body.career-printing section {
+    border-radius: 8pt !important;
+    padding: 12pt !important;
+    margin-top: 8pt !important;
+    background: #ffffff !important;
+    page-break-inside: auto;
+    overflow: visible !important;
+  }
+
+  body.career-printing h1,
+  body.career-printing h2,
+  body.career-printing h3 {
+    page-break-after: avoid;
+  }
+
+  body.career-printing p { orphans: 3; widows: 3; }
+
+  body.career-printing blockquote {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  body.career-printing table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 9pt !important;
+  }
+
+  body.career-printing th,
+  body.career-printing td {
+    border: 1px solid #ddd !important;
+    padding: 4pt 8pt !important;
+  }
+
+  body.career-printing thead {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  body.career-printing span[style*="background"] {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  body.career-printing [class*="overflow"] { overflow: visible !important; }
 }

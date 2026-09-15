@@ -11,15 +11,6 @@ const GROUP_LABELS: Record<ChatHistoryGroup, string> = {
 
 const GROUP_ORDER: ChatHistoryGroup[] = ['today', 'yesterday', 'previous'];
 
-const MOCK_CONVERSATIONS: ChatConversationSummary[] = [
-  { id: 'career', title: 'Sự nghiệp của tôi', preview: 'Bạn: Điểm mạnh tiềm ẩn của mình là gì?', group: 'today', time: '10:45 AM' },
-  { id: 'journey', title: 'Hành trình nghề nghiệp', preview: 'Bạn: Mình hợp môi trường nào?', group: 'today', time: '09:30 AM' },
-  { id: 'plan3y', title: 'Kế hoạch 3 năm tới', preview: 'Bạn: Làm sao để đạt mục tiêu?', group: 'today', time: '08:15 AM' },
-  { id: 'decision', title: 'Chuyển việc hay ở lại?', preview: 'Bạn: Nên cân nhắc những yếu tố nào?', group: 'yesterday', time: '09:20 PM' },
-  { id: 'direction2024', title: 'Định hướng 2024', preview: 'Bạn: Công việc phù hợp với mình?', group: 'previous', time: 'Thứ 5' },
-  { id: 'strength', title: 'Phân tích điểm mạnh', preview: 'Bạn: Mình cần cải thiện điều gì?', group: 'previous', time: 'Thứ 4' },
-];
-
 interface ChatSidebarProps {
   conversations: ChatConversationSummary[];
   activeConversationId: string;
@@ -36,11 +27,9 @@ export default function ChatSidebar({
   onNewChat,
 }: ChatSidebarProps) {
   const groupedConversations = useMemo(() => {
-    const filtered = conversations.length ? conversations : MOCK_CONVERSATIONS;
-
     return GROUP_ORDER.map((group) => ({
       group,
-      items: filtered.filter((c) => c.group === group),
+      items: conversations.filter((c) => c.group === group),
     })).filter((section) => section.items.length > 0);
   }, [conversations]);
 
@@ -50,7 +39,7 @@ export default function ChatSidebar({
         <button
           type="button"
           onClick={onNewChat}
-          className="flex w-full items-center justify-center gap-3 rounded-xl border-none bg-[#24533E] px-4 py-3.5 font-sans text-sm font-semibold text-white shadow-[0_14px_30px_-22px_rgba(36,83,62,0.75)] transition hover:bg-[#173124] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173124]/25 active:translate-y-0"
+          className="flex w-full items-center justify-center gap-3 rounded-xl border-none bg-[#24533E] px-4 py-3.5 font-sans text-sm font-semibold text-white shadow-[0_14px_30px_-22px_rgba(36,83,62,0.75)] transition hover:bg-[#214D3B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#214D3B]/25 active:translate-y-0"
         >
           <Plus className="h-5 w-5" />
           Bắt đầu trò chuyện mới
@@ -61,7 +50,7 @@ export default function ChatSidebar({
           <input
             type="search"
             placeholder="Tìm kiếm lịch sử..."
-            className="w-full rounded-xl border border-[#EEE7DD] bg-white py-3 pl-10 pr-10 font-sans text-sm text-[#173124] shadow-sm outline-none placeholder:text-[#9AA098] focus:ring-1 focus:ring-[#B68A2F]"
+            className="w-full rounded-xl border border-[#EEE7DD] bg-white py-3 pl-10 pr-10 font-sans text-sm text-[#214D3B] shadow-sm outline-none placeholder:text-[#9AA098] focus:ring-1 focus:ring-[#B68A2F]"
           />
           <SlidersHorizontal className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9AA098]" />
         </label>
@@ -76,26 +65,26 @@ export default function ChatSidebar({
 
         {groupedConversations.map(({ group, items }) => (
           <div key={group} className="mb-6">
-            <p className="px-2 pb-3 font-sans text-sm font-bold text-[#22251F]">
+            <p className="px-2 pb-3 font-sans text-sm font-bold text-[#214D3B]">
               {GROUP_LABELS[group]}
             </p>
             <div className="flex flex-col gap-2">
               {items.map((conversation) => {
-                const isActive = conversation.id === activeConversationId || (!activeConversationId && conversation.id === 'career');
+                const isActive = conversation.id === activeConversationId;
                 return (
                   <button
                     key={conversation.id}
                     type="button"
                     onClick={() => onSelectConversation(conversation.id)}
                     className={`group relative flex items-start gap-3 rounded-xl border px-3 py-3 text-left shadow-[0_10px_28px_-26px_rgba(23,49,36,0.65)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#24533E]/20 ${
-                      isActive ? 'border-[#9DB6A4] bg-[#EFF7EC] text-[#173124]' : 'border-[#F0E8DE] bg-white/72 text-[#424844] hover:border-[#D7CBBB] hover:bg-white'
+                      isActive ? 'border-[#9DB6A4] bg-[#EFF7EC] text-[#214D3B]' : 'border-[#F0E8DE] bg-white/72 text-[#424844] hover:border-[#D7CBBB] hover:bg-white'
                     }`}
                   >
                     <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${isActive ? 'bg-[#F4E6C9] text-[#7C5730]' : 'bg-transparent text-[#7C5730]'}`}>
                       <BriefcaseBusiness className="h-4 w-4" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-sans text-sm font-semibold text-[#22251F]">
+                      <span className="block truncate font-sans text-sm font-semibold text-[#214D3B]">
                         {conversation.title}
                       </span>
                       <span className="mt-1 block truncate font-sans text-[0.72rem] text-[#7B817B]">{conversation.preview}</span>
@@ -115,7 +104,7 @@ export default function ChatSidebar({
       <div className="px-5 pb-4">
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-xl border border-[#E8D3B8] bg-[#FBF1E1]/78 px-4 py-3 font-sans text-sm font-semibold text-[#22251F] transition hover:bg-[#FFF8EC]"
+          className="flex w-full items-center justify-between rounded-xl border border-[#E8D3B8] bg-[#FBF1E1]/78 px-4 py-3 font-sans text-sm font-semibold text-[#214D3B] transition hover:bg-[#FFF8EC]"
         >
           <span className="flex items-center gap-2">
             <BriefcaseBusiness className="h-4 w-4 text-[#7C5730]" />
@@ -132,7 +121,7 @@ export default function ChatSidebar({
               <img src={APP_ASSETS.linhNhiMascot} alt="Linh Nhi" className="h-full w-full scale-[1.9] object-contain" draggable={false} />
             </span>
             <span className="min-w-0">
-              <span className="flex items-center gap-1.5 font-sans text-sm font-bold text-[#173124]">
+              <span className="flex items-center gap-1.5 font-sans text-sm font-bold text-[#214D3B]">
                 Linh Nhi
                 <span className="h-2 w-2 rounded-full bg-[#2F8F5B]" aria-label="Đang hoạt động" />
               </span>

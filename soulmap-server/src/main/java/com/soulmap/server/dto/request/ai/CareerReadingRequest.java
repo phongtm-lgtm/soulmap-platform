@@ -1,5 +1,6 @@
 package com.soulmap.server.dto.request.ai;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CareerReadingRequest {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userId;
     private String mode = "FULL_READING";
     private String language = "vi";

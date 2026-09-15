@@ -1,12 +1,16 @@
 package com.soulmap.server.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class TuViRequest {
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String mbtiType;
 
     //TODO: add validate
 

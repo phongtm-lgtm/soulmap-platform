@@ -22,17 +22,17 @@ export default function ChatTopBar({
   onExit: _onExit,
 }: ChatTopBarProps) {
   return (
-    <header className="relative z-[2] flex shrink-0 items-center justify-between border-b border-[#E6DDCE] bg-[#FCF9F8]/86 px-4 py-4 backdrop-blur-xl sm:px-6 md:px-8">
+    <header className="relative z-[2] flex shrink-0 items-center justify-between border-b border-[#E6DDCE] bg-[#F8F4EB]/86 px-4 py-4 backdrop-blur-xl sm:px-6 md:px-8">
       <div className="flex min-w-0 items-center gap-4">
         <span className="hidden h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[#7C5730]/20 bg-[#F2E8D8] sm:block">
           <img src={APP_ASSETS.linhNhiMascot} alt="Linh Nhi" className="h-full w-full scale-[1.85] object-contain" draggable={false} />
         </span>
         <div className="min-w-0">
-          <h1 className="truncate font-display text-[1.45rem] font-semibold leading-tight text-[#173124] md:text-[1.7rem]">
+          <h1 className="truncate font-display text-[1.45rem] font-semibold leading-tight text-[#214D3B] md:text-[1.7rem]">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-1 truncate font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[#6A6E69]">
+            <p className="mt-1 truncate font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-[#5E625F]">
               {subtitle}
             </p>
           )}

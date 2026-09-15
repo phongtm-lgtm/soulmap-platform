@@ -1,6 +1,4 @@
-DROP TABLE IF EXISTS mbti_questions;
-
-CREATE TABLE mbti_questions (
+CREATE TABLE IF NOT EXISTS mbti_questions (
     id BIGSERIAL PRIMARY KEY,
     stt INTEGER NOT NULL,
     group_index INTEGER NOT NULL,

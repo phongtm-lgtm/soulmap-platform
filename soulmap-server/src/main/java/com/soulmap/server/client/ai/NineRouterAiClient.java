@@ -21,7 +21,8 @@ public class NineRouterAiClient implements AiProviderClient {
     private final SoulmapAiProperties properties;
     private final WebClient webClient;
 
-    public NineRouterAiClient(WebClient.Builder webClientBuilder, SoulmapAiProperties properties) {
+    public NineRouterAiClient(WebClient.Builder webClientBuilder,
+                              SoulmapAiProperties properties) {
         this.properties = properties;
         if (!StringUtils.hasText(properties.getBaseUrl())) {
             throw new AiServiceException(ErrorCode.AI_ERROR_0001);
@@ -40,6 +41,20 @@ public class NineRouterAiClient implements AiProviderClient {
 
     @Override
     public String generateStructuredJson(AiChatRequest request) {
+        return completeChat(request);
+    }
+
+    @Override
+    public String generateText(AiChatRequest request) {
+        return completeChat(new AiChatRequest(
+                request.model(),
+                request.messages(),
+                request.temperature(),
+                null
+        ));
+    }
+
+    private String completeChat(AiChatRequest request) {
         try {
             long startedAt = System.currentTimeMillis();
             log.info("Calling AI provider: provider={}, baseUrl={}, model={}, structuredOutputMode={}",

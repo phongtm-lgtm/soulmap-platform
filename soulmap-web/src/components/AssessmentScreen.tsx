@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import MbtiTestBackground from './MbtiTestBackground';
 import LinhNhiMessage from './LinhNhiMessage';
+import Button from './ui/Button';
 import type { Question } from '../types';
 
 interface AssessmentScreenProps {
@@ -149,7 +150,7 @@ export default function AssessmentScreen({
                   className={`flex items-start gap-3 rounded-xl border px-4 py-3.5 text-left transition-all duration-200 active:scale-[0.99] ${
                     isSelected
                       ? 'border-[#2F6B4D] bg-[#F0F7F2] shadow-[0_8px_24px_-18px_rgba(33,77,59,0.35)]'
-                      : 'border-[#E8DFCF] bg-[#FFFCF8] hover:border-[#3F7A58]/50 hover:bg-[#FAF6EE]'
+                      : 'border-[#E8DFCF] bg-[#FFFCF8] hover:border-[#3F7A58]/50 hover:bg-[#F8F4EB]'
                   }`}
                 >
                   <span
@@ -168,31 +169,29 @@ export default function AssessmentScreen({
           </div>
 
           <div className="mx-auto mt-7 flex w-full max-w-[560px] items-center justify-between gap-4">
-              <button
+              <Button
                 type="button"
                 onClick={handlePrevQuestion}
                 disabled={currentQuestionIndex === 0}
-              className={`relative flex min-w-[160px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#24533E] px-5 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] transition-all duration-300 hover:bg-[#214D3B] active:scale-95 sm:min-w-[190px] ${
-                currentQuestionIndex === 0 ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
-              }`}
-            >
-              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
-              <ArrowLeft className="h-4 w-4" />
-              Quay lại câu trước
-            </button>
+                size="lg"
+                className="relative min-w-[160px] flex-1 overflow-hidden shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] sm:min-w-[190px]"
+              >
+                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
+                <ArrowLeft className="h-4 w-4" />
+                Quay lại câu trước
+              </Button>
 
-              <button
+              <Button
                 type="button"
                 onClick={handleNextQuestion}
-              disabled={!selectedOption || isSubmitting}
-              className={`relative flex min-w-[160px] flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#24533E] px-5 py-3.5 font-sans text-sm font-bold text-white shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] transition-all duration-300 hover:bg-[#214D3B] active:scale-95 sm:min-w-[190px] ${
-                !selectedOption || isSubmitting ? 'cursor-not-allowed opacity-40 shadow-none hover:bg-[#24533E]' : ''
-              }`}
-            >
-              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
-              {isSubmitting ? 'Đang gửi kết quả...' : currentQuestionIndex === questions.length - 1 ? 'Khám phá kết quả' : 'Câu tiếp theo'}
-              <ArrowRight className="h-4 w-4" />
-            </button>
+                disabled={!selectedOption || isSubmitting}
+                size="lg"
+                className="relative min-w-[160px] flex-1 overflow-hidden shadow-[0_14px_26px_-16px_rgba(33,77,59,0.65)] sm:min-w-[190px]"
+              >
+                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
+                {isSubmitting ? 'Đang gửi kết quả...' : currentQuestionIndex === questions.length - 1 ? 'Khám phá kết quả' : 'Câu tiếp theo'}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
           </div>
             </>
           )}

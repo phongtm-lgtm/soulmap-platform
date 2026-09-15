@@ -7,7 +7,7 @@ import { SOULMAP_QUESTIONS, PERSONALITY_PROFILES, PersonalityProfile, AppScreen,
 // Import modular subcomponents
 import Navbar from './components/Navbar';
 import LandingScreen from './components/LandingScreen';
-import AuthScreen from './components/AuthScreen';
+import GoogleAuthScreen from './components/GoogleAuthScreen';
 import MbtiStartScreen from './components/MbtiStartScreen';
 import AssessmentScreen from './components/AssessmentScreen';
 import ResultScreen from './components/ResultScreen';
@@ -19,6 +19,17 @@ import AcademyScreen from './components/AcademyScreen';
 import { buildMockJourneys } from './data/mockJourneys';
 import type { SoulMapJourney } from './types/journey';
 import { fetchMbtiQuestions, submitMbtiAnswers } from './lib/mbtiApi';
+import { fetchCurrentUser, signOut, verifyGoogleCredential } from './lib/authApi';
+import {
+  createMentorConversation,
+  getMentorConversation,
+  listMentorConversations,
+  MentorApiError,
+  sendMentorMessage,
+  toChatMessages,
+  toConversationSummaries,
+} from './lib/mentorApi';
+import type { ChatConversationSummary, ChatMessage } from './types/chat';
 
 interface AppProps {
   initialScreen?: AppScreen;
@@ -37,37 +48,33 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
   const searchParams = useSearchParams();
   type Screen = AppScreen;
   const [currentScreen, setCurrentScreen] = useState<Screen>(initialScreen);
-  const [transitionDirection, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
+  // Reserved for future screen-transition animations. Currently write-only:
+  // handlers record intended direction but no CSS transition consumes it yet.
+  // Kept as a stable prop across screens to avoid churn when the effect lands.
+  const [, setTransitionDirection] = useState<'push' | 'push_back' | 'none'>('none');
 
   // User Authentication State
   const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null);
 
-  // Initialize from localStorage safely in useEffect after mounting to avoid Next.js SSR hydration errors
+  // Restore the HttpOnly session cookie after mounting.
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const loggedIn = localStorage.getItem('soulmap_logged_in') === 'true';
-    const u = localStorage.getItem('soulmap_user');
-    let parsedUser: { name: string; email: string } | null = null;
-    if (u) {
-      try {
-        parsedUser = JSON.parse(u);
-      } catch (e) {
-        console.error('Failed to parse user from localStorage:', e);
-      }
-    }
+    localStorage.removeItem('soulmap_logged_in');
+    localStorage.removeItem('soulmap_user');
 
-    if (loggedIn && parsedUser) {
-      setIsLoggedIn(true);
-      setCurrentUser(parsedUser);
-    } else {
-      localStorage.removeItem('soulmap_logged_in');
-      localStorage.removeItem('soulmap_user');
-      setIsLoggedIn(false);
-      setCurrentUser(null);
-    }
+    void fetchCurrentUser()
+      .then((user) => {
+        setIsLoggedIn(true);
+        setCurrentUser(user);
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      })
+      .finally(() => setIsAuthReady(true));
 
     const savedProgress = localStorage.getItem('soulmap_mbti_progress');
     if (savedProgress) {
@@ -97,103 +104,37 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
       }
     }
 
-    setIsAuthReady(true);
   }, []);
 
-  // Auth Screen Local States
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [authEmail, setAuthEmail] = useState<string>('');
-  const [authPassword, setAuthPassword] = useState<string>('');
-  const [authConfirmPassword, setAuthConfirmPassword] = useState<string>('');
-  const [authName, setAuthName] = useState<string>('');
+  // Authentication feedback state
   const [authError, setAuthError] = useState<string>('');
   const [authSuccessMsg, setAuthSuccessMsg] = useState<string>('');
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-  const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem('soulmap_logged_in');
-    localStorage.removeItem('soulmap_user');
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    navigateToLanding('push_back');
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } finally {
+      setIsLoggedIn(false);
+      setCurrentUser(null);
+      navigateToLanding('push_back');
+    }
   };
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthSuccessMsg('');
+  const handleGoogleSignIn = async (credential: string) => {
+    try {
+      const userObj = await verifyGoogleCredential(credential);
 
-    // Validation
-    if (!authEmail) {
-      setAuthError('Vui lòng nhập địa chỉ email.');
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(authEmail)) {
-      setAuthError('Địa chỉ email không đúng định dạng.');
-      return;
-    }
-
-    if (!authPassword) {
-      setAuthError('Vui lòng nhập mật khẩu.');
-      return;
-    }
-    if (authPassword.length < 6) {
-      setAuthError('Mật khẩu phải chứa nhất 6 ký tự.');
-      return;
-    }
-
-    if (authMode === 'register') {
-      if (!authName.trim()) {
-        setAuthError('Vui lòng nhập họ và tên.');
-        return;
-      }
-      if (authPassword !== authConfirmPassword) {
-        setAuthError('Mật khẩu xác nhận không trùng khớp.');
-        return;
-      }
-      if (!agreeTerms) {
-        setAuthError('Bạn cần đồng ý với Điều khoản dịch vụ và Chính sách bảo mật.');
-        return;
-      }
-    }
-
-    setIsAuthLoading(true);
-
-    // Simulate authenticating/syncing flow with the cosmic aesthetic
-    setTimeout(() => {
-      setIsAuthLoading(false);
-      const userObj = {
-        name: authMode === 'register' ? authName.trim() : (authEmail.split('@')[0].toUpperCase()),
-        email: authEmail.trim().toLowerCase()
-      };
-
-      localStorage.setItem('soulmap_logged_in', 'true');
-      localStorage.setItem('soulmap_user', JSON.stringify(userObj));
       setIsLoggedIn(true);
       setCurrentUser(userObj);
-
-      setAuthSuccessMsg(authMode === 'login' ? 'Đăng nhập thành công! Đang kết nối chòm sao hộ mệnh...' : 'Đăng ký tài khoản thành công! Linh Nhi chào mừng bạn.');
-      
-      // Auto redirect after a short magical pause
-      setTimeout(() => {
-        // Clear forms
-        setAuthEmail('');
-        setAuthPassword('');
-        setAuthConfirmPassword('');
-        setAuthName('');
-        setAuthError('');
-        setAuthSuccessMsg('');
-        
-        router.push('/journeys');
-        setCurrentScreen('four_journeys');
-        setTransitionDirection('push');
-      }, 1500);
-
-    }, 2000);
+      setAuthSuccessMsg('Đăng nhập bằng Google thành công!');
+      setTimeout(() => goToScreen('landing'), 1200);
+    } catch (error) {
+      console.error('Failed to read Google credential:', error);
+      setAuthError('Không thể xác thực tài khoản Google. Vui lòng thử lại.');
+    } finally {
+      setIsAuthLoading(false);
+    }
   };
   
   // Assessment State
@@ -215,7 +156,9 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
   }, [currentScreen, isAuthReady, profile, router]);
 
   useEffect(() => {
-    if (currentScreen !== 'assessment' || mbtiQuestions.length > 0 || isQuestionsLoading) return;
+    // A failed request must wait for an explicit re-entry to the assessment.
+    // Otherwise toggling isQuestionsLoading in finally() continuously re-runs this effect.
+    if (currentScreen !== 'assessment' || mbtiQuestions.length > 0 || isQuestionsLoading || questionsError) return;
 
     setIsQuestionsLoading(true);
     setQuestionsError(null);
@@ -233,7 +176,7 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
       .finally(() => {
         setIsQuestionsLoading(false);
       });
-  }, [answers, currentQuestionIndex, currentScreen, isQuestionsLoading, mbtiQuestions.length]);
+  }, [answers, currentQuestionIndex, currentScreen, isQuestionsLoading, mbtiQuestions.length, questionsError]);
 
   // Sub-steps for the results screen: 'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map'
   const [resultStep, setResultStep] = useState<'mbti_summary' | 'birth_form' | 'generating' | 'reveal' | 'full_map'>('mbti_summary');
@@ -267,54 +210,72 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
   }, [resultStep]);
   
   // AI Chat State
+  const WELCOME_CHAT: ChatMessage[] = [
+    {
+      sender: 'assistant',
+      text: 'Chào mừng bạn đến với Bản đồ nội tâm! Linh Nhi ở đây để giúp bạn diễn giải chi tiết hơn về MBTI, lá số Tử Vi, cũng như tháo gỡ những vướng mắc trong sự nghiệp, tình duyên hay cuộc sống của bạn.',
+    },
+  ];
   const [chatInput, setChatInput] = useState<string>('');
-  const [chatHistory, setChatHistory] = useState<{ sender: 'user' | 'assistant'; text: string }[]>([
-    { 
-      sender: 'assistant', 
-      text: 'Chào mừng bạn đến với Bản đồ nội tâm! 🌿 Linh Nhi ở đây để giúp bạn diễn giải chi tiết hơn về MBTI, lá số Tử Vi, Ngũ hành, cũng như tháo gỡ những vướng mắc trong sự nghiệp, tình duyên hay cuộc sống của bạn.' 
-    }
-  ]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>(WELCOME_CHAT);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [mentorConversations, setMentorConversations] = useState<ChatConversationSummary[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string>('');
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [activeMentorJourney, setActiveMentorJourney] = useState<string | null>(null);
 
-  // Navigation handlers with specified transition names
-  const navigateToAssessment = (direction: 'push' | 'none' = 'push') => {
+  // ── Navigation (single source of truth) ────────────────────────────────
+  // Every screen maps to exactly one URL here, so router.push + setCurrentScreen
+  // never drift apart. Prefer goToScreen() over calling them separately.
+  const SCREEN_PATHS: Record<Screen, string> = {
+    landing: '/soulmap',
+    test_intro: '/mbti-test',
+    assessment: '/mbti-assessment',
+    result: '/soulmap-result',
+    four_journeys: '/journeys',
+    ai_chat: '/ai-mentor',
+    journal: '/journal',
+    academy: '/academy',
+    auth: '/soulmap',
+  };
+
+  const goToScreen = (
+    screen: Screen,
+    direction: 'push' | 'push_back' | 'none' = 'push',
+    pathOverride?: string,
+  ) => {
     setTransitionDirection(direction);
-    router.push('/mbti-assessment');
+    router.push(pathOverride ?? SCREEN_PATHS[screen]);
+    setCurrentScreen(screen);
+  };
+
+  const navigateToAssessment = (direction: 'push' | 'none' = 'push') => {
     setCurrentQuestionIndex(0);
     setAnswers({});
     setSelectedOption(null);
-    setCurrentScreen('assessment');
+    setQuestionsError(null);
+    goToScreen('assessment', direction);
   };
 
   const navigateToTestIntro = (direction: 'push' | 'none' = 'push') => {
-    setTransitionDirection(direction);
-    router.push('/mbti-test');
-    setCurrentScreen('test_intro');
+    goToScreen('test_intro', direction);
   };
 
   const navigateToLanding = (direction: 'push_back' | 'none' = 'push_back') => {
-    setTransitionDirection(direction);
-    router.push('/soulmap');
-    setCurrentScreen('landing');
+    goToScreen('landing', direction);
   };
 
   const navigateToFourJourneys = () => {
     setJourneyDetail(null);
-    setTransitionDirection('push');
-    router.push('/journeys');
-    setCurrentScreen('four_journeys');
+    goToScreen('four_journeys');
   };
 
   const navigateToJournal = () => {
-    setTransitionDirection('push');
-    router.push('/journal');
-    setCurrentScreen('journal');
+    goToScreen('journal');
   };
 
   const navigateToAcademy = () => {
-    setTransitionDirection('push');
-    router.push('/academy');
-    setCurrentScreen('academy');
+    goToScreen('academy');
   };
 
   // Track which screen to return to when the user exits the dedicated AI Chat page.
@@ -322,25 +283,65 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
 
   const navigateToAiChat = () => {
     setScreenBeforeChat(currentScreen);
-    setTransitionDirection('push');
-    router.push('/ai-mentor');
-    setCurrentScreen('ai_chat');
+    if (journeyDetail?.slug) {
+      setActiveMentorJourney(journeyDetail.slug);
+    }
+    goToScreen('ai_chat');
   };
 
   const exitAiChat = () => {
-    setTransitionDirection('push_back');
-    router.push(screenBeforeChat === 'four_journeys' ? '/journeys' : '/soulmap');
-    setCurrentScreen(screenBeforeChat);
+    goToScreen(screenBeforeChat, 'push_back');
   };
 
   const handleNewChat = () => {
+    setActiveConversationId('');
+    setActiveMentorJourney(null);
+    setChatError(null);
     setChatHistory([
       {
         sender: 'assistant',
-        text: 'Chào bạn! Linh Nhi đang lắng nghe. Hãy chia sẻ điều bạn đang suy nghĩ nhé. 🌿',
+        text: 'Chào bạn! Linh Nhi đang lắng nghe. Hãy chia sẻ điều bạn đang suy nghĩ nhé.',
       },
     ]);
     setChatInput('');
+  };
+
+  const refreshMentorConversations = useCallback(async () => {
+    if (!isLoggedIn) {
+      setMentorConversations([]);
+      return;
+    }
+    try {
+      const list = await listMentorConversations();
+      setMentorConversations(toConversationSummaries(list));
+    } catch (error) {
+      console.error('Failed to load mentor conversations', error);
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (currentScreen !== 'ai_chat' || !isAuthReady) return;
+    void refreshMentorConversations();
+  }, [currentScreen, isAuthReady, isLoggedIn, refreshMentorConversations]);
+
+  const handleSelectConversation = async (id: string) => {
+    if (!isLoggedIn) {
+      goToScreen('auth');
+      return;
+    }
+    setChatError(null);
+    try {
+      const detail = await getMentorConversation(Number(id));
+      setActiveConversationId(String(detail.id));
+      setActiveMentorJourney(detail.activeJourney ?? null);
+      setChatHistory(toChatMessages(detail.messages));
+      setChatInput('');
+    } catch (error) {
+      const message = error instanceof MentorApiError
+        ? error.message
+        : 'Không thể mở cuộc trò chuyện. Vui lòng thử lại.';
+      setChatError(message);
+    }
   };
 
   // Journey detail overlay for the standalone four_journeys screen
@@ -361,8 +362,26 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
   const handleExploreJourney = (journey: SoulMapJourney) => {
     setTransitionDirection('push');
     setJourneyDetail(journey);
-    const chapter = journey.slug === 'career' ? '&chapter=1' : '';
-    router.push(`/journeys?journey=${journey.slug}${chapter}`);
+    router.push(`/journeys?journey=${journey.slug}`);
+  };
+
+  const getJourneys = () => {
+    const journeys = buildMockJourneys(profile || PERSONALITY_PROFILES.DEFAULT);
+    if (!profile) return journeys.map((journey) => ({ ...journey, status: 'locked' as const }));
+
+    const readingKeys: Partial<Record<SoulMapJourney['slug'], string>> = {
+      identity: 'soulmap_ai_reading_identity_id',
+      career: 'soulmap_ai_reading_career_chapter_01_id',
+      love: 'soulmap_ai_reading_love_v2_id',
+      tuvi: 'soulmap_ai_reading_tuvi_id',
+    };
+    const hasReading = Object.values(readingKeys).some((key) => key && localStorage.getItem(key));
+    if (!hasReading) return journeys.map((journey) => ({ ...journey, status: 'locked' as const }));
+
+    return journeys.map((journey) => {
+      const key = readingKeys[journey.slug];
+      return { ...journey, status: !key || localStorage.getItem(key) ? 'ready' as const : 'locked' as const };
+    });
   };
 
   const handleBackFromJourneyDetail = () => {
@@ -370,10 +389,6 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
     setJourneyDetail(null);
     router.push('/journeys');
   };
-
-  const handleCareerChapterChange = useCallback((chapter: 1 | 3) => {
-    router.push(`/journeys?journey=career&chapter=${chapter}`, { scroll: false });
-  }, [router]);
 
   const buildAnswersFromMbtiType = (mbtiType: string): Record<number, 'A' | 'B'> => {
     const letters = new Set(mbtiType.split(''));
@@ -492,46 +507,62 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
     return "Hãy cứ trả lời thật lòng, không có đúng hay sai, chỉ có phiên bản chân thực nhất của bạn thôi. ❤️";
   };
 
-  const handleSendMessage = (textToSend?: string) => {
-    const messageText = textToSend || chatInput;
-    if (!messageText.trim()) return;
+  const handleSendMessage = async (textToSend?: string) => {
+    const messageText = (textToSend || chatInput).trim();
+    if (!messageText || isTyping) return;
 
-    // Add user message
-    setChatHistory(prev => [...prev, { sender: 'user', text: messageText }]);
+    if (!isLoggedIn) {
+      goToScreen('auth');
+      return;
+    }
+
+    setChatError(null);
+    setChatHistory((prev) => [...prev, { sender: 'user', text: messageText }]);
     if (!textToSend) setChatInput('');
     setIsTyping(true);
 
-    // Simulate AI Wisdom Reply
-    setTimeout(() => {
-      let replyText = "";
-      const lowerText = messageText.toLowerCase();
-      const userType = profile?.type || "INFJ";
-      const element = profile?.element || "Mộc";
-
-      if (lowerText.includes("sự nghiệp") || lowerText.includes("công việc") || lowerText.includes("career")) {
-        replyText = `Với năng lượng của một ${profile?.name} (hệ ${element}), con đường sự nghiệp lý tưởng của bạn không chỉ là kiếm sống mà là tìm kiếm "sứ mệnh thiêng liêng". Bạn phát huy tốt nhất khi được làm việc trong môi trường tôn trọng sự độc lập và mang tính nhân văn sâu sắc. Tránh các công việc lặp đi lặp lại hay thiếu đi sự thấu cảm nhé. Bạn nghĩ sao về một vai trò kết nối hoặc sáng tạo nội dung? 💡`;
-      } else if (lowerText.includes("tình duyên") || lowerText.includes("tình yêu") || lowerText.includes("love") || lowerText.includes("mối quan hệ")) {
-        replyText = `Trong tình duyên, bạn là người tìm kiếm sự kết nối "tâm giao" - sâu sắc, chân thành và thấu hiểu lẫn nhau ở cấp độ linh hồn. Bạn cực kỳ nhạy cảm với năng lượng của đối phương. Lời khuyên từ Linh Nhi là hãy học cách bày tỏ mong muốn của mình rõ ràng hơn, và đừng ngần ngại cho bản thân cơ hội đón nhận tình yêu ấm áp nhé! 🌟`;
-      } else if (lowerText.includes("khuyên") || lowerText.includes("lời khuyên") || lowerText.includes("advice")) {
-        replyText = `Lời khuyên dành cho bạn hôm nay là: "Hãy tin vào trực giác của mình". Đôi khi thế giới bên ngoài quá ồn ào khiến bạn nghi ngờ bản thân. Hãy dành ra 10 phút tĩnh lặng cuối ngày, thắp một ngọn nến thơm hoặc ngồi thiền nhẹ để kết nối lại với ngọn lửa nội tâm của bạn nhé! 🧘‍♀️`;
-      } else if (lowerText.includes("tử vi") || lowerText.includes("ngũ hành") || lowerText.includes("zodiac") || lowerText.includes("sao")) {
-        replyText = `Bạn có lá số hộ mệnh được chiếu sáng bởi ${profile?.zodiac}. Sự tương tác giữa tinh tú cổ xưa phương Đông và tính cách ${userType} phương Tây mang lại cho bạn một nguồn năng lượng độc bản. Hệ ${element} thúc đẩy bạn luôn hướng thượng, thích che chở và lan tỏa giá trị tốt đẹp. Hãy phát huy tối đa tinh thần này! 🎋`;
-      } else {
-        replyText = `Linh Nhi rất hiểu chia sẻ của bạn. Là một ${profile?.name}, bạn thường có xu hướng suy nghĩ rất nhiều (overthinking) và tự tạo áp lực cho mình. Hãy nhớ rằng hành trình khám phá bản thân là một chặng đường dài đầy thú vị, hãy bước từng bước nhẹ nhàng và tận hưởng hiện tại nhé. Linh Nhi luôn ở bên bạn! 🌸`;
+    try {
+      let conversationId = activeConversationId ? Number(activeConversationId) : null;
+      if (!conversationId) {
+        const created = await createMentorConversation({
+          activeJourney: activeMentorJourney ?? undefined,
+        });
+        conversationId = created.id;
+        setActiveConversationId(String(created.id));
+        setActiveMentorJourney(created.activeJourney ?? null);
+        // Keep welcome + user message already shown; server also has welcome.
       }
 
-      setChatHistory(prev => [...prev, { sender: 'assistant', text: replyText }]);
+      const result = await sendMentorMessage(conversationId, messageText);
+      setChatHistory((prev) => [
+        ...prev,
+        { sender: 'assistant', text: result.assistantMessage.content },
+      ]);
+      setActiveConversationId(String(result.conversation.id));
+      await refreshMentorConversations();
+    } catch (error) {
+      const message = error instanceof MentorApiError
+        ? (error.status === 401
+          ? 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'
+          : error.message)
+        : 'Không thể gửi tin nhắn tới Linh Nhi. Vui lòng thử lại.';
+      setChatError(message);
+      setChatHistory((prev) => {
+        const next = [...prev];
+        const last = next[next.length - 1];
+        if (last?.sender === 'user' && last.text === messageText) {
+          next.pop();
+        }
+        return next;
+      });
+      if (!textToSend) setChatInput(messageText);
+    } finally {
       setIsTyping(false);
-    }, 1200);
-  };
-
-  // Determine container translation animation classes based on state
-  const getScreenTransitionClass = () => {
-    return '';
+    }
   };
 
   return (
-    <div className={`min-h-screen bg-[#fbf9f5] flex flex-col overflow-x-hidden ${getScreenTransitionClass()}`}>
+    <div className="min-h-screen bg-[#F8F4EB] flex flex-col overflow-x-hidden">
       
       {/* Top Navigation Bar (Shared across all pages except custom headers) */}
       {currentScreen !== 'auth' && currentScreen !== 'result' && (
@@ -546,8 +577,6 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
           navigateToTestIntro={navigateToTestIntro}
           onOpenJourneys={navigateToFourJourneys}
           onOpenAiMentor={navigateToAiChat}
-          onOpenJournal={navigateToJournal}
-          onOpenAcademy={navigateToAcademy}
           setCurrentScreen={setCurrentScreen}
           setTransitionDirection={setTransitionDirection}
         />
@@ -572,35 +601,15 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
       )}
 
       {currentScreen === 'auth' && (
-        <AuthScreen 
-          authMode={authMode}
-          setAuthMode={setAuthMode}
-          authEmail={authEmail}
-          setAuthEmail={setAuthEmail}
-          authPassword={authPassword}
-          setAuthPassword={setAuthPassword}
-          authConfirmPassword={authConfirmPassword}
-          setAuthConfirmPassword={setAuthConfirmPassword}
-          authName={authName}
-          setAuthName={setAuthName}
+        <GoogleAuthScreen
           authError={authError}
           setAuthError={setAuthError}
           authSuccessMsg={authSuccessMsg}
           setAuthSuccessMsg={setAuthSuccessMsg}
           isAuthLoading={isAuthLoading}
           setIsAuthLoading={setIsAuthLoading}
-          showPassword={showPassword}
-          setShowPassword={setShowPassword}
-          showConfirmPassword={showConfirmPassword}
-          setShowConfirmPassword={setShowConfirmPassword}
-          agreeTerms={agreeTerms}
-          setAgreeTerms={setAgreeTerms}
-          handleAuthSubmit={handleAuthSubmit}
+          handleGoogleSignIn={handleGoogleSignIn}
           navigateToLanding={navigateToLanding}
-          setCurrentScreen={setCurrentScreen}
-          setTransitionDirection={setTransitionDirection}
-          setIsLoggedIn={setIsLoggedIn}
-          setCurrentUser={setCurrentUser}
         />
       )}
 
@@ -657,27 +666,16 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
       {currentScreen === 'four_journeys' && journeyDetail && (
           <JourneyDetailScreen
             journey={journeyDetail}
-            initialCareerChapter={1}
-            onCareerChapterChange={handleCareerChapterChange}
+            onOpenAiMentor={navigateToAiChat}
           onBack={handleBackFromJourneyDetail}
         />
       )}
 
       {currentScreen === 'four_journeys' && !journeyDetail && (
         <FourJourneysScreen
-          journeys={profile ? buildMockJourneys(profile) : buildMockJourneys({
-            type: 'INFJ', name: 'Người Bảo Hộ', title: 'The Advocate',
-            element: 'Mộc', zodiac: 'Xử Nữ', mbtiMatch: 'INFJ',
-            description: '',
-            pillars: {
-              identity: 'Khám phá bản sắc và nội tâm để hiểu rõ con người thật của bạn.',
-              career: 'Định hướng và phát triển con đường sự nghiệp phù hợp với bản thân.',
-              love: 'Thấu hiểu tình yêu và kết nối để xây dựng mối quan hệ bền vững.',
-              life: 'Hiểu vận mệnh và sống trọn vẹn hành trình của chính bạn.',
-            },
-            advice: [],
-          })}
+          journeys={getJourneys()}
           onExplore={handleExploreJourney}
+          onCreateSoulMap={navigateToTestIntro}
           userName={currentUser?.name}
         />
       )}
@@ -692,6 +690,12 @@ function AppContent({ initialScreen = 'landing' }: AppProps) {
           handleSendMessage={handleSendMessage}
           onNewChat={handleNewChat}
           onExit={exitAiChat}
+          conversations={mentorConversations}
+          activeConversationId={activeConversationId}
+          onSelectConversation={handleSelectConversation}
+          chatError={chatError}
+          requiresLogin={!isLoggedIn}
+          onRequestLogin={() => goToScreen('auth')}
         />
       )}
 

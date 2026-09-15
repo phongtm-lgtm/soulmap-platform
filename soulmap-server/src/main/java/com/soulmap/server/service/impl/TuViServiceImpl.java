@@ -15,9 +15,13 @@ import com.soulmap.server.service.TuViService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +44,8 @@ public class TuViServiceImpl implements TuViService {
     private static final List<String> ORDERED_KEYS = Arrays.asList(
             "ty", "ngo", "mui", "than", "dau", "tuat", "hoi", "ty_b", "suu", "dan", "mao", "thin"
     );
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(20);
+    private static final int MAX_TRANSIENT_RETRIES = 2;
 
     private final WebClient webClient;
 
@@ -59,6 +65,8 @@ public class TuViServiceImpl implements TuViService {
                     .bodyValue(buildRequestBody(request))
                     .retrieve()
                     .bodyToMono(TuViResponse.class)
+                    .timeout(REQUEST_TIMEOUT)
+                    .retryWhen(transientRetrySpec())
                     .block();
 
             if (createResponse == null || createResponse.getData() == null || createResponse.getData().getSlug() == null) {
@@ -69,6 +77,8 @@ public class TuViServiceImpl implements TuViService {
                     .uri("/la-so/{slug}", createResponse.getData().getSlug())
                     .retrieve()
                     .bodyToMono(TuViResponse.class)
+                    .timeout(REQUEST_TIMEOUT)
+                    .retryWhen(transientRetrySpec())
                     .block();
 
             if (detailResponse == null || detailResponse.getData() == null) {
@@ -83,6 +93,16 @@ public class TuViServiceImpl implements TuViService {
         } catch (Exception exception) {
             throw new TuViSourceException("Loi ket noi API tuvi.vn: " + exception.getMessage(), exception);
         }
+    }
+
+    private Retry transientRetrySpec() {
+        return Retry.backoff(MAX_TRANSIENT_RETRIES, Duration.ofMillis(300))
+                .filter(this::isTransientRequestFailure);
+    }
+
+    private boolean isTransientRequestFailure(Throwable throwable) {
+        return throwable instanceof WebClientRequestException
+                || throwable instanceof TimeoutException;
     }
 
     private Map<String, Object> buildRequestBody(TuViRequest request) {

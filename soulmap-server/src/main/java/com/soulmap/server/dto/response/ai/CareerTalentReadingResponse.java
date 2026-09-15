@@ -16,7 +16,7 @@ public class CareerTalentReadingResponse {
     private String intro;
     private List<Talent> talents;
     private String combinationInsight;
-    private List<CareerReadingResponse.Card> balanceRisks;
+    private List<Card> balanceRisks;
     private String deepReadingMarkdown;
 
     @Getter
@@ -26,5 +26,12 @@ public class CareerTalentReadingResponse {
         private String description;
         private String workExpression;
         private String developmentTip;
+    }
+
+    @Getter
+    @Setter
+    public static class Card {
+        private String title;
+        private String description;
     }
 }

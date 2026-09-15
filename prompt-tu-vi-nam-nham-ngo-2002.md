@@ -4,388 +4,86 @@ Nhiệm vụ: Hãy luận giải chi tiết lá số Tử Vi cho đương số d
 
 ## Thông tin đương số
 
-* Tên người được luận giải: Phong
-* Giới tính: Nam
-* Năm sinh: Nhâm Ngọ, 2002
-* Ngày giờ sinh: Giờ Dần, ngày 2 tháng 2 năm Nhâm Ngọ
-* Ngày âm lịch: 2/2/2002
-* Ngày dương lịch: 15/3/2002
-* Thời điểm hiện tại: Bính Ngọ 2026, 25 tuổi
-* Can chi đầy đủ: Ngày Nhâm Ngọ, tháng Quý Mão, năm Nhâm Ngọ
-* Âm/Dương: Dương Nam
-* Mệnh cục: Dương Liễu Mộc
-* Cục: Mộc Tam Cục
-* Quan hệ Cục - Mệnh: Cục Mộc Mệnh Mộc bình hòa
-* Mệnh an tại: Sửu
-* Thân an tại: Tỵ
-* Cân xương: 3 lượng 2 chỉ
-* Lai nhân cung: Huynh Đệ
+* Tên người được luận giải: My
+* Giới tính: Nữ
+* Năm sinh: Giáp Thân, 2004
+* Ngày giờ sinh: Giờ Thân, ngày 4 tháng 7 năm Giáp Thân
+* Ngày âm lịch: 4/7/2004
+* Ngày dương lịch: 19/8/2004
+* Thời điểm hiện tại: Bính Ngọ 2026, 23 tuổi
+* Can chi đầy đủ: Ngày Canh Ngọ, tháng Nhâm Thân, năm Giáp Thân
+* Âm/Dương: Dương Nữ
+* Mệnh cục: Tuyền Trung Thủy
+* Cục: Thủy Nhị Cục
+* Quan hệ Cục - Mệnh: Cục Thủy Mệnh Thủy bình hòa
+* Mệnh an tại: Tý
+* Thân an tại: Thìn
+* Cân xương: 3 lượng 7 chỉ
+* Lai nhân cung: Phu Thê
 * Cung trọng tâm cần luận: Mệnh, Thân, Quan Lộc, Tài Bạch, Phu Thê, Phúc Đức
-* Các cung cần lưu ý: Tật Ách, Điền Trạch, Thiên Di
-* Chi tiết cung cần lưu ý: Sức khỏe/bệnh tật, nhà cửa/đất đai, xuất ngoại
+* Các cung cần lưu ý: Tử Tức, Phúc Đức, Điền Trạch
+* Chi tiết cung cần lưu ý: Con cái, phúc khí tổ tiên, nhà cửa/đất đai
 
 ## Dữ liệu lá số đã có sẵn
 
 ```json
 {
-  "summary": "Lá số tử vi giới tính Nam, sinh giờ Dần, ngày 2, tháng 2, năm Nhâm Ngọ",
-  "gender": "M",
-  "timeFull": "2/2/2002 (Âm Lịch)",
-  "solarFull": "15/3/2002 (Dương Lịch)",
-  "currentTimeFull": "Bính Ngọ (2026), 25 tuổi",
-  "canChiFull": "Ngày Nhâm Ngọ, tháng Quý Mão, năm Nhâm Ngọ ",
-  "cucFull": "Mộc Tam Cục (Cục Mộc Mệnh Mộc bình hòa)",
-  "amDuong": "Dương Nam",
-  "loaiHanh": "Dương Liễu Mộc",
-  "viTriCungMenh": "Sửu",
-  "viTriCungThan": "Tỵ",
-  "canXuong": "3 lượng 2 chỉ",
-  "laiNhanCung": "Huynh Đệ",
+  "summary": "Lá số tử vi giới tính Nữ, sinh giờ Thân, ngày 4, tháng 7, năm Giáp Thân",
+  "gender": "F",
+  "timeFull": "4/7/2004 (Âm Lịch)",
+  "solarFull": "19/8/2004 (Dương Lịch)",
+  "currentTimeFull": "Bính Ngọ (2026), 23 tuổi",
+  "canChiFull": "Ngày Canh Ngọ, tháng Nhâm Thân, năm Giáp Thân ",
+  "cucFull": "Thủy Nhị Cục (Cục Thủy Mệnh Thủy bình hòa)",
+  "amDuong": "Dương Nữ",
+  "loaiHanh": "Tuyền Trung Thủy",
+  "viTriCungMenh": "Tý",
+  "viTriCungThan": "Thìn",
+  "canXuong": "3 lượng 7 chỉ",
+  "laiNhanCung": "Phu Thê",
   "cungs": [
-    {
-      "key": "ty",
-      "gridClass": "cung-ty",
-      "name": "Quan Lộc",
-      "diaChi": "Ấ.Tỵ",
-      "hanhCung": "-Hoả",
-      "daiVan": "43",
-      "daiVanText": "ĐV.PHÚC",
-      "tieuVan": "LN.TỬ",
-      "trangSinh": "Bệnh",
-      "chinhTinh": ["Tham Lang", "Liêm Trinh"],
-      "catTinh": ["Tả Phù", "Thiên Việt", "L.Lộc Tồn", "ĐV. T Việt", "ĐV. T Mã", "Hóa Khoa"],
-      "hungTinh": ["Phá Toái", "Trực Phù", "Phi Liêm", "ĐV. H Kỵ", "L.Hóa Kỵ"],
-      "tuHoa": ["Hóa Lộc - Huynh Đệ", "Hóa Quyền - Tật Ách", "Hóa Khoa - Mệnh", "Hóa Kỵ - Điền Trạch"]
-    },
-    {
-      "key": "ngo",
-      "gridClass": "cung-ngo",
-      "name": "Nô Bộc",
-      "diaChi": "B.Ngọ",
-      "hanhCung": "+Hoả",
-      "daiVan": "53",
-      "daiVanText": "ĐV.ĐIỀN",
-      "tieuVan": "LN.PHỐI",
-      "trangSinh": "Tử",
-      "chinhTinh": ["Cự Môn"],
-      "catTinh": ["Văn Khúc", "Thiên Phúc", "Hỷ Thần", "Thiên Quý", "Tam Thai", "L.Văn Khúc", "ĐV. H Quyền"],
-      "hungTinh": ["Thái Tuế", "L.Thái Tuế", "L.Kình Dương", "Thiên Thương"],
-      "tuHoa": ["Hóa Lộc - Tật Ách", "Hóa Quyền - Huynh Đệ", "Hóa Khoa - Tật Ách", "Hóa Kỵ - Quan Lộc"]
-    },
-    {
-      "key": "mui",
-      "gridClass": "cung-mui",
-      "name": "Thiên Di",
-      "diaChi": "Đ.Mùi",
-      "hanhCung": "-Thổ",
-      "daiVan": "63",
-      "daiVanText": "ĐV.QUAN",
-      "tieuVan": "LN.HUYNH",
-      "trangSinh": "Mộ",
-      "chinhTinh": ["Thiên Tướng"],
-      "catTinh": ["Quốc Ấn", "Thiếu Dương", "Thiên Tài"],
-      "hungTinh": ["Thiên Không", "Bệnh Phù", "Đầu Quân"],
-      "tuHoa": ["Hóa Lộc - Điền Trạch", "Hóa Quyền - Tật Ách", "Hóa Khoa - Huynh Đệ", "Hóa Kỵ - Nô Bộc"]
-    },
-    {
-      "key": "than",
-      "gridClass": "cung-than",
-      "name": "Tật Ách",
-      "diaChi": "M.Thân",
-      "hanhCung": "+Kim",
-      "daiVan": "73",
-      "daiVanText": "ĐV.NÔ",
-      "tieuVan": "LN.MỆNH",
-      "trangSinh": "Tuyệt",
-      "chinhTinh": ["Thiên Đồng", "Thiên Lương"],
-      "catTinh": ["Văn Xương", "Thai Phụ", "Địa Giải", "Thiên Mã", "Ân Quang", "Bát Tọa", "L.Văn Xương", "L.Thiên Mã", "L.Hóa Lộc", "L.Hóa Khoa", "Hóa Lộc"],
-      "hungTinh": ["Cô Thần", "TUẦN", "Tang Môn", "Đại Hao", "L.Tang Môn", "Thiên Sứ"],
-      "tuHoa": ["Hóa Lộc - Quan Lộc", "Hóa Quyền - Điền Trạch", "Hóa Khoa - Tài Bạch", "Hóa Kỵ - Huynh Đệ"]
-    },
-    {
-      "key": "dau",
-      "gridClass": "cung-dau",
-      "name": "Tài Bạch",
-      "diaChi": "K.Dậu",
-      "hanhCung": "-Kim",
-      "daiVan": "83",
-      "daiVanText": "ĐV.DI",
-      "tieuVan": "LN.PHỤ",
-      "trangSinh": "Thai",
-      "chinhTinh": ["Thất Sát", "Vũ Khúc"],
-      "catTinh": ["Hữu Bật", "Thiên Giải", "Thiên Trù", "Văn Tinh", "Hồng Loan", "Thiếu Âm", "L.Hồng Loan", "L.Thiên Việt"],
-      "hungTinh": ["Địa Không", "TUẦN", "Phục Binh", "Hóa Kỵ"],
-      "tuHoa": ["Hóa Lộc - Tài Bạch", "Hóa Quyền - Quan Lộc", "Hóa Khoa - Tật Ách", "Hóa Kỵ - Nô Bộc"]
-    },
-    {
-      "key": "tuat",
-      "gridClass": "cung-tuat",
-      "name": "Tử Tức",
-      "diaChi": "C.Tuất",
-      "hanhCung": "+Thổ",
-      "daiVan": "93",
-      "daiVanText": "ĐV.TẬT",
-      "tieuVan": "LN.PHÚC",
-      "trangSinh": "Dưỡng",
-      "chinhTinh": ["Thái Dương"],
-      "catTinh": ["Thiên Quan", "Long Trì", "Hoa Cái"],
-      "hungTinh": ["Thiên Hình", "Đà La", "Quan Phù", "Quan Phủ", "Địa Võng"],
-      "tuHoa": ["Hóa Lộc - Tử Tức", "Hóa Quyền - Tài Bạch", "Hóa Khoa - Điền Trạch", "Hóa Kỵ - Tật Ách"]
-    },
-    {
-      "key": "hoi",
-      "gridClass": "cung-hoi",
-      "name": "Phu Thê",
-      "diaChi": "T.Hợi",
-      "hanhCung": "-Thuỷ",
-      "daiVan": "103",
-      "daiVanText": "ĐV.TÀI",
-      "tieuVan": "LN.ĐIỀN",
-      "trangSinh": "Tràng Sinh",
-      "chinhTinh": [],
-      "catTinh": ["Lộc Tồn", "Nguyệt Đức", "Bác Sỹ", "Thiên Thọ", "L.Thiên Khôi", "L.Nguyệt Đức", "ĐV. Khúc"],
-      "hungTinh": ["Lưu Hà", "Kiếp Sát", "Tử Phù", "L.Kiếp Sát", "ĐV. Đà La"],
-      "tuHoa": ["Hóa Lộc - Nô Bộc", "Hóa Quyền - Tử Tức", "Hóa Khoa - Nô Bộc", "Hóa Kỵ - Tật Ách"]
-    },
-    {
-      "key": "ty_b",
-      "gridClass": "cung-ty-b",
-      "name": "Huynh Đệ",
-      "diaChi": "N.Tý",
-      "hanhCung": "+Thuỷ",
-      "daiVan": "113",
-      "daiVanText": "ĐV.TỬ",
-      "tieuVan": "LN.QUAN",
-      "trangSinh": "Mộc Dục",
-      "chinhTinh": ["Thiên Cơ"],
-      "catTinh": ["Lực Sỹ", "ĐV. Lộc Tồn", "L.Hóa Quyền"],
-      "hungTinh": ["Kình Dương", "Thiên Khốc", "Thiên Hư", "Tuế Phá", "L.Thiên Khốc", "L.Thiên Hư"],
-      "tuHoa": ["Hóa Lộc - Tật Ách", "Hóa Quyền - Mệnh", "Hóa Khoa - Quan Lộc", "Hóa Kỵ - Tài Bạch"]
-    },
-    {
-      "key": "suu",
-      "gridClass": "cung-suu",
-      "name": "Mệnh",
-      "diaChi": "Q.Sửu",
-      "hanhCung": "-Thổ",
-      "daiVan": "3",
-      "daiVanText": "ĐV.PHỐI",
-      "tieuVan": "LN.NÔ",
-      "trangSinh": "Quan Đới",
-      "chinhTinh": ["Phá Quân", "Tử Vi"],
-      "catTinh": ["Long Đức", "Thanh Long", "L.Long Đức", "ĐV. H Lộc", "Hóa Quyền"],
-      "hungTinh": ["Linh Tinh", "Địa Kiếp", "ĐV. K Dương"],
-      "tuHoa": ["Hóa Lộc - Mệnh", "Hóa Quyền - Nô Bộc", "Hóa Khoa - Điền Trạch", "Hóa Kỵ - Quan Lộc"]
-    },
-    {
-      "key": "dan",
-      "gridClass": "cung-dan",
-      "name": "Phụ Mẫu",
-      "diaChi": "N.Dần",
-      "hanhCung": "+Mộc",
-      "daiVan": "13",
-      "daiVanText": "ĐV.HUYNH",
-      "tieuVan": "LN.DI",
-      "trangSinh": "Lâm Quan",
-      "chinhTinh": [],
-      "catTinh": ["Thiên Y"],
-      "hungTinh": ["Thiên Diêu", "TRIỆT", "Bạch Hổ", "Tiểu Hao", "L.Bạch Hổ"],
-      "tuHoa": ["Hóa Lộc - Tật Ách", "Hóa Quyền - Mệnh", "Hóa Khoa - Quan Lộc", "Hóa Kỵ - Tài Bạch"]
-    },
-    {
-      "key": "mao",
-      "gridClass": "cung-mao",
-      "name": "Phúc Đức",
-      "diaChi": "Q.Mão",
-      "hanhCung": "-Mộc",
-      "daiVan": "23",
-      "daiVanText": "ĐV.MỆNH",
-      "tieuVan": "LN.TẬT",
-      "trangSinh": "Đế Vượng",
-      "chinhTinh": ["Thiên Phủ"],
-      "catTinh": ["Thiên Khôi", "Đào Hoa", "Thiên Hỉ", "Thiên Đức", "Phúc Đức", "L.Đào Hoa", "L.Thiên Đức", "L.Phúc Đức", "ĐV. T Khôi", "ĐV. Xương"],
-      "hungTinh": ["Hỏa Tinh", "TRIỆT", "Tướng Quân"],
-      "tuHoa": ["Hóa Lộc - Mệnh", "Hóa Quyền - Nô Bộc", "Hóa Khoa - Điền Trạch", "Hóa Kỵ - Quan Lộc"]
-    },
-    {
-      "key": "thin",
-      "gridClass": "cung-thin",
-      "name": "Điền Trạch",
-      "diaChi": "G.Thìn",
-      "hanhCung": "+Thổ",
-      "daiVan": "33",
-      "daiVanText": "ĐV.PHỤ",
-      "tieuVan": "LN.TÀI",
-      "trangSinh": "Suy",
-      "chinhTinh": ["Thái Âm"],
-      "catTinh": ["Phong Cáo", "Đường Phù", "Giải Thần", "Phượng Các", "Tấu Thư", "ĐV. H Khoa"],
-      "hungTinh": ["Quả Tú", "Điếu Khách", "Thiên La"],
-      "tuHoa": ["Hóa Lộc - Quan Lộc", "Hóa Quyền - Mệnh", "Hóa Khoa - Tài Bạch", "Hóa Kỵ - Tử Tức"]
-    }
+    {"key":"ty","gridClass":"cung-ty","name":"Nô Bộc","diaChi":"K.Tỵ","hanhCung":"-Hoả","daiVan":"72","daiVanText":"ĐV.TẬT","tieuVan":"LN.PHỤ","trangSinh":"Lâm Quan","chinhTinh":["Thiên Tướng"],"catTinh":["Thiên Trù","Văn Tinh","Thiên Đức","Phúc Đức","L.Lộc Tồn","L.Phúc Đức","ĐV. Xương"],"hungTinh":["Kiếp Sát","Đại Hao","Thiên Thương"],"tuHoa":["Hóa Lộc - Huynh Đệ","Hóa Quyền - Điền Trạch","Hóa Khoa - Thiên Di","Hóa Kỵ - Mệnh"]},
+    {"key":"ngo","gridClass":"cung-ngo","name":"Thiên Di","diaChi":"C.Ngọ","hanhCung":"+Hoả","daiVan":"62","daiVanText":"ĐV.TÀI","tieuVan":"LN.PHÚC","trangSinh":"Quan Đới","chinhTinh":["Thiên Lương"],"catTinh":["L.Văn Khúc"],"hungTinh":["Hỏa Tinh","Linh Tinh","TUẦN","Điếu Khách","Bệnh Phù","L.Thái Tuế","L.Kình Dương"],"tuHoa":["Hóa Lộc - Mệnh","Hóa Quyền - Huynh Đệ","Hóa Khoa - Phúc Đức","Hóa Kỵ - Phu Thê"]},
+    {"key":"mui","gridClass":"cung-mui","name":"Tật Ách","diaChi":"T.Mùi","hanhCung":"-Thổ","daiVan":"52","daiVanText":"ĐV.TỬ","tieuVan":"LN.ĐIỀN","trangSinh":"Mộc Dục","chinhTinh":["Thất Sát","Liêm Trinh"],"catTinh":["Thiên Y","Thiên Việt","Thiên Quan","Đường Phù","Hồng Loan","Hỷ Thần","ĐV. H Lộc","ĐV. T Việt","Hóa Lộc"],"hungTinh":["Địa Kiếp","Thiên Diêu","Quả Tú","TUẦN","Trực Phù","Thiên Sứ","L.Hóa Kỵ"],"tuHoa":["Hóa Lộc - Quan Lộc","Hóa Quyền - Mệnh","Hóa Khoa - Mệnh","Hóa Kỵ - Phúc Đức"]},
+    {"key":"than","gridClass":"cung-than","name":"Tài Bạch","diaChi":"N.Thân","hanhCung":"+Kim","daiVan":"42","daiVanText":"ĐV.PHỐI","tieuVan":"LN.QUAN","trangSinh":"Tràng Sinh","chinhTinh":[],"catTinh":["Thiên Tài","L.Văn Xương","L.Thiên Mã","ĐV. T Mã"],"hungTinh":["TRIỆT","Thái Tuế","Phi Liêm","L.Tang Môn"],"tuHoa":["Hóa Lộc - Thiên Di","Hóa Quyền - Điền Trạch","Hóa Khoa - Phu Thê","Hóa Kỵ - Huynh Đệ"]},
+    {"key":"dau","gridClass":"cung-dau","name":"Tử Tức","diaChi":"Q.Dậu","hanhCung":"-Kim","daiVan":"32","daiVanText":"ĐV.HUYNH","tieuVan":"LN.NÔ","trangSinh":"Dưỡng","chinhTinh":[],"catTinh":["Thiên Phúc","Đào Hoa","Thiếu Dương","Tấu Thư","L.Hồng Loan","L.Thiên Việt","ĐV. Khúc"],"hungTinh":["Lưu Hà","TRIỆT","Phá Toái","Thiên Không"],"tuHoa":["Hóa Lộc - Huynh Đệ","Hóa Quyền - Quan Lộc","Hóa Khoa - Phúc Đức","Hóa Kỵ - Điền Trạch"]},
+    {"key":"tuat","gridClass":"cung-tuat","name":"Phu Thê","diaChi":"G.Tuất","hanhCung":"+Thổ","daiVan":"22","daiVanText":"ĐV.MỆNH","tieuVan":"LN.DI","trangSinh":"Thai","chinhTinh":["Thiên Đồng"],"catTinh":["Phong Cáo","Tả Phù","Quốc Ấn","Thiên Quý","L.Hóa Lộc"],"hungTinh":["Thiên Khốc","Tang Môn","Tướng Quân","Đầu Quân","Địa Võng"],"tuHoa":["Hóa Lộc - Tật Ách","Hóa Quyền - Huynh Đệ","Hóa Khoa - Huynh Đệ","Hóa Kỵ - Mệnh"]},
+    {"key":"hoi","gridClass":"cung-hoi","name":"Huynh Đệ","diaChi":"Ấ.Hợi","hanhCung":"-Thuỷ","daiVan":"12","daiVanText":"ĐV.PHỤ","tieuVan":"LN.TẬT","trangSinh":"Tuyệt","chinhTinh":["Phá Quân","Vũ Khúc"],"catTinh":["Thiếu Âm","L.Thiên Khôi","L.Nguyệt Đức","ĐV. H Quyền","ĐV. H Khoa","Hóa Quyền","Hóa Khoa"],"hungTinh":["Cô Thần","Tiểu Hao","L.Kiếp Sát"],"tuHoa":["Hóa Lộc - Phúc Đức","Hóa Quyền - Thiên Di","Hóa Khoa - Điền Trạch","Hóa Kỵ - Phúc Đức"]},
+    {"key":"ty_b","gridClass":"cung-ty-b","name":"Mệnh","diaChi":"B.Tý","hanhCung":"+Thuỷ","daiVan":"2","daiVanText":"ĐV.PHÚC","tieuVan":"LN.TÀI","trangSinh":"Mộ","chinhTinh":["Thái Dương"],"catTinh":["Văn Khúc","Long Trì","Thanh Long","Thiên Thọ"],"hungTinh":["Quan Phù","L.Thiên Khốc","L.Thiên Hư","ĐV. H Kỵ","Hóa Kỵ"],"tuHoa":["Hóa Lộc - Phu Thê","Hóa Quyền - Phúc Đức","Hóa Khoa - Phúc Đức","Hóa Kỵ - Tật Ách"]},
+    {"key":"suu","gridClass":"cung-suu","name":"Phụ Mẫu","diaChi":"Đ.Sửu","hanhCung":"-Thổ","daiVan":"112","daiVanText":"ĐV.ĐIỀN","tieuVan":"LN.TỬ","trangSinh":"Tử","chinhTinh":["Thiên Phủ"],"catTinh":["Địa Giải","Thiên Khôi","Thiên Hỉ","Nguyệt Đức","Lực Sỹ","Tam Thai","Bát Tọa","ĐV. T Khôi"],"hungTinh":["Đà La","Tử Phù","ĐV. Đà La"],"tuHoa":["Hóa Lộc - Phúc Đức","Hóa Quyền - Phu Thê","Hóa Khoa - Phúc Đức","Hóa Kỵ - Quan Lộc"]},
+    {"key":"dan","gridClass":"cung-dan","name":"Phúc Đức","diaChi":"B.Dần","hanhCung":"+Mộc","daiVan":"102","daiVanText":"ĐV.QUAN","tieuVan":"LN.PHỐI","trangSinh":"Bệnh","chinhTinh":["Thái Âm","Thiên Cơ"],"catTinh":["Văn Xương","Thai Phụ","Thiên Giải","Lộc Tồn","Thiên Mã","Giải Thần","Phượng Các","Bác Sỹ","ĐV. Lộc Tồn","L.Hóa Quyền","L.Hóa Khoa"],"hungTinh":["Thiên Hư","Tuế Phá","L.Bạch Hổ"],"tuHoa":["Hóa Lộc - Phu Thê","Hóa Quyền - Phúc Đức","Hóa Khoa - Phúc Đức","Hóa Kỵ - Tật Ách"]},
+    {"key":"mao","gridClass":"cung-mao","name":"Điền Trạch","diaChi":"Đ.Mão","hanhCung":"-Mộc","daiVan":"92","daiVanText":"ĐV.NÔ","tieuVan":"LN.HUYNH","trangSinh":"Suy","chinhTinh":["Tử Vi","Tham Lang"],"catTinh":["Long Đức","L.Đào Hoa","L.Thiên Đức","L.Long Đức"],"hungTinh":["Địa Không","Thiên Hình","Kình Dương","Quan Phủ","ĐV. K Dương"],"tuHoa":["Hóa Lộc - Phúc Đức","Hóa Quyền - Phu Thê","Hóa Khoa - Phúc Đức","Hóa Kỵ - Quan Lộc"]},
+    {"key":"thin","gridClass":"cung-thin","name":"Quan Lộc","diaChi":"M.Thìn","hanhCung":"+Thổ","daiVan":"82","daiVanText":"ĐV.DI","tieuVan":"LN.MỆNH","trangSinh":"Đế Vượng","chinhTinh":["Cự Môn"],"catTinh":["Hữu Bật","Hoa Cái","Ân Quang"],"hungTinh":["Bạch Hổ","Phục Binh","Thiên La"],"tuHoa":["Hóa Lộc - Điền Trạch","Hóa Quyền - Phúc Đức","Hóa Khoa - Quan Lộc","Hóa Kỵ - Phúc Đức"]}
   ],
-  "cungXau": ["Phụ Mẫu", "Điền Trạch", "Tật Ách"],
-  "cungXauDetail": ["Cha mẹ", "Nhà cửa, đất đai", "Sức khỏe, bệnh tật"],
+  "cungXau": ["Tử Tức", "Phúc Đức", "Điền Trạch"],
+  "cungXauDetail": ["Con cái", "Phúc khí tổ tiên", "Nhà cửa, đất đai"],
   "daiVanXau": "",
   "tieuVanXau": "",
   "generalLuanGiai": [
-    {
-      "id": 32,
-      "title": "Cung Thân đồng cung với cung Quan lộc",
-      "content": "Có nhiệt tình trong sự nghiệp, có khuynh hướng xem trọng danh vị và sự nghiệp, cũng xem trọng sự cảm thụ trong công việc",
-      "sourceId": 2,
-      "sourceName": "Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch"
-    },
-    {
-      "id": 719,
-      "title": "Cung Thân đồng cung với cung Quan lộc",
-      "content": "Bất chấp trước sự nghiệp, có tinh thần trách nhiệm, rất xem trọng vinh dự, có tham vọng. Nếu tổ hợp sao tốt, có thể lập nên nghiệp lớn, năng lực làm việc rất tốt, một đời thuận lợi, khí chất cao thượng; nếu tổ hợp sao không tốt thì ngược lại.",
-      "sourceId": 15,
-      "sourceName": "Tử vi đẩu số tinh hoa tập thành - Đại Đức Sơn Nhân"
-    },
-    {
-      "id": 51,
-      "title": "Lai Nhân Cung ở cung Huynh Đệ",
-      "content": "Anh chị em, tình hình kinh tế và thành tựu sự nghiệp sẽ ảnh hưởng đến cuộc đời của mệnh tạo. \"Lai nhân cung\" ở tam phương của cung điền trạch (điền, huynh, tật) là cách cục nhờ vả người khác để lập nghiệp, thuộc cung vị ở trạng thái động.Lai nhân cung không ở bốn cung mệnh, tài, quan, điền thì có lợi cho người khác như anh em, vợ chồng, con cái, cha mẹ, bạn bè.",
-      "sourceId": 2,
-      "sourceName": "Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch"
-    },
-    {
-      "id": 106320,
-      "title": "Cân Xương Tính Số: Số 3 lượng 2",
-      "content": "    Tuổi trẻ bôn chôn ích lợi gì  Từ hăm hai tuổi hết sầu bi  Tiền tài danh vọng từ từ tới  Họa phước tạo công đã định kỳ.",
-      "sourceId": null,
-      "sourceName": ""
-    }
+    {"id":32,"title":"Cung Thân đồng cung với cung Quan lộc","content":"Có nhiệt tình trong sự nghiệp, có khuynh hướng xem trọng danh vị và sự nghiệp, cũng xem trọng sự cảm thụ trong công việc","sourceId":2,"sourceName":"Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch"},
+    {"id":719,"title":"Cung Thân đồng cung với cung Quan lộc","content":"Bất chấp trước sự nghiệp, có tinh thần trách nhiệm, rất xem trọng vinh dự, có tham vọng. Nếu tổ hợp sao tốt, có thể lập nên nghiệp lớn, năng lực làm việc rất tốt, một đời thuận lợi, khí chất cao thượng; nếu tổ hợp sao không tốt thì ngược lại.","sourceId":15,"sourceName":"Tử vi đẩu số tinh hoa tập thành - Đại Đức Sơn Nhân"},
+    {"id":116,"title":"Lai Nhân Cung ở cung Phu Thê","content":"Người khác giới sẽ ảnh hưởng đến cuộc đời của mệnh tạo, nếu không có hôn nhân thì chính mệnh tạo là nhân tố chính ảnh hưởng đến cuộc đời của chính mình. \"Lai nhân cung\" ở tam phương của cung phúc đức (phúc, di, phối) là thuộc cách tự lập, tự lập cánh sinh, thuộc cung vị ở trạng thái tĩnh.Lai nhân cung không ở bốn cung mệnh, tài, quan, điền thì có lợi cho người khác như anh em, vợ chồng, con cái, cha mẹ, bạn bè.","sourceId":2,"sourceName":"Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch"},
+    {"id":106343,"title":"Cân Xương Tính Số: Số 3 lượng 7","content":"    Vận mạng làm gì cũng chẳng thành  Anh em ly tán, độc cô hành  Còn nhờ phúc ấm truyền lưu lại  Gặp dịp may ra cũng nổi danh.","sourceId":null,"sourceName":""}
   ],
   "menhLuanGiai": [
-    {
-      "id": 91143,
-      "title": "Cung Mệnh an tại Sửu có sao Thiên tướng tọa thủ và các sao Hồng loan hội hợp",
-      "content": "Lấy chồng làm quan to",
-      "sourceId": 25,
-      "sourceName": "Tử vi chỉ nam - Song An Đỗ Văn Lưu"
-    },
-    {
-      "id": 135,
-      "title": "Cung Mệnh an tại Sửu có sao Long đức",
-      "content": "Tư cách: Là người thua thì tự an ủi và nghĩ tới vấn đề về phúc đức (an ủi vì thua thiệt mà tu, bon chen cũng không đến đâu)",
-      "sourceId": 5,
-      "sourceName": "Tử vi nghiệm lý - Cụ Thiên Lương"
-    },
-    {
-      "id": 20277,
-      "title": "Cung Mệnh an tại Sửu có sao Thanh long tọa thủ và các sao Mộc dục hội hợp",
-      "content": "Được tiếng tốt",
-      "sourceId": 30,
-      "sourceName": "Phú Ma Thị"
-    },
-    {
-      "id": 20433,
-      "title": "Cung Mệnh an tại Sửu có sao Quan đới",
-      "content": "Chủ về lạc quan tiến thủ, độc lập tự chủ nhưng rất hiếu thắng, có sức phấn đấu và giàu sức sống, luôn nỗ lực vươn lên, có tầm nhìn xa, rất nhạy cảm với thời thế, luôn đi trước thời đại, nhưng dễ thành ra độc đoán, gây thù kết oán. Là mệnh nữ là người cực kỳ hoạt bát sôi nổi.",
-      "sourceId": 26,
-      "sourceName": "Tử vi đẩu số - Cổ Đồ Thư"
-    },
-    {
-      "id": 32507,
-      "title": "Cung Mệnh an tại Sửu có sao Tử vi",
-      "content": "Mẫu người này có tình rất phách lối, thích ra oai, thích được người ta chiều chuộng, cũng có khả năng lấy vợ lớn tuổi hơn mình, vì những phụ nữ lớn tuổi có thể vỗ về chiều chuộng họ, chỉ cần người phụ nữ này diện mạo khá tốt, nhìn không thấy già, thì họ có thể tiếp nhận.",
-      "sourceId": 2,
-      "sourceName": "Trung Châu tử vi đẩu số - Tứ Hóa Phái - Nguyễn Anh Vũ dịch"
-    },
-    {
-      "id": 32980,
-      "title": "Cung Mệnh an tại Sửu có sao Phá quân",
-      "content": "Thân hình đẫy đà cao vừa tầm (Phá Quân đắc địa hay Phá Quân hãm địa thân hình hơi thấp) da hồng hào, mặt đầy đặn, mắt lộ, lông mày thưa",
-      "sourceId": 12,
-      "sourceName": "Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang"
-    },
-    {
-      "id": 40375,
-      "title": "Cung Mệnh an tại Sửu có sao Địa kiếp",
-      "content": "Là người cao thượng, đa sầu đa cảm, có tinh thần hỷ xả và thiệt thòi",
-      "sourceId": 24,
-      "sourceName": "Tử vi đại toàn - Thái Đình Nguyên"
-    },
-    {
-      "id": 54244,
-      "title": "Cung Mệnh an tại Sửu có sao Thanh long tọa thủ và các sao Quan đới hội hợp",
-      "content": "Là người hiên ngang trong trốn triều đình",
-      "sourceId": 30,
-      "sourceName": "Phú Ma Thị"
-    },
-    {
-      "id": 54336,
-      "title": "Cung Mệnh an tại Sửu có sao Phá quân tọa thủ và các sao Hữu bật,Kình dương hội hợp",
-      "content": "Làm lên, thành công, nhưng dễ cô độc thường phải lìa bỏ quê hương, người thân",
-      "sourceId": 22,
-      "sourceName": "Tử vi tinh điển - Vũ Tài Lục"
-    },
-    {
-      "id": 58416,
-      "title": "Cung Mệnh an tại Sửu có sao Thiên tướng tọa thủ và các sao Hữu bật hội hợp",
-      "content": "Thường gặp may mắn",
-      "sourceId": 22,
-      "sourceName": "Tử vi tinh điển - Vũ Tài Lục"
-    },
-    {
-      "id": 58417,
-      "title": "Cung Mệnh an tại Sửu có sao Thiên tướng tọa thủ và các sao Hữu bật,Tả phù hội hợp",
-      "content": "Làm nghề thầy thuốc giỏi",
-      "sourceId": 22,
-      "sourceName": "Tử vi tinh điển - Vũ Tài Lục"
-    },
-    {
-      "id": 56585,
-      "title": "Cung Mệnh an tại Sửu có sao Linh tinh",
-      "content": "Dễ chết non",
-      "sourceId": 24,
-      "sourceName": "Tử vi đại toàn - Thái Đình Nguyên"
-    }
+    {"id":799,"title":"Cung Mệnh an tại Tí có sao Mộ tọa thủ và các sao Bát tọa,Tam thai hội hợp","content":"Cách Mộ Trung Thai Tọa, thì dù có nghèo đến mấy cũng là người có nhân phẩm cao, giấu rách giữ lề.","sourceId":24,"sourceName":"Tử vi đại toàn - Thái Đình Nguyên"},
+    {"id":997,"title":"Cung Mệnh an tại Tí có sao Mộ","content":"Chủ về tính trì trệ, cá tính lập dị, kỳ cục, không thích tô vẽ bề ngoài, tiết kiệm keo kiệt, có sở thích sưu tầm, làm việc có kế hoạch, say mê nghiên cứu, làm việc bám sát thực tế, nếu biết sống cởi mở và nỗ lực không ngừng sẽ được tụ tài","sourceId":26,"sourceName":"Tử vi đẩu số - Cổ Đồ Thư"},
+    {"id":85698,"title":"Cung Mệnh an tại Tí có sao Thái dương","content":"Quý đến thượng phẩm và phú gia địch quốc. Đàn bà được cách này thì được số vượng phu ích tử, phong tặng phu nhân.","sourceId":21,"sourceName":"Thái Vi Phú"},
+    {"id":27154,"title":"Cung Mệnh an tại Tí có sao Thanh long tọa thủ và các sao Quan đới hội hợp","content":"Là người hiên ngang trong trốn triều đình","sourceId":30,"sourceName":"Phú Ma Thị"},
+    {"id":27153,"title":"Cung Mệnh an tại Tí có sao Thanh long","content":"Rất tốt","sourceId":30,"sourceName":"Phú Ma Thị"},
+    {"id":35782,"title":"Cung Mệnh an tại Tí có sao Quan phù","content":"Tư cách: Họ cũng hành động chính đáng nhưng trước khi hành động họ phải suy nghĩ làm thế nào cho kỹ càng để không đụng chạm (tính toán kỹ lưỡng)","sourceId":5,"sourceName":"Tử vi nghiệm lý - Cụ Thiên Lương"},
+    {"id":35855,"title":"Cung Mệnh an tại Tí có sao Văn khúc","content":"Chủ về nhiều nốt ruồi đen, miệng có góc cạnh, sắc da xanh vàng","sourceId":18,"sourceName":"Trung Châu tử vi đẩu số - Tam Hợp Phái - Nguyễn Anh Vũ dịch"},
+    {"id":79240,"title":"Cung Mệnh an tại Tí có sao Điếu khách tọa thủ và các sao Hỏa tinh,Linh tinh hội hợp","content":"Mắc bệnh Phù Dung tiên tử","sourceId":24,"sourceName":"Tử vi đại toàn - Thái Đình Nguyên"},
+    {"id":82220,"title":"Cung Mệnh an tại Tí có sao Cự môn tọa thủ và các sao Hỏa tinh,Linh tinh hội hợp","content":"Gặp ác hạn tất chết nơi đường sá","sourceId":12,"sourceName":"Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang"},
+    {"id":62299,"title":"Cung Mệnh an tại Tí có sao Thiên phủ tọa thủ và các sao Thanh long hội hợp","content":"Tốt lắm","sourceId":22,"sourceName":"Tử vi tinh điển - Vũ Tài Lục"}
   ],
   "daiVanLuanGiai": [
-    {
-      "id": 89557,
-      "title": "Đại vận ở cung Mệnh (tại Sửu) có các sao Quốc ấn,Tuần",
-      "content": "Công danh trắc trở, nếu có quan chức tất bị truất giáng",
-      "sourceId": 12,
-      "sourceName": "Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang"
-    },
-    {
-      "id": 5877,
-      "title": "Đại vận ở cung Mệnh (tại Sửu) có sao Long đức tọa thủ",
-      "content": "Là giai đoạn chấp nhận hình thái thua thiệt (hình thức) để vượt qua cơn \"bĩ cực\" (sẽ tới hồi \"thái lại: chờ thời đại vận tốt đẹp ngay liền sau đó\").",
-      "sourceId": 9,
-      "sourceName": "Linh khu thời mệnh lý - Lê Hưng VKD"
-    },
-    {
-      "id": 15921,
-      "title": "Đại vận ở cung Mệnh (tại Sửu) có sao Phá quân",
-      "content": "Tài lộc dồi dào, công danh hiến đạt",
-      "sourceId": 12,
-      "sourceName": "Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang"
-    },
-    {
-      "id": 15957,
-      "title": "Đại vận ở cung Mệnh (tại Sửu) có các sao Địa không,Địa kiếp hội hợp",
-      "content": "Hạn nặng, suy thoái, ốm đau",
-      "sourceId": 8,
-      "sourceName": "Tử vi giảng minh - Thiên Phúc Vũ Tiến Phúc"
-    },
-    {
-      "id": 55280,
-      "title": "Đại vận ở cung Mệnh (tại Sửu) có sao Thanh long tọa thủ",
-      "content": "Sinh con",
-      "sourceId": 8,
-      "sourceName": "Tử vi giảng minh - Thiên Phúc Vũ Tiến Phúc"
-    },
-    {
-      "id": 74438,
-      "title": "Đại vận ở cung Mệnh (tại Sửu) có các sao Kình dương,Thiên tướng",
-      "content": "Cần phòng nữ sắc hoặc bị nữ giới vu khống, hãm hại",
-      "sourceId": 33,
-      "sourceName": "Bát tự luận đoán tuần hoàn - Phan Tử Ngư"
-    }
+    {"id":88648,"title":"Đại vận ở cung Mệnh (tại Tí) có các sao Thiên khôi,Tuần","content":"Mắc tai nạn khủng khiếp, đầu bị thương rất nặng, nếu có quan chức tất bị bãi truất","sourceId":12,"sourceName":"Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang"},
+    {"id":29448,"title":"Đại vận ở cung Mệnh (tại Tí) có sao Thanh long tọa thủ","content":"Sinh con","sourceId":8,"sourceName":"Tử vi giảng minh - Thiên Phúc Vũ Tiến Phúc"},
+    {"id":15542,"title":"Đại vận ở cung Mệnh (tại Tí) có sao Thái dương","content":"Đau yếu, có bệnh ở mắt hay đầu (nhức đầu), hao tán tiền tài, sức khỏe của cha hay chồng (nếu là đàn bà gặp hạn) suy kém","sourceId":12,"sourceName":"Tử vi đẩu số tân biên - Vân Đằng Thái Thứ Lang"},
+    {"id":16004,"title":"Đại vận ở cung Mệnh (tại Tí) có các sao Đà la,Hỏa tinh,Linh tinh hội hợp","content":"Sinh kiện sự lôi thôi","sourceId":25,"sourceName":"Tử vi chỉ nam - Song An Đỗ Văn Lưu"},
+    {"id":38152,"title":"Đại vận ở cung Mệnh (tại Tí) có sao Quan phù tọa thủ","content":"Đắc thời trong sự tính toán","sourceId":37,"sourceName":"10 điều khai sáng cho khoa nghiệm lý Tử Vi"},
+    {"id":38363,"title":"Đại vận ở cung Mệnh (tại Tí) có các sao Hỏa tinh,Linh tinh hội hợp","content":"Hạn nặng, suy thoái, ốm đau","sourceId":8,"sourceName":"Tử vi giảng minh - Thiên Phúc Vũ Tiến Phúc"}
   ]
 }
 ```
@@ -424,17 +122,17 @@ Toàn bộ bài luận phải viết theo phong cách gần gũi, ấm áp, có 
 
 Cách xưng hô:
 * Người luận giải tự xưng là "Linh Nhi".
-* Gọi người được luận giải bằng tên riêng đã cung cấp trong phần thông tin đương số. Với lá số này, gọi là "Phong".
+* Gọi người được luận giải bằng tên riêng đã cung cấp trong phần thông tin đương số. Với lá số này, gọi là "My".
 * Không gọi người được luận giải là "em" trong bài luận chính, trừ khi nội dung mẫu giọng văn bắt buộc có sẵn từ "em".
 * Hạn chế dùng từ "đương số" trong bài luận chính.
-* Ưu tiên các cách nói như: "lá số của Phong", "số của Phong", "cung này của Phong", "Phong là kiểu người...", "Linh Nhi thấy rằng...", "Linh Nhi muốn nhắc Phong rằng...".
+* Ưu tiên các cách nói như: "lá số của My", "số của My", "cung này của My", "My là kiểu người...", "Linh Nhi thấy rằng...", "Linh Nhi muốn nhắc My rằng...".
 
 Giọng văn:
 * Viết như lời luận giải cá nhân, không viết như báo cáo học thuật khô cứng.
 * Có màu sắc tâm linh nhẹ, truyền cảm, nhưng không mê tín cực đoan.
 * Không dùng giọng phán xét, hù dọa, áp đặt.
 * Không kết luận tuyệt đối kiểu "chắc chắn", "nhất định", "không tránh khỏi".
-* Ưu tiên các cụm diễn đạt mềm như: "có xu hướng", "dễ", "nên", "cần lưu ý", "nếu biết...", "khi Phong...".
+* Ưu tiên các cụm diễn đạt mềm như: "có xu hướng", "dễ", "nên", "cần lưu ý", "nếu biết...", "khi My...".
 
 Cách trình bày:
 * Câu ngắn, rõ, dễ đọc.
@@ -446,16 +144,16 @@ Cách trình bày:
 * Không viết thành danh sách gạch đầu dòng quá nhiều, ưu tiên văn xuôi có nhịp.
 
 Có thể dùng các câu mở đoạn như:
-* "Lá số của Phong là..."
+* "Lá số của My là..."
 * "Điều đặc biệt ở đây là..."
 * "Nói dễ hiểu thì..."
 * "Cái hay của cung này là..."
-* "Nhưng Phong cũng cần lưu ý..."
-* "Phong không phải kiểu người..."
-* "Số của Phong không phải là..."
-* "Bài học lớn của Phong là..."
-* "Linh Nhi muốn nhắn với Phong rằng..."
-* "Lời khuyên Linh Nhi dành cho Phong là..."
+* "Nhưng My cũng cần lưu ý..."
+* "My không phải kiểu người..."
+* "Số của My không phải là..."
+* "Bài học lớn của My là..."
+* "Linh Nhi muốn nhắn với My rằng..."
+* "Lời khuyên Linh Nhi dành cho My là..."
 
 Yêu cầu quan trọng:
 * Vẫn phải bám sát dữ liệu sao, cung, tam phương tứ chính, tứ hóa, đại vận, tiểu vận và lưu niên đã cung cấp.

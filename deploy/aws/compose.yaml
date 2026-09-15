@@ -1,0 +1,102 @@
+name: soulmap
+
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST}
+      ROUTER_PUBLIC_HOST: ${ROUTER_PUBLIC_HOST}
+      ACME_EMAIL: ${ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/soulmap/config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /opt/soulmap/data/caddy:/data
+      - /opt/soulmap/state/caddy:/config
+    networks:
+      - edge
+      - backend
+    depends_on:
+      soulmap:
+        condition: service_healthy
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  soulmap:
+    image: ${SOULMAP_IMAGE}
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: ${SERVER_PORT}
+      SOULMAP_FRONTEND_ORIGIN: ${SOULMAP_FRONTEND_ORIGIN}
+      SOULMAP_GOOGLE_CLIENT_ID: ${SOULMAP_GOOGLE_CLIENT_ID}
+      SOULMAP_SESSION_DURATION_DAYS: ${SOULMAP_SESSION_DURATION_DAYS}
+      SOULMAP_SESSION_COOKIE_SECURE: ${SOULMAP_SESSION_COOKIE_SECURE}
+      SOULMAP_SESSION_COOKIE_SAME_SITE: ${SOULMAP_SESSION_COOKIE_SAME_SITE}
+      SOULMAP_DATABASE_URL: ${SOULMAP_DATABASE_URL}
+      SOULMAP_DATABASE_USERNAME: ${SOULMAP_DATABASE_USERNAME}
+      SOULMAP_DATABASE_PASSWORD: ${SOULMAP_DATABASE_PASSWORD}
+      SOULMAP_DB_POOL_MAX_SIZE: ${SOULMAP_DB_POOL_MAX_SIZE}
+      SOULMAP_DB_POOL_MIN_IDLE: ${SOULMAP_DB_POOL_MIN_IDLE}
+      SOULMAP_AI_PROVIDER: ${SOULMAP_AI_PROVIDER}
+      SOULMAP_AI_BASE_URL: ${SOULMAP_AI_BASE_URL}
+      SOULMAP_AI_API_KEY: ${SOULMAP_AI_API_KEY}
+      SOULMAP_AI_MODEL: ${SOULMAP_AI_MODEL}
+      SOULMAP_AI_TIMEOUT_SECONDS: ${SOULMAP_AI_TIMEOUT_SECONDS}
+      SOULMAP_AI_STRUCTURED_OUTPUT_MODE: ${SOULMAP_AI_STRUCTURED_OUTPUT_MODE}
+    expose:
+      - "8090"
+    networks:
+      - edge
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8090/api/v1/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 20s
+      timeout: 5s
+      retries: 6
+      start_period: 90s
+    depends_on:
+      9router:
+        condition: service_healthy
+    mem_limit: 900m
+    logging: *logging
+
+  9router:
+    image: decolua/9router:0.5.35@sha256:3c308fda5b1990cfbe817b4fede56c56a0af09d4e5e7b6556c7759fde496fda3
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /app/data
+      PORT: "20128"
+      HOSTNAME: 0.0.0.0
+      NODE_ENV: production
+      BASE_URL: ${ROUTER_PUBLIC_URL}
+      NEXT_PUBLIC_BASE_URL: ${ROUTER_PUBLIC_URL}
+      AUTH_COOKIE_SECURE: "true"
+      ENABLE_REQUEST_LOGS: "false"
+      JWT_SECRET: ${JWT_SECRET}
+      INITIAL_PASSWORD: ${INITIAL_PASSWORD}
+      API_KEY_SECRET: ${API_KEY_SECRET}
+      MACHINE_ID_SALT: ${MACHINE_ID_SALT}
+    ports:
+      - "127.0.0.1:20128:20128"
+    volumes:
+      - /opt/soulmap/data/9router:/app/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:20128/api/health | grep -q '\"ok\":true'"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    mem_limit: 650m
+    logging: *logging
+
+networks:
+  edge:
+  backend:

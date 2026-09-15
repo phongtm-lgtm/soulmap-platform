@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${SOULMAP_DATABASE_URL}
+    url: ${SOULMAP_DATABASE_URL:jdbc:postgresql://postgres:5432/soulmap}
     username: ${SOULMAP_DATABASE_USERNAME}
     password: ${SOULMAP_DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver

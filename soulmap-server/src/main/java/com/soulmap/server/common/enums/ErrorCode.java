@@ -13,7 +13,8 @@ public enum ErrorCode {
     AI_ERROR_0001(HttpStatus.BAD_GATEWAY, "0001.ai.provider-error"),
     AI_ERROR_0002(HttpStatus.BAD_GATEWAY, "0002.ai.response-parse-error"),
     AI_ERROR_0003(HttpStatus.BAD_GATEWAY, "0003.ai.response-validation-error"),
-    AI_ERROR_0004(HttpStatus.GATEWAY_TIMEOUT, "0004.ai.timeout");
+    AI_ERROR_0004(HttpStatus.GATEWAY_TIMEOUT, "0004.ai.timeout"),
+    SOULMAP_ERROR_0001(HttpStatus.PAYMENT_REQUIRED, "0001.soulmap.regeneration-required");
 
     private final HttpStatus httpStatus;
     private final String messageKey;

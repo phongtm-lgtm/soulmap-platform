@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.time.Instant;
@@ -88,6 +89,15 @@ public class GlobalExceptionHandler {
                 Collections.emptyList(),
                 locale
         );
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ProblemDetail> handleResponseStatusException(ResponseStatusException exception) {
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(
+                exception.getStatusCode(),
+                exception.getReason() == null ? "Request failed" : exception.getReason()
+        );
+        return ResponseEntity.status(exception.getStatusCode()).body(response);
     }
 
     /**

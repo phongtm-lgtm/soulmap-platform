@@ -204,7 +204,7 @@ export default function JourneysMapView({ journeys, onExplore }: JourneysMapView
           {/* Detail panel */}
           {activeJourney && (
             <article
-              className="hidden animate-fade-in gap-6 rounded-[1.5rem] border border-[#B68A2F]/24 bg-gradient-to-br from-[#FFFCF8]/96 to-[#FAF6EE]/88 p-5 shadow-[0_18px_50px_-36px_rgba(33,77,59,0.32)] md:flex"
+              className="hidden animate-fade-in gap-6 rounded-[1.5rem] border border-[#B68A2F]/24 bg-gradient-to-br from-[#FFFCF8]/96 to-[#F8F4EB]/88 p-5 shadow-[0_18px_50px_-36px_rgba(33,77,59,0.32)] md:flex"
               style={{ animationDelay: '200ms', animationFillMode: 'both' }}
             >
               <div className="relative h-[168px] w-[168px] shrink-0 overflow-hidden rounded-[1.25rem] border border-[#B68A2F]/28">

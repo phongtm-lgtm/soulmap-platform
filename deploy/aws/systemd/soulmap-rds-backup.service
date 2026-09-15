@@ -1,0 +1,8 @@
+[Unit]
+Description=Create and rotate Soulmap RDS snapshots
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/soulmap/bin/backup-rds.sh

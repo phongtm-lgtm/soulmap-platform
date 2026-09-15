@@ -7,6 +7,7 @@ import com.soulmap.server.client.ai.AiMessage;
 import com.soulmap.server.client.ai.AiProviderClient;
 import com.soulmap.server.common.enums.ErrorCode;
 import com.soulmap.server.common.error.AiServiceException;
+import com.soulmap.server.common.error.BusinessException;
 import com.soulmap.server.config.SoulmapAiProperties;
 import com.soulmap.server.dto.request.TuViRequest;
 import com.soulmap.server.dto.request.ai.TuViReadingRequest;
@@ -17,12 +18,16 @@ import com.soulmap.server.repository.AiReadingRepository;
 import com.soulmap.server.service.PromptTemplateService;
 import com.soulmap.server.service.TuViAiService;
 import com.soulmap.server.service.TuViService;
+import com.soulmap.server.service.UserTuViChartService;
+import com.soulmap.server.service.SoulMapProfileKeyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class TuViAiServiceImpl implements TuViAiService {
     private static final String PROMPT_PATH = "tuvi/full-reading.md";
@@ -249,31 +254,46 @@ public class TuViAiServiceImpl implements TuViAiService {
 
     private final AiProviderClient aiProviderClient;
     private final TuViService tuViService;
+    private final UserTuViChartService userTuViChartService;
     private final PromptTemplateService promptTemplateService;
     private final AiReadingRepository aiReadingRepository;
     private final SoulmapAiProperties properties;
     private final ObjectMapper objectMapper;
+    private final SoulMapProfileKeyService profileKeyService;
 
     public TuViAiServiceImpl(
             AiProviderClient aiProviderClient,
             TuViService tuViService,
+            UserTuViChartService userTuViChartService,
             PromptTemplateService promptTemplateService,
             AiReadingRepository aiReadingRepository,
             SoulmapAiProperties properties,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            SoulMapProfileKeyService profileKeyService
     ) {
         this.aiProviderClient = aiProviderClient;
         this.tuViService = tuViService;
+        this.userTuViChartService = userTuViChartService;
         this.promptTemplateService = promptTemplateService;
         this.aiReadingRepository = aiReadingRepository;
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.profileKeyService = profileKeyService;
     }
 
     @Override
     public TuViReadingResponse generateReading(TuViReadingRequest request) {
         try {
-            LaSoResponse laSo = tuViService.getLaSo(toTuViRequest(request));
+            String profileKey = profileKey(request);
+            if (userTuViChartService.isRegenerationRequired(Long.valueOf(request.getUserId()), profileKey)) throw new BusinessException(ErrorCode.SOULMAP_ERROR_0001);
+            AiReading existing = findExistingReading(request);
+            if (existing.getId() != null && existing.getProfileKey() != null) {
+                if (!profileKey.equals(existing.getProfileKey())) throw new BusinessException(ErrorCode.SOULMAP_ERROR_0001);
+                return toResponse(existing);
+            }
+            TuViRequest tuViRequest = toTuViRequest(request);
+            LaSoResponse laSo = tuViService.getLaSo(tuViRequest);
+            userTuViChartService.save(Long.valueOf(request.getUserId()), tuViRequest, laSo, profileKey);
             String laSoJson = objectMapper.writeValueAsString(laSo);
             String systemPrompt = promptTemplateService.loadPrompt(PROMPT_PATH);
             if (systemPrompt.isBlank()) {
@@ -291,7 +311,7 @@ public class TuViAiServiceImpl implements TuViAiService {
             ));
             content = normalizeContent(content);
 
-            AiReading reading = saveReading(request, laSoJson, content);
+            AiReading reading = saveReading(request, laSoJson, content, profileKey);
             return toResponse(reading);
         } catch (AiServiceException exception) {
             throw exception;
@@ -350,13 +370,14 @@ public class TuViAiServiceImpl implements TuViAiService {
         return content;
     }
 
-    private AiReading saveReading(TuViReadingRequest request, String laSoJson, String content)
+    private AiReading saveReading(TuViReadingRequest request, String laSoJson, String content, String profileKey)
             throws JsonProcessingException {
         AiReading reading = findExistingReading(request);
         reading.setUserId(request.getUserId());
         reading.setType(READING_TYPE);
         reading.setChapterId(CHAPTER_ID);
         reading.setChapterTitle(CHAPTER_TITLE);
+        reading.setProfileKey(profileKey);
         reading.setModel(properties.getModel());
         reading.setRequestJson(objectMapper.writeValueAsString(request));
         reading.setLaSoJson(laSoJson);
@@ -372,6 +393,10 @@ public class TuViAiServiceImpl implements TuViAiService {
                 .findTopByUserIdAndTypeAndChapterIdOrderByUpdatedAtDesc(
                         request.getUserId(), READING_TYPE, CHAPTER_ID)
                 .orElseGet(AiReading::new);
+    }
+
+    private String profileKey(TuViReadingRequest request) {
+        return profileKeyService.create(request.getMbtiType(), request.getDay(), request.getMonth(), request.getYear(), request.getCalendar(), request.getGender(), request.getHour(), request.getMin(), request.getTimezone());
     }
 
     private TuViReadingResponse toResponse(AiReading reading) {

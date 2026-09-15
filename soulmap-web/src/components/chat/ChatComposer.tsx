@@ -39,7 +39,7 @@ export default function ChatComposer({
   const canSend = value.trim().length > 0 && !disabled;
 
   return (
-    <div className="shrink-0 bg-gradient-to-t from-[#FCF9F8] via-[#FCF9F8]/94 to-transparent pb-5 pt-4">
+    <div className="shrink-0 bg-gradient-to-t from-[#F8F4EB] via-[#F8F4EB]/94 to-transparent pb-5 pt-4">
       <div className="mx-auto flex w-full max-w-[760px] items-end gap-2 rounded-full border border-[#C2C8C2] bg-white px-4 py-2 shadow-sm backdrop-blur-sm transition focus-within:ring-1 focus-within:ring-[#7C5730]">
         <textarea
           ref={textareaRef}
@@ -48,7 +48,7 @@ export default function ChatComposer({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="custom-scrollbar max-h-[120px] min-h-10 flex-1 resize-none bg-transparent px-1 py-2 font-sans text-[0.96rem] leading-relaxed text-[#173124] outline-none placeholder:italic placeholder:font-light placeholder:text-[#8E9089]"
+          className="custom-scrollbar max-h-[120px] min-h-10 flex-1 resize-none bg-transparent px-1 py-2 font-sans text-[0.96rem] leading-relaxed text-[#214D3B] outline-none placeholder:italic placeholder:font-light placeholder:text-[#8E9089]"
         />
 
         <button
@@ -74,7 +74,7 @@ export default function ChatComposer({
           aria-label="Gửi tin nhắn"
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#24533E]/25 ${
             canSend
-              ? 'border-none bg-[#173124] text-white hover:scale-105 active:scale-90 cursor-pointer'
+              ? 'border-none bg-[#214D3B] text-white hover:scale-105 active:scale-90 cursor-pointer'
               : 'border-none bg-[#EEE7DD] text-[#B5ADA0] cursor-not-allowed'
           }`}
         >

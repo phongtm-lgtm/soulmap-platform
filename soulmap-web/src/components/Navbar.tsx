@@ -3,7 +3,6 @@ import {
   Compass, 
   Trophy, 
   Zap, 
-  Bell, 
   ChevronDown, 
   LogOut, 
   User,
@@ -11,10 +10,12 @@ import {
   Menu,
   X,
   BotMessageSquare,
-  NotebookPen,
-  Newspaper,
 } from 'lucide-react';
 import type { AppScreen } from '../types';
+
+// PLACEHOLDER demo data — not wired to a backend yet.
+// TODO: replace with real gamification data before launch.
+const SOUL_ENERGY_PLACEHOLDER = '1,250';
 
 interface NavbarProps {
   isAuthReady?: boolean;
@@ -27,8 +28,6 @@ interface NavbarProps {
   navigateToTestIntro?: (direction?: 'push' | 'none') => void;
   onOpenJourneys?: () => void;
   onOpenAiMentor?: () => void;
-  onOpenJournal?: () => void;
-  onOpenAcademy?: () => void;
   setCurrentScreen: (screen: AppScreen) => void;
   setTransitionDirection: (direction: 'push' | 'push_back' | 'none') => void;
 }
@@ -44,8 +43,6 @@ export default function Navbar({
   navigateToTestIntro,
   onOpenJourneys,
   onOpenAiMentor,
-  onOpenJournal,
-  onOpenAcademy,
   setCurrentScreen,
   setTransitionDirection,
 }: NavbarProps) {
@@ -99,28 +96,9 @@ export default function Navbar({
     onOpenAiMentor?.();
   };
 
-  const openJournal = () => {
-    setIsMobileMenuOpen(false);
-    setIsProfileMenuOpen(false);
-    if (!isLoggedIn) {
-      setTransitionDirection('push');
-      setCurrentScreen('auth');
-      return;
-    }
-    onOpenJournal?.();
-  };
-
-  const openAcademy = () => {
-    setIsMobileMenuOpen(false);
-    setIsProfileMenuOpen(false);
-    onOpenAcademy?.();
-  };
-
   const isMapActive = currentScreen === 'landing' || currentScreen === 'test_intro' || currentScreen === 'assessment';
   const isJourneysActive = currentScreen === 'four_journeys';
   const isAiMentorActive = currentScreen === 'ai_chat';
-  const isJournalActive = currentScreen === 'journal';
-  const isAcademyActive = currentScreen === 'academy';
 
   const desktopNavClass = (active: boolean) =>
     `nav-menu-item group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 cursor-pointer border outline-none ${
@@ -184,41 +162,19 @@ export default function Navbar({
             <span>AI Mentor</span>
           </button>
 
-          <button
-            onClick={openJournal}
-            className={desktopNavClass(isJournalActive)}
-          >
-            <NotebookPen className={desktopIconClass(isJournalActive)} />
-            <span>Nhật ký</span>
-          </button>
-
-          <button
-            onClick={openAcademy}
-            className={desktopNavClass(isAcademyActive)}
-          >
-            <Newspaper className={desktopIconClass(isAcademyActive)} />
-            <span>Học viện</span>
-          </button>
         </div>
 
         {/* Right Section: Profile / Login CTA */}
         <div className="flex shrink-0 items-center justify-end gap-3 md:gap-4">
-          {/* Soul Energy + notifications — only for signed-in travelers */}
+           {/* Soul Energy — only for signed-in travelers */}
           {isAuthReady && isLoggedIn && (
             <>
               <div className="hidden sm:flex items-center gap-2">
                 <Zap className="w-5 h-5 text-[#B68A2F] fill-[#B68A2F] drop-shadow-[0_2px_4px_rgba(182,138,47,0.25)]" />
                 <div className="flex flex-col text-left leading-tight">
-                  <span className="font-sans text-xs font-bold text-[#24533E]">1,250</span>
-                  <span className="font-sans text-[9px] text-[#8C928D] font-medium tracking-wide">Soul Energy</span>
+                  <span className="font-sans text-xs font-bold text-[#24533E]">{SOUL_ENERGY_PLACEHOLDER}</span>
+                  <span className="font-sans text-[11px] text-[#8C928D] font-medium tracking-wide">Soul Energy</span>
                 </div>
-              </div>
-              <span className="h-5 w-px bg-[#E8DFCF] hidden sm:inline"></span>
-              <div className="relative cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300">
-                <Bell className="w-5 h-5 text-[#B68A2F]" />
-                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#B68A2F] rounded-full text-[9px] font-bold text-white flex items-center justify-center border-2 border-[#F8F4EB]">
-                  8
-                </span>
               </div>
               <span className="h-5 w-px bg-[#E8DFCF]"></span>
             </>
@@ -235,14 +191,6 @@ export default function Navbar({
                 aria-haspopup="menu"
                 aria-expanded={isProfileMenuOpen}
               >
-                <div className="w-8 h-8 rounded-full bg-[#B68A2F]/10 border border-[#B68A2F]/30 flex items-center justify-center font-bold text-sm text-[#B68A2F] overflow-hidden">
-                  <img 
-                    className="w-full h-full object-cover" 
-                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=120" 
-                    alt={currentUser.name} 
-                    referrerPolicy="no-referrer" 
-                  />
-                </div>
                 <span className="font-sans text-xs font-bold text-[#214D3B] max-w-[100px] truncate hidden sm:inline">
                   {currentUser.name}
                 </span>
@@ -258,7 +206,7 @@ export default function Navbar({
                 <div className="px-4 py-2 border-b border-[#214D3B]/5 mb-1 text-left">
                   <p className="text-[10px] font-bold text-[#B68A2F] uppercase tracking-wider">Người lữ hành</p>
                   <p className="font-sans text-xs font-bold text-[#214D3B] truncate">{currentUser.name}</p>
-                  <p className="font-sans text-[10px] text-[#636A64] truncate">{currentUser.email}</p>
+                  <p className="font-sans text-[10px] text-[#5E625F] truncate">{currentUser.email}</p>
                 </div>
                 <button 
                   onClick={() => {
@@ -345,22 +293,6 @@ export default function Navbar({
             >
               <BotMessageSquare className="w-4 h-4 text-[#B68A2F]" />
               AI Mentor
-            </button>
-
-            <button
-              onClick={openJournal}
-              className={mobileNavClass(isJournalActive)}
-            >
-              <NotebookPen className="w-4 h-4 text-[#B68A2F]" />
-              Nhật ký
-            </button>
-
-            <button
-              onClick={openAcademy}
-              className={mobileNavClass(isAcademyActive)}
-            >
-              <Newspaper className="w-4 h-4 text-[#B68A2F]" />
-              Học viện SoulMap
             </button>
 
             {!isAuthReady ? null : !isLoggedIn ? (

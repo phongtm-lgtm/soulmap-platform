@@ -31,8 +31,21 @@ export function extractPrimaryHeadings(content: string): MarkdownHeading[] {
     .map((label) => ({ id: markdownHeadingId(label), label }));
 }
 
+function stripDanglingMarkers(value: string): string {
+  // While streaming, an unmatched trailing `**` or backtick would otherwise render as raw
+  // characters. Hide the still-open marker until the model emits its closing pair.
+  let result = value;
+  if ((result.match(/\*\*/g)?.length ?? 0) % 2 === 1) {
+    result = result.replace(/\*\*(?=[^*]*$)/, '');
+  }
+  if ((result.match(/`/g)?.length ?? 0) % 2 === 1) {
+    result = result.replace(/`(?=[^`]*$)/, '');
+  }
+  return result;
+}
+
 function renderInline(value: string): ReactNode[] {
-  return value.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean).map((part, index) => {
+  return stripDanglingMarkers(value).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean).map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return <strong key={index} className="font-extrabold text-[#2F342F]">{part.slice(2, -2)}</strong>;
     }

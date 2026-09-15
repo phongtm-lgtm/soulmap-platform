@@ -7,6 +7,7 @@ import com.soulmap.server.client.ai.AiMessage;
 import com.soulmap.server.client.ai.AiProviderClient;
 import com.soulmap.server.common.enums.ErrorCode;
 import com.soulmap.server.common.error.AiServiceException;
+import com.soulmap.server.common.error.BusinessException;
 import com.soulmap.server.config.SoulmapAiProperties;
 import com.soulmap.server.dto.request.TuViRequest;
 import com.soulmap.server.dto.request.ai.CareerReadingRequest;
@@ -18,6 +19,8 @@ import com.soulmap.server.dto.response.ai.CareerTalentReadingResponse;
 import com.soulmap.server.repository.AiReadingRepository;
 import com.soulmap.server.service.CareerAiService;
 import com.soulmap.server.service.TuViService;
+import com.soulmap.server.service.UserTuViChartService;
+import com.soulmap.server.service.SoulMapProfileKeyService;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -187,39 +190,8 @@ public class CareerAiServiceImpl implements CareerAiService {
             {
               "chapterId": "career-chapter-01",
               "chapterTitle": "Bản đồ sự nghiệp",
-              "careerPath": {
-                "intro": "1-2 câu tóm tắt định hướng sự nghiệp cá nhân hóa.",
-                "cards": [
-                  { "title": "Điểm cốt lõi 1", "description": "Một câu ngắn rút ra từ dữ liệu." },
-                  { "title": "Điểm cốt lõi 2", "description": "Một câu ngắn rút ra từ dữ liệu." },
-                  { "title": "Điểm cốt lõi 3", "description": "Một câu ngắn rút ra từ dữ liệu." }
-                ],
-                "quote": "Một câu đúc kết mạnh, tối đa 12 từ."
-              },
-              "growthDrivers": {
-                "strongWhen": [
-                  { "title": "Điều kiện phát huy 1", "description": "Một câu giải thích đời thường." },
-                  { "title": "Điều kiện phát huy 2", "description": "Một câu giải thích đời thường." },
-                  { "title": "Điều kiện phát huy 3", "description": "Một câu giải thích đời thường." },
-                  { "title": "Điều kiện phát huy 4", "description": "Một câu giải thích đời thường." }
-                ],
-                "notFitWith": [
-                  { "title": "Điều kiện cản trở 1", "description": "Một câu giải thích đời thường." },
-                  { "title": "Điều kiện cản trở 2", "description": "Một câu giải thích đời thường." },
-                  { "title": "Điều kiện cản trở 3", "description": "Một câu giải thích đời thường." },
-                  { "title": "Điều kiện cản trở 4", "description": "Một câu giải thích đời thường." }
-                ]
-              },
               "deepReadingMarkdown": "Báo cáo Markdown theo bố cục bắt buộc bên dưới."
             }
-
-            Quy định field UI:
-            - `careerPath.cards`: đúng 3 items.
-            - `growthDrivers.strongWhen`: đúng 4 items.
-            - `growthDrivers.notFitWith`: đúng 4 items.
-            - Mỗi `title` tối đa 7 từ; mỗi `description` tối đa 18 từ.
-            - Các nội dung mẫu trong schema chỉ mô tả vai trò field, tuyệt đối không sao chép.
-            - Các field UI phải thống nhất với báo cáo đầy đủ, không đưa ra một chân dung khác.
 
             ## Bố cục bắt buộc của `deepReadingMarkdown`
 
@@ -377,28 +349,40 @@ public class CareerAiServiceImpl implements CareerAiService {
 
     private final AiProviderClient aiProviderClient;
     private final TuViService tuViService;
+    private final UserTuViChartService userTuViChartService;
     private final AiReadingRepository aiReadingRepository;
     private final SoulmapAiProperties properties;
     private final ObjectMapper objectMapper;
+    private final SoulMapProfileKeyService profileKeyService;
 
     public CareerAiServiceImpl(
             AiProviderClient aiProviderClient,
             TuViService tuViService,
+            UserTuViChartService userTuViChartService,
             AiReadingRepository aiReadingRepository,
             SoulmapAiProperties properties,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            SoulMapProfileKeyService profileKeyService
     ) {
         this.aiProviderClient = aiProviderClient;
         this.tuViService = tuViService;
+        this.userTuViChartService = userTuViChartService;
         this.aiReadingRepository = aiReadingRepository;
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.profileKeyService = profileKeyService;
     }
 
     @Override
     public CareerReadingResponse generateCareerReading(CareerReadingRequest request) {
         try {
-            LaSoResponse laSo = tuViService.getLaSo(toTuViRequest(request));
+            String profileKey = profileKey(request);
+            if (userTuViChartService.isRegenerationRequired(Long.valueOf(request.getUserId()), profileKey)) throw new BusinessException(ErrorCode.SOULMAP_ERROR_0001);
+            AiReading cached = findCachedReading(request, "career-chapter-01", profileKey);
+            if (cached != null) return cachedCareerReading(cached);
+            TuViRequest tuViRequest = toTuViRequest(request);
+            LaSoResponse laSo = tuViService.getLaSo(tuViRequest);
+            userTuViChartService.save(Long.valueOf(request.getUserId()), tuViRequest, laSo, profileKey);
             String laSoJson = buildUserPrompt(request, laSo);
 
             List<AiMessage> messages = List.of(
@@ -415,7 +399,7 @@ public class CareerAiServiceImpl implements CareerAiService {
 
             CareerReadingResponse response = parseCareerReadingResponse(rawJson);
             normalizeAndValidate(response);
-            AiReading savedReading = saveReading(request, laSoJson, response);
+            AiReading savedReading = saveReading(request, laSoJson, response, profileKey);
             response.setId(savedReading.getId());
             response.setType(savedReading.getType());
             response.setChapterId(savedReading.getChapterId());
@@ -431,7 +415,13 @@ public class CareerAiServiceImpl implements CareerAiService {
     @Override
     public CareerTalentReadingResponse generateCareerTalentReading(CareerReadingRequest request) {
         try {
-            LaSoResponse laSo = tuViService.getLaSo(toTuViRequest(request));
+            String profileKey = profileKey(request);
+            if (userTuViChartService.isRegenerationRequired(Long.valueOf(request.getUserId()), profileKey)) throw new BusinessException(ErrorCode.SOULMAP_ERROR_0001);
+            AiReading cached = findCachedReading(request, "career-chapter-03", profileKey);
+            if (cached != null) return cachedTalentReading(cached);
+            TuViRequest tuViRequest = toTuViRequest(request);
+            LaSoResponse laSo = tuViService.getLaSo(tuViRequest);
+            userTuViChartService.save(Long.valueOf(request.getUserId()), tuViRequest, laSo, profileKey);
             String laSoJson = buildUserPrompt(request, laSo);
             List<AiMessage> messages = List.of(
                     new AiMessage("system", buildChapter03SystemPrompt()),
@@ -445,7 +435,7 @@ public class CareerAiServiceImpl implements CareerAiService {
             ));
             CareerTalentReadingResponse response = objectMapper.readValue(extractJson(rawJson), CareerTalentReadingResponse.class);
             normalizeAndValidateTalentReading(response);
-            AiReading savedReading = saveTalentReading(request, laSoJson, response);
+            AiReading savedReading = saveTalentReading(request, laSoJson, response, profileKey);
             response.setId(savedReading.getId());
             response.setType(savedReading.getType());
             response.setChapterId(savedReading.getChapterId());
@@ -481,12 +471,13 @@ public class CareerAiServiceImpl implements CareerAiService {
         return String.join("\n\n---\n\n", PERSONA_PROMPT, STYLE_GUIDE_PROMPT, CHAPTER_03_PROMPT);
     }
 
-    private AiReading saveReading(CareerReadingRequest request, String laSoJson, CareerReadingResponse response) throws JsonProcessingException {
+    private AiReading saveReading(CareerReadingRequest request, String laSoJson, CareerReadingResponse response, String profileKey) throws JsonProcessingException {
         AiReading reading = findExistingReading(request, response);
         reading.setUserId(request.getUserId());
         reading.setType("CAREER_CHAPTER");
         reading.setChapterId(response.getChapterId());
         reading.setChapterTitle(response.getChapterTitle());
+        reading.setProfileKey(profileKey);
         reading.setModel(properties.getModel());
         reading.setRequestJson(objectMapper.writeValueAsString(request));
         reading.setLaSoJson(laSoJson);
@@ -494,12 +485,13 @@ public class CareerAiServiceImpl implements CareerAiService {
         return aiReadingRepository.save(reading);
     }
 
-    private AiReading saveTalentReading(CareerReadingRequest request, String laSoJson, CareerTalentReadingResponse response) throws JsonProcessingException {
+    private AiReading saveTalentReading(CareerReadingRequest request, String laSoJson, CareerTalentReadingResponse response, String profileKey) throws JsonProcessingException {
         AiReading reading = findExistingReading(request, response.getChapterId());
         reading.setUserId(request.getUserId());
         reading.setType("CAREER_CHAPTER");
         reading.setChapterId(response.getChapterId());
         reading.setChapterTitle(response.getChapterTitle());
+        reading.setProfileKey(profileKey);
         reading.setModel(properties.getModel());
         reading.setRequestJson(objectMapper.writeValueAsString(request));
         reading.setLaSoJson(laSoJson);
@@ -522,6 +514,29 @@ public class CareerAiServiceImpl implements CareerAiService {
                         chapterId
                 )
                 .orElseGet(AiReading::new);
+    }
+
+    private String profileKey(CareerReadingRequest request) {
+        return profileKeyService.create(request.getMbtiType(), request.getDay(), request.getMonth(), request.getYear(), request.getCalendar(), request.getGender(), request.getHour(), request.getMin(), request.getTimezone());
+    }
+
+    private AiReading findCachedReading(CareerReadingRequest request, String chapterId, String profileKey) {
+        AiReading reading = findExistingReading(request, chapterId);
+        if (reading.getId() == null || reading.getProfileKey() == null) return null;
+        if (!profileKey.equals(reading.getProfileKey())) throw new BusinessException(ErrorCode.SOULMAP_ERROR_0001);
+        return reading;
+    }
+
+    private CareerReadingResponse cachedCareerReading(AiReading reading) throws JsonProcessingException {
+        CareerReadingResponse response = objectMapper.readValue(reading.getContent(), CareerReadingResponse.class);
+        response.setId(reading.getId()); response.setType(reading.getType()); response.setChapterId(reading.getChapterId()); response.setChapterTitle(reading.getChapterTitle());
+        return response;
+    }
+
+    private CareerTalentReadingResponse cachedTalentReading(AiReading reading) throws JsonProcessingException {
+        CareerTalentReadingResponse response = objectMapper.readValue(reading.getContent(), CareerTalentReadingResponse.class);
+        response.setId(reading.getId()); response.setType(reading.getType()); response.setChapterId(reading.getChapterId()); response.setChapterTitle(reading.getChapterTitle());
+        return response;
     }
 
     private String buildUserPrompt(CareerReadingRequest request, LaSoResponse laSo) throws JsonProcessingException {
@@ -623,27 +638,6 @@ public class CareerAiServiceImpl implements CareerAiService {
         if (isBlank(response.getChapterTitle())) {
             response.setChapterTitle("Bản đồ sự nghiệp");
         }
-        if (response.getCareerPath() == null
-                || response.getCareerPath().getCards() == null
-                || response.getCareerPath().getCards().size() != 3
-                || isBlank(response.getCareerPath().getIntro())
-                || isBlank(response.getCareerPath().getQuote())) {
-            throw new AiServiceException(ErrorCode.AI_ERROR_0003);
-        }
-        if (response.getCareerPath().getCards().stream().anyMatch(this::hasInvalidCard)) {
-            throw new AiServiceException(ErrorCode.AI_ERROR_0003);
-        }
-        if (response.getGrowthDrivers() == null
-                || response.getGrowthDrivers().getStrongWhen() == null
-                || response.getGrowthDrivers().getStrongWhen().size() != 4
-                || response.getGrowthDrivers().getNotFitWith() == null
-                || response.getGrowthDrivers().getNotFitWith().size() != 4) {
-            throw new AiServiceException(ErrorCode.AI_ERROR_0003);
-        }
-        if (response.getGrowthDrivers().getStrongWhen().stream().anyMatch(this::hasInvalidCard)
-                || response.getGrowthDrivers().getNotFitWith().stream().anyMatch(this::hasInvalidCard)) {
-            throw new AiServiceException(ErrorCode.AI_ERROR_0003);
-        }
         if (isBlank(response.getDeepReadingMarkdown())) {
             throw new AiServiceException(ErrorCode.AI_ERROR_0003);
         }
@@ -678,7 +672,7 @@ public class CareerAiServiceImpl implements CareerAiService {
                 || isBlank(talent.getDevelopmentTip());
     }
 
-    private boolean hasInvalidCard(CareerReadingResponse.Card card) {
+    private boolean hasInvalidCard(CareerTalentReadingResponse.Card card) {
         return card == null || isBlank(card.getTitle()) || isBlank(card.getDescription());
     }
 

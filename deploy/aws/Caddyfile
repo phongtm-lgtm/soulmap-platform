@@ -1,0 +1,55 @@
+{
+	email {$ACME_EMAIL}
+	admin off
+}
+
+{$PUBLIC_HOST} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	reverse_proxy soulmap:8090 {
+		health_uri /api/v1/actuator/health
+		health_interval 30s
+		transport http {
+			read_timeout 330s
+			write_timeout 330s
+		}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
+
+{$ROUTER_PUBLIC_HOST} {
+	encode zstd gzip
+
+	@llm_api path /v1 /v1/* /v1beta /v1beta/*
+	respond @llm_api 404
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	reverse_proxy 9router:20128 {
+		transport http {
+			read_timeout 330s
+			write_timeout 330s
+		}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

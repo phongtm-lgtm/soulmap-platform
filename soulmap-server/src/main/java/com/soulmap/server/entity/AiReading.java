@@ -34,6 +34,9 @@ public class AiReading {
     @Column(name = "chapter_title")
     private String chapterTitle;
 
+    @Column(name = "profile_key", length = 64)
+    private String profileKey;
+
     @Column(name = "model")
     private String model;
 

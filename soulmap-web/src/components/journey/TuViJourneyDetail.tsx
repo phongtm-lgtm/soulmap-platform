@@ -1,7 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, BookOpen, Compass, MessageCircle, RefreshCw, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, BookOpen, Compass, FileDown, MessageCircle, RefreshCw, Sparkles } from 'lucide-react';
 import { APP_ASSETS } from '../../assets';
-import { fetchAiReading, type AiReading } from '../../lib/aiReadingsApi';
+import {
+  fetchAiReading,
+  generateTuViReading,
+  type AiReading,
+  type TuViReadingRequest,
+} from '../../lib/aiReadingsApi';
 import type { SoulMapJourney } from '../../types/journey';
 import MarkdownReading, { extractPrimaryHeadings } from './MarkdownReading';
 
@@ -11,52 +16,108 @@ interface TuViJourneyDetailProps {
 }
 
 const READING_ID_KEY = 'soulmap_ai_reading_tuvi_id';
-const READING_PENDING_KEY = 'soulmap_ai_reading_tuvi_pending';
+const BIRTH_INFO_KEY = 'soulmap_birth_info';
 const TUVI_ACCENT = '#A66D24';
 
+type StoredBirthInfo = {
+  name?: string;
+  birthDate: string;
+  birthCalendar: 'solar' | 'lunar';
+  birthTime: string;
+  gender: string;
+  timezone?: number;
+  viewYear?: number;
+};
+
+function buildTuViInputFromStorage(): TuViReadingRequest {
+  const raw = localStorage.getItem(BIRTH_INFO_KEY);
+  if (!raw) throw new Error('missing birth info');
+  const birthInfo = JSON.parse(raw) as StoredBirthInfo;
+  const [year, month, day] = birthInfo.birthDate.split('-').map(Number);
+  const [hour, min] = birthInfo.birthTime.split(':').map(Number);
+  return {
+    name: birthInfo.name || 'Bạn',
+    day,
+    month,
+    year,
+    calendar: birthInfo.birthCalendar,
+    gender: birthInfo.gender === 'Nam' ? 'male' : 'female',
+    hour,
+    min,
+    timezone: birthInfo.timezone ?? 1,
+    viewYear: birthInfo.viewYear ?? new Date().getFullYear(),
+  };
+}
+
 export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetailProps) {
+  const handleExportPdf = () => {
+    document.body.classList.add('tuvi-printing');
+    window.print();
+    window.addEventListener('afterprint', () => {
+      document.body.classList.remove('tuvi-printing');
+    }, { once: true });
+  };
+
   const [reading, setReading] = useState<AiReading | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeHeading, setActiveHeading] = useState('');
+  const abortRef = useRef<AbortController | null>(null);
 
   const loadReading = useCallback(async () => {
-    const readingId = Number(localStorage.getItem(READING_ID_KEY));
-    const pending = localStorage.getItem(READING_PENDING_KEY) === 'true';
-    setIsPending(pending);
+    abortRef.current?.abort();
+    setError(null);
 
-    if (!readingId) {
-      setReading(null);
-      setIsLoading(false);
-      setError(pending ? null : 'Bạn cần tạo SoulMap trước khi mở hành trình Tử Vi.');
+    // 1. A previously generated reading exists -> just fetch it (no re-generate).
+    const readingId = Number(localStorage.getItem(READING_ID_KEY));
+    if (readingId) {
+      setIsLoading(true);
+      try {
+        setReading(await fetchAiReading(readingId));
+      } catch {
+        setError('Linh Nhi chưa thể tải bài luận giải Tử Vi lúc này. Bạn thử lại sau nhé.');
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    // 2. No reading yet -> generate it.
+    let input: TuViReadingRequest;
     try {
-      setReading(await fetchAiReading(readingId));
-      setIsPending(false);
+      input = buildTuViInputFromStorage();
     } catch {
-      setError('Linh Nhi chưa thể tải bài luận giải Tử Vi lúc này. Bạn thử lại sau nhé.');
-    } finally {
+      setReading(null);
       setIsLoading(false);
+      setError('Bạn cần tạo SoulMap trước khi mở hành trình Tử Vi.');
+      return;
+    }
+
+    setReading(null);
+    setIsLoading(true);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      const finalReading = await generateTuViReading(input, controller.signal);
+      if (controller.signal.aborted) return;
+      localStorage.setItem(READING_ID_KEY, String(finalReading.id));
+      setReading(finalReading);
+    } catch {
+      if (controller.signal.aborted) return;
+      setError('Chưa thể tạo bài luận giải Tử Vi lúc này. Hãy chắc rằng bạn đã tạo SoulMap trước đó rồi thử lại.');
+    } finally {
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     void loadReading();
+    return () => abortRef.current?.abort();
   }, [loadReading]);
 
-  useEffect(() => {
-    if (!isPending || reading) return;
-    const timer = window.setInterval(() => {
-      if (localStorage.getItem(READING_ID_KEY)) void loadReading();
-    }, 3000);
-    return () => window.clearInterval(timer);
-  }, [isPending, loadReading, reading]);
-
+  const displayContent = reading?.content || '';
   const headings = useMemo(() => extractPrimaryHeadings(reading?.content || ''), [reading?.content]);
 
   useEffect(() => {
@@ -95,15 +156,27 @@ export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetail
               <div className="mt-7">
                 <p className="font-sans text-[0.72rem] font-extrabold uppercase tracking-[0.15em] text-[#8E806C]">Hành trình</p>
                 <h2 className="mt-1 font-display text-[2rem] font-bold text-[#A66D24]">Tử Vi</h2>
-                <p className="mt-2 font-reading text-[0.9rem] leading-relaxed text-[#656A65]">Đọc sâu cấu trúc lá số, vận trình và những bài học có thể ứng dụng trong đời sống.</p>
+                <p className="mt-2 font-reading text-[0.9rem] leading-relaxed text-[#5E625F]">Đọc sâu cấu trúc lá số, vận trình và những bài học có thể ứng dụng trong đời sống.</p>
               </div>
 
               <div className="mt-6 rounded-2xl border border-[#EAD8B8] bg-[#FFF6E5] p-3.5">
                 <div className="flex items-center gap-2 font-sans text-[0.8rem] font-extrabold text-[#76501E]">
                   <Sparkles className="h-4 w-4" />
-                  {reading ? 'Bài luận đã sẵn sàng' : isPending ? 'Đang lập bài luận' : 'Chưa có bài luận'}
+                  {reading ? 'Bài luận đã sẵn sàng' : isLoading ? 'Đang lập bài luận' : 'Chưa có bài luận'}
                 </div>
               </div>
+
+              {reading && (
+                <button
+                  type="button"
+                  id="tuvi-export-pdf-btn"
+                  onClick={handleExportPdf}
+                  className="tuvi-no-print mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#D7B77E] bg-[#A66D24] px-4 py-3 font-sans text-[0.84rem] font-extrabold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#8C5B1C] active:scale-95"
+                >
+                  <FileDown className="h-4 w-4" />
+                  Xuất PDF
+                </button>
+              )}
 
               {headings.length > 0 && (
                 <nav className="mt-7 hidden xl:block" aria-label="Mục lục luận giải Tử Vi">
@@ -112,7 +185,7 @@ export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetail
                     {headings.map((heading, index) => {
                       const active = heading.id === activeHeading;
                       return (
-                        <button key={heading.id} type="button" onClick={() => navigateToHeading(heading.id)} className={`flex w-full items-start gap-2.5 rounded-xl px-3 py-2.5 text-left font-sans text-[0.78rem] font-semibold leading-snug transition ${active ? 'bg-[#F7E9D3] text-[#87571B]' : 'text-[#656A65] hover:bg-[#FAF6EE]'}`}>
+                        <button key={heading.id} type="button" onClick={() => navigateToHeading(heading.id)} className={`flex w-full items-start gap-2.5 rounded-xl px-3 py-2.5 text-left font-sans text-[0.78rem] font-semibold leading-snug transition ${active ? 'bg-[#F7E9D3] text-[#87571B]' : 'text-[#5E625F] hover:bg-[#F8F4EB]'}`}>
                           <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[0.67rem] font-extrabold ${active ? 'bg-[#A66D24] text-white' : 'bg-[#EFE9DB] text-[#8B8F8A]'}`}>{index + 1}</span>
                           <span>{heading.label}</span>
                         </button>
@@ -142,10 +215,10 @@ export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetail
             </header>
 
             {headings.length > 0 && (
-              <div className="sticky top-16 z-20 -mx-4 mt-4 border-y border-[#E4D8C4] bg-[#F8F3E8]/95 px-4 py-3 backdrop-blur-md xl:hidden">
+              <div className="tuvi-no-print sticky top-16 z-20 -mx-4 mt-4 border-y border-[#E4D8C4] bg-[#F8F3E8]/95 px-4 py-3 backdrop-blur-md xl:hidden">
                 <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {headings.map((heading, index) => (
-                    <button key={heading.id} type="button" onClick={() => navigateToHeading(heading.id)} className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 font-sans text-[0.78rem] font-bold ${heading.id === activeHeading ? 'border-[#A66D24] bg-[#A66D24] text-white' : 'border-[#E4D8C4] bg-[#FFFDF8] text-[#656A65]'}`}>
+                    <button key={heading.id} type="button" onClick={() => navigateToHeading(heading.id)} className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 font-sans text-[0.78rem] font-bold ${heading.id === activeHeading ? 'border-[#A66D24] bg-[#A66D24] text-white' : 'border-[#E4D8C4] bg-[#FFFDF8] text-[#5E625F]'}`}>
                       <span>{index + 1}</span>
                       {heading.label.replace(/^BƯỚC\s+\d+:\s*/i, '').replace(/^KẾT LUẬN\s*/i, 'Kết luận')}
                     </button>
@@ -155,22 +228,22 @@ export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetail
             )}
 
             <section className="mt-6 rounded-[1.8rem] border border-[#E4D8C4] bg-[#FFFDF8] px-5 py-7 shadow-[0_24px_70px_-52px_rgba(77,52,28,0.42)] md:px-10 md:py-10">
-              {(isLoading || (isPending && !reading)) && (
+              {isLoading && !displayContent && (
                 <div className="flex min-h-[380px] flex-col items-center justify-center text-center">
                   <div className="relative grid h-20 w-20 place-items-center rounded-full border border-[#E4D8C4] bg-[#FFF6E5]">
                     <Compass className="h-9 w-9 animate-pulse text-[#A66D24]" />
                     <span className="absolute inset-[-7px] animate-spin rounded-full border border-dashed border-[#C8964C]" />
                   </div>
                   <h2 className="mt-6 font-display text-2xl font-bold text-[#2E3E33]">Linh Nhi đang mở lá số của bạn</h2>
-                  <p className="mt-3 max-w-lg font-reading leading-relaxed text-[#656A65]">Bài luận này đi qua nhiều cung và vận trình nên có thể cần thêm vài phút. Trang sẽ tự cập nhật khi nội dung sẵn sàng.</p>
+                  <p className="mt-3 max-w-lg font-reading leading-relaxed text-[#5E625F]">Bài luận sắp bắt đầu hiện ra. Từng phần sẽ được viết trực tiếp cho bạn ngay khi Linh Nhi luận xong.</p>
                 </div>
               )}
 
-              {!isLoading && !isPending && error && (
+              {!isLoading && !displayContent && error && (
                 <div className="flex min-h-[360px] flex-col items-center justify-center px-4 text-center">
                   <Sparkles className="h-11 w-11 text-[#A66D24]" />
                   <h2 className="mt-5 font-display text-2xl font-bold text-[#2E3E33]">Hành trình Tử Vi chưa sẵn sàng</h2>
-                  <p className="mt-3 max-w-lg font-reading leading-relaxed text-[#656A65]">{error}</p>
+                  <p className="mt-3 max-w-lg font-reading leading-relaxed text-[#5E625F]">{error}</p>
                   <div className="mt-6 flex flex-wrap justify-center gap-3">
                     <button type="button" onClick={() => void loadReading()} className="inline-flex items-center gap-2 rounded-full border border-[#D7B77E] bg-[#FFF6E5] px-5 py-2.5 font-sans text-sm font-extrabold text-[#87571B]"><RefreshCw className="h-4 w-4" /> Thử tải lại</button>
                     <button type="button" onClick={onBack} className="rounded-full bg-[#2E3E33] px-5 py-2.5 font-sans text-sm font-extrabold text-white">Về danh sách Journey</button>
@@ -178,16 +251,18 @@ export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetail
                 </div>
               )}
 
-              {!isLoading && reading && (
+              {displayContent && (
                 <article>
                   <div className="mb-9 flex items-center gap-3 border-b border-[#E8DFCF] pb-5">
                     <span className="grid h-11 w-11 place-items-center rounded-full bg-[#FFF0D2] text-[#A66D24]"><Sparkles className="h-5 w-5" /></span>
                     <div>
                       <p className="font-sans text-[0.72rem] font-extrabold uppercase tracking-[0.14em] text-[#9A8263]">Linh Nhi luận giải</p>
-                      <h2 className="font-display text-[1.35rem] font-bold text-[#2E3E33]">{reading.chapterTitle || 'Luận giải Tử Vi tổng quan'}</h2>
+                      <h2 className="font-display text-[1.35rem] font-bold text-[#2E3E33]">{reading?.chapterTitle || 'Luận giải Tử Vi tổng quan'}</h2>
                     </div>
                   </div>
-                  <MarkdownReading content={reading.content} accentColor={TUVI_ACCENT} />
+                  <div>
+                    <MarkdownReading content={displayContent} accentColor={TUVI_ACCENT} />
+                  </div>
                 </article>
               )}
             </section>
@@ -199,7 +274,7 @@ export default function TuViJourneyDetail({ journey, onBack }: TuViJourneyDetail
                 <img src={APP_ASSETS.linhNhiMascot} alt="Linh Nhi" className="h-16 w-16 object-contain" draggable={false} />
                 <div>
                   <h3 className="font-display text-[1.45rem] font-bold text-[#A66D24]">Linh Nhi ✦</h3>
-                  <p className="font-sans text-[0.8rem] text-[#656A65]">Người đồng hành cùng bạn</p>
+                  <p className="font-sans text-[0.8rem] text-[#5E625F]">Người đồng hành cùng bạn</p>
                 </div>
               </div>
               <p className="mt-4 rounded-2xl border border-[#EAD8B8] bg-[#FFF6E5] p-4 font-reading text-[0.92rem] leading-relaxed text-[#514A40]">Tử Vi là một góc nhìn để chiêm nghiệm, không phải một bản án. Điều quan trọng nhất vẫn là cách bạn lựa chọn và sống với những điều mình hiểu ra.</p>

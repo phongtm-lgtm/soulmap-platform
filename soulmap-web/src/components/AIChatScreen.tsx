@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowUp, BookOpen, BriefcaseBusiness, ChevronRight, Heart, Leaf, Mic, PanelRightClose, PanelRightOpen, PenLine, Sparkles, Target, UserRound } from 'lucide-react';
+import { ArrowUp, BookOpen, BriefcaseBusiness, ChevronRight, Heart, Leaf, Mic, PenLine, Sparkles, Target } from 'lucide-react';
 import ChatBackground from './chat/ChatBackground';
 import ChatSidebar from './chat/ChatSidebar';
 import ChatMessageBubble, { ChatTypingBubble } from './chat/ChatMessageBubble';
 import ChatQuickActions from './chat/ChatQuickActions';
 import ChatComposer from './chat/ChatComposer';
-import ChatContextPanel from './chat/ChatContextPanel';
 import { APP_ASSETS } from '../assets';
-import type { ChatMessage } from '../types/chat';
+import type { ChatConversationSummary, ChatMessage } from '../types/chat';
 
 interface AIChatScreenProps {
   chatInput: string;
@@ -20,6 +19,12 @@ interface AIChatScreenProps {
   handleSendMessage: (textToSend?: string) => void;
   onNewChat: () => void;
   onExit: () => void;
+  conversations: ChatConversationSummary[];
+  activeConversationId: string;
+  onSelectConversation: (id: string) => void;
+  chatError?: string | null;
+  requiresLogin?: boolean;
+  onRequestLogin?: () => void;
 }
 
 /**
@@ -37,32 +42,30 @@ export default function AIChatScreen({
   handleSendMessage,
   onNewChat,
   onExit,
+  conversations,
+  activeConversationId,
+  onSelectConversation,
+  chatError,
+  requiresLogin = false,
+  onRequestLogin,
 }: AIChatScreenProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasEnteredWorkspace, setHasEnteredWorkspace] = useState(false);
-  const [showContextPanel, setShowContextPanel] = useState(true);
-  const demoMessages: ChatMessage[] = [
-    {
-      sender: 'user',
-      text: 'Mình cảm thấy chán công việc hiện tại,\nkhông có động lực và thấy bế tắc.',
-    },
-    {
-      sender: 'assistant',
-      text:
-        'Linh Nhi hiểu cảm giác đó của bạn. 🌿\nDựa trên SoulMap của bạn, mình thấy có một vài điều có thể bạn chưa nhận ra:\n\n🌿  Giá trị cốt lõi: Tự do - Sáng tạo - Ý nghĩa\n⚙️  Điểm mạnh nổi bật: Tư duy chiến lược, Đồng cảm, Sáng tạo\n✣  MBTI (INFJ): Hướng nội - Trực giác - Cảm xúc - Nguyên tắc\n🌿  Giai đoạn hiện tại: Bạn đang ở giai đoạn chuyển đổi quan trọng\n\nCó thể bạn không thiếu năng lực,\nmà chỉ đang làm một công việc chưa thật sự phù hợp với bạn.\n\nBạn muốn Linh Nhi phân tích sâu hơn về hướng đi phù hợp không? ✨',
-    },
-  ];
   const isOnlyWelcome = chatHistory.length === 1 && chatHistory[0]?.sender === 'assistant';
-  const shouldShowDemo = isOnlyWelcome && hasEnteredWorkspace;
-  const messagesToRender = shouldShowDemo ? demoMessages : chatHistory;
-  const shouldShowHome = !hasEnteredWorkspace && isOnlyWelcome && !isTyping;
+  const messagesToRender = chatHistory;
+  const shouldShowHome = !hasEnteredWorkspace && isOnlyWelcome && !isTyping && !activeConversationId;
 
-  // Auto scroll to the latest message whenever the transcript changes.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   }, [messagesToRender.length, isTyping]);
+
+  useEffect(() => {
+    if (activeConversationId || chatHistory.length > 1) {
+      setHasEnteredWorkspace(true);
+    }
+  }, [activeConversationId, chatHistory.length]);
 
   const handleNewChatClick = () => {
     setHasEnteredWorkspace(false);
@@ -70,11 +73,19 @@ export default function AIChatScreen({
   };
 
   const handleQuickAction = (prompt: string) => {
+    if (requiresLogin) {
+      onRequestLogin?.();
+      return;
+    }
     setHasEnteredWorkspace(true);
     handleSendMessage(prompt);
   };
 
   const handleSend = () => {
+    if (requiresLogin) {
+      onRequestLogin?.();
+      return;
+    }
     setHasEnteredWorkspace(true);
     handleSendMessage();
   };
@@ -92,6 +103,15 @@ export default function AIChatScreen({
         onSelectPrompt={handleQuickAction}
         onExit={onExit}
         currentUser={currentUser}
+        conversations={conversations}
+        activeConversationId={activeConversationId}
+        onSelectConversation={(id) => {
+          setHasEnteredWorkspace(true);
+          onSelectConversation(id);
+        }}
+        chatError={chatError}
+        requiresLogin={requiresLogin}
+        onRequestLogin={onRequestLogin}
       />
     );
   }
@@ -100,37 +120,52 @@ export default function AIChatScreen({
   const showQuickActions = !isTyping && lastMessage?.sender === 'assistant';
 
   return (
-    <div className="relative mt-20 flex h-[calc(100vh-5rem)] w-full flex-col overflow-hidden bg-[#FCF9F8]">
+    <div className="relative mt-20 flex h-[calc(100vh-5rem)] w-full flex-col overflow-hidden bg-[#F8F4EB]">
       <ChatBackground />
 
       <div className="relative z-[1] flex min-h-0 flex-1 overflow-hidden">
         <ChatSidebar
-          conversations={[]}
-          activeConversationId=""
-          onSelectConversation={() => {}}
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onSelectConversation={(id) => {
+            setHasEnteredWorkspace(true);
+            onSelectConversation(id);
+          }}
           onNewChat={handleNewChatClick}
           currentUser={currentUser}
         />
 
-        <main className="relative z-[1] flex min-w-0 flex-1 flex-col bg-[#FCF9F8]/82">
-          <button
-            type="button"
-            onClick={() => setShowContextPanel((value) => !value)}
-            className="absolute right-4 top-4 z-[3] hidden h-10 w-10 place-items-center rounded-full border border-[#E6DDCE] bg-white/85 text-[#424844] shadow-sm backdrop-blur transition hover:bg-white hover:text-[#173124] xl:grid"
-            aria-label={showContextPanel ? 'Ẩn phần tham chiếu' : 'Hiển thị phần tham chiếu'}
-          >
-            {showContextPanel ? <PanelRightClose className="h-5 w-5" /> : <PanelRightOpen className="h-5 w-5" />}
-          </button>
-
+        <main className="relative z-[1] flex min-w-0 flex-1 flex-col bg-[#F8F4EB]/82">
           <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar">
             <div className="mx-auto flex min-h-full w-full max-w-[820px] flex-col px-4 pb-8 pt-10 sm:px-6 md:px-8">
               <div className="mx-auto mb-8 flex w-full max-w-[720px] items-center gap-4 text-[#B8B2A6]">
                 <span className="h-px flex-1 bg-[#E1DACF]" />
                 <Leaf className="h-4 w-4" />
-                <span className="font-sans text-[0.9rem] font-extrabold text-[#22251F]">Hôm nay</span>
+                <span className="font-sans text-[0.9rem] font-extrabold text-[#214D3B]">Hôm nay</span>
                 <Leaf className="h-4 w-4 -scale-x-100" />
                 <span className="h-px flex-1 bg-[#E1DACF]" />
               </div>
+
+              {requiresLogin && (
+                <div className="mb-6 rounded-2xl border border-[#E8DFCF] bg-white/80 px-5 py-4 text-center">
+                  <p className="font-sans text-sm text-[#5E625F]">
+                    Đăng nhập để trò chuyện với Linh Nhi và lưu lịch sử mentor.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={onRequestLogin}
+                    className="mt-3 rounded-full bg-[#24533E] px-4 py-2 font-sans text-sm font-semibold text-white"
+                  >
+                    Đăng nhập bằng Google
+                  </button>
+                </div>
+              )}
+
+              {chatError && (
+                <p className="mb-4 rounded-xl border border-[#F0D3C8] bg-[#FFF6F3] px-4 py-3 font-sans text-sm text-[#9A4B3C]">
+                  {chatError}
+                </p>
+              )}
 
               {messagesToRender.length === 0 && (
                 <div className="flex flex-1 flex-col items-center justify-center gap-2 py-20 text-center">
@@ -149,7 +184,7 @@ export default function AIChatScreen({
 
               {isTyping && <ChatTypingBubble />}
 
-              {showQuickActions && <ChatQuickActions onSelect={handleQuickAction} />}
+              {showQuickActions && !requiresLogin && <ChatQuickActions onSelect={handleQuickAction} />}
             </div>
           </div>
 
@@ -158,12 +193,10 @@ export default function AIChatScreen({
               value={chatInput}
               onChange={setChatInput}
               onSend={handleSend}
-              disabled={isTyping}
+              disabled={isTyping || requiresLogin}
             />
           </div>
         </main>
-
-        {showContextPanel && <ChatContextPanel onSelectSuggestion={handleQuickAction} />}
       </div>
     </div>
   );
@@ -178,9 +211,30 @@ interface LinhNhiHomeProps {
   onSelectPrompt: (prompt: string) => void;
   onExit: () => void;
   currentUser: { name: string; email: string } | null;
+  conversations: ChatConversationSummary[];
+  activeConversationId: string;
+  onSelectConversation: (id: string) => void;
+  chatError?: string | null;
+  requiresLogin?: boolean;
+  onRequestLogin?: () => void;
 }
 
-function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPrompt, onExit: _onExit, currentUser }: LinhNhiHomeProps) {
+function LinhNhiHome({
+  userName,
+  value,
+  onChange,
+  onSend,
+  onNewChat,
+  onSelectPrompt,
+  onExit: _onExit,
+  currentUser,
+  conversations,
+  activeConversationId,
+  onSelectConversation,
+  chatError,
+  requiresLogin,
+  onRequestLogin,
+}: LinhNhiHomeProps) {
   const prompts = useMemo(
     () => [
       {
@@ -229,16 +283,16 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
     [],
   );
 
-  const canSend = value.trim().length > 0;
+  const canSend = value.trim().length > 0 && !requiresLogin;
 
   return (
-    <div className="relative flex min-h-screen overflow-hidden bg-[#FCF9F8] pt-20 text-[#1C1B1B]">
+    <div className="relative flex min-h-screen overflow-hidden bg-[#F8F4EB] pt-20 text-[#1C1B1B]">
       <ChatBackground />
       <div className="relative z-[2] h-[calc(100vh-5rem)] shrink-0 self-start">
         <ChatSidebar
-          conversations={[]}
-          activeConversationId=""
-          onSelectConversation={() => {}}
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onSelectConversation={onSelectConversation}
           onNewChat={onNewChat}
           currentUser={currentUser}
         />
@@ -246,13 +300,34 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
 
       <main className="relative z-[1] mx-auto w-full max-w-[1120px] px-6 pb-10 pt-10 md:px-10 md:pt-14">
         <section className="relative overflow-hidden pb-4 text-center">
-          <h1 className="mx-auto max-w-[760px] font-display text-[3rem] font-medium leading-[1.05] tracking-[-0.02em] text-[#173124] md:text-[4.2rem]">
+          <h1 className="mx-auto max-w-[760px] font-display text-[3rem] font-medium leading-[1.05] tracking-[-0.02em] text-[#214D3B] md:text-[4.2rem]">
             Xin chào, {userName}.
           </h1>
           <p className="mx-auto mt-4 max-w-[620px] font-display text-[1.35rem] italic leading-snug text-[#6F756F] md:text-[1.55rem]">
             Hôm nay bạn muốn khám phá điều gì về chính mình?
           </p>
         </section>
+
+        {requiresLogin && (
+          <div className="mx-auto mb-4 max-w-[760px] rounded-2xl border border-[#E8DFCF] bg-white/80 px-5 py-4 text-center">
+            <p className="font-sans text-sm text-[#5E625F]">
+              Đăng nhập để bắt đầu trò chuyện với Linh Nhi.
+            </p>
+            <button
+              type="button"
+              onClick={onRequestLogin}
+              className="mt-3 rounded-full bg-[#24533E] px-4 py-2 font-sans text-sm font-semibold text-white"
+            >
+              Đăng nhập bằng Google
+            </button>
+          </div>
+        )}
+
+        {chatError && (
+          <p className="mx-auto mb-4 max-w-[760px] rounded-xl border border-[#F0D3C8] bg-[#FFF6F3] px-4 py-3 text-center font-sans text-sm text-[#9A4B3C]">
+            {chatError}
+          </p>
+        )}
 
         <section className="mx-auto mt-6 max-w-[760px]">
           <div className="flex items-end gap-2 rounded-full border border-[#E8DFCF] bg-white/94 p-2 pl-5 shadow-[0_18px_46px_-34px_rgba(23,49,36,0.55)] backdrop-blur-sm focus-within:ring-1 focus-within:ring-[#7C5730]">
@@ -268,13 +343,13 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
                 }
               }}
               placeholder="Hãy hỏi Linh Nhi về sự nghiệp, tình yêu hoặc cuộc sống..."
-              className="max-h-[120px] min-h-11 flex-1 resize-none border-none bg-transparent py-3 font-sans text-[1rem] leading-relaxed text-[#173124] outline-none placeholder:italic placeholder:text-[#424844]/50 focus:ring-0"
+              className="max-h-[120px] min-h-11 flex-1 resize-none border-none bg-transparent py-3 font-sans text-[1rem] leading-relaxed text-[#214D3B] outline-none placeholder:italic placeholder:text-[#424844]/50 focus:ring-0"
             />
             <button
               type="button"
               onClick={() => canSend && onSend()}
               disabled={!canSend}
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#073D2A] text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:bg-[#EEE7DD] disabled:text-[#B5ADA0] disabled:opacity-100"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#24533E] text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:bg-[#EEE7DD] disabled:text-[#B5ADA0] disabled:opacity-100"
               aria-label="Gửi câu hỏi"
             >
               <ArrowUp className="h-5 w-5" />
@@ -298,7 +373,7 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
                     <Icon className="h-7 w-7 transition group-hover:scale-110" />
                   </span>
                   <span className="min-w-0 flex-1 pt-1">
-                    <span className="block font-display text-[1.55rem] font-semibold leading-none text-[#173124]">{prompt.title}</span>
+                    <span className="block font-display text-[1.55rem] font-semibold leading-none text-[#214D3B]">{prompt.title}</span>
                   </span>
                   <ChevronRight className="mt-2 h-5 w-5 text-[#9A5D24] transition group-hover:translate-x-0.5" />
                 </button>
@@ -308,7 +383,7 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
                       key={chip}
                       type="button"
                       onClick={() => onSelectPrompt(chip)}
-                      className="rounded-full border border-[#E4D2BD] bg-[#FFF9F0] px-3 py-1.5 font-sans text-xs text-[#5E625F] transition hover:border-[#CFAE80] hover:text-[#173124]"
+                      className="rounded-full border border-[#E4D2BD] bg-[#FFF9F0] px-3 py-1.5 font-sans text-xs text-[#5E625F] transition hover:border-[#CFAE80] hover:text-[#214D3B]"
                     >
                       {chip}
                     </button>
@@ -321,10 +396,10 @@ function LinhNhiHome({ userName, value, onChange, onSend, onNewChat, onSelectPro
 
         <section className="relative mt-6 overflow-hidden rounded-2xl border border-[#EDE3D4] bg-[#F5F2EA]/88 px-8 py-5 text-center shadow-[0_18px_40px_-34px_rgba(23,49,36,0.55)]">
           <p className="relative z-[1] mx-auto max-w-[620px] font-display text-[1.1rem] italic leading-[1.8] text-[#24533E]">
-            <span className="mr-3 text-3xl text-[#D0A75B]">“</span>
+            <span className="mr-3 text-3xl text-[#B68A2F]">“</span>
             Bạn không cần phải biết tất cả ngay hôm nay.<br />
             Chỉ cần bước tiếp một bước nhỏ với sự chân thành.
-            <span className="ml-3 text-3xl text-[#D0A75B]">”</span>
+            <span className="ml-3 text-3xl text-[#B68A2F]">”</span>
           </p>
           <img src={APP_ASSETS.pillars.decorLeaf} alt="" className="pointer-events-none absolute right-10 top-0 h-24 w-24 opacity-55" draggable={false} />
         </section>

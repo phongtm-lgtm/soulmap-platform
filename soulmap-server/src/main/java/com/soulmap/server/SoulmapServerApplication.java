@@ -1,14 +1,18 @@
 package com.soulmap.server;
 
+import com.soulmap.server.config.GoogleAuthProperties;
+import com.soulmap.server.config.SessionProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 
 @Slf4j
 @SpringBootApplication
+@EnableConfigurationProperties({GoogleAuthProperties.class, SessionProperties.class})
 public class SoulmapServerApplication {
 
     private final Environment environment;

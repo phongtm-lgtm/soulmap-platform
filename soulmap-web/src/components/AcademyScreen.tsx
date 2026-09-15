@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from 'react';
 import {
   Bookmark,
   BriefcaseBusiness,
@@ -8,7 +9,6 @@ import {
   Leaf,
   LayoutGrid,
   Mail,
-  Sparkles,
   Star,
   UserRound,
 } from 'lucide-react';
@@ -74,8 +74,10 @@ const POPULAR = [
   'Làm thế nào để buông bỏ những điều không còn phù hợp?',
 ];
 
+const ALL_CATEGORY = 'Tất cả';
+
 const CATEGORIES = [
-  { label: 'Tất cả', icon: LayoutGrid, active: true },
+  { label: ALL_CATEGORY, icon: LayoutGrid },
   { label: 'Phát triển bản thân', icon: Leaf },
   { label: 'Tình yêu & Mối quan hệ', icon: Heart },
   { label: 'Sự nghiệp', icon: BriefcaseBusiness },
@@ -104,10 +106,10 @@ function ArticleCard({ article }: { article: AcademyArticle }) {
         <span className={`inline-flex rounded-full px-3 py-1 font-sans text-[0.72rem] font-bold ${chipTone[article.tone]}`}>
           {article.category}
         </span>
-        <h3 className="mt-3 line-clamp-2 font-display text-[1.03rem] font-bold leading-snug text-[#22251F]">
+        <h3 className="mt-3 line-clamp-2 font-display text-[1.03rem] font-bold leading-snug text-[#214D3B]">
           {article.title}
         </h3>
-        <p className="mt-2 line-clamp-3 font-sans text-[0.86rem] leading-relaxed text-[#676B66]">
+        <p className="mt-2 line-clamp-3 font-sans text-[0.86rem] leading-relaxed text-[#5E625F]">
           {article.excerpt}
         </p>
 
@@ -133,23 +135,37 @@ function ArticleCard({ article }: { article: AcademyArticle }) {
 }
 
 export default function AcademyScreen({ currentUser: _currentUser }: AcademyScreenProps) {
+  const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORY);
+
+  const visibleArticles = useMemo(
+    () =>
+      activeCategory === ALL_CATEGORY
+        ? ARTICLES
+        : ARTICLES.filter((article) => article.category === activeCategory),
+    [activeCategory],
+  );
+
   return (
-    <main className="min-h-screen bg-[#FBF9F5] px-4 pb-10 pt-24 sm:px-6 lg:px-8 xl:px-10">
-      <div className="mx-auto grid max-w-[1500px] gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+    <main className="min-h-screen bg-[#F8F4EB] px-4 pb-10 pt-24 sm:px-6 lg:px-8 xl:px-10">
+      <div className="mx-auto grid max-w-[1280px] gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <section className="min-w-0">
           <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CATEGORIES.map((category) => {
               const Icon = category.icon;
+              const isActive = category.label === activeCategory;
               return (
                 <button
                   key={category.label}
+                  type="button"
+                  onClick={() => setActiveCategory(category.label)}
+                  aria-pressed={isActive}
                   className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 font-sans text-[0.82rem] font-bold shadow-sm transition-all ${
-                    category.active
+                    isActive
                       ? 'border-[#24533E] bg-[#24533E] text-white shadow-[0_12px_24px_-16px_rgba(33,77,59,0.7)]'
                       : 'border-[#E8DFCF] bg-[#FFFDF8] text-[#4F5A52] hover:border-[#D8CDBB] hover:text-[#24533E]'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${category.active ? 'text-[#F5D58E]' : 'text-[#7B8A80]'}`} />
+                  <Icon className={`h-4 w-4 ${isActive ? 'text-[#F5D58E]' : 'text-[#7B8A80]'}`} />
                   {category.label}
                 </button>
               );
@@ -163,11 +179,17 @@ export default function AcademyScreen({ currentUser: _currentUser }: AcademyScre
             </button>
           </div>
 
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {ARTICLES.map((article) => (
-              <ArticleCard key={article.title} article={article} />
-            ))}
-          </div>
+          {visibleArticles.length > 0 ? (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {visibleArticles.map((article) => (
+                <ArticleCard key={article.title} article={article} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-dashed border-[#E8DFCF] bg-[#FFFDF8] p-10 text-center font-sans text-[0.9rem] text-[#5E625F]">
+              Chưa có bài học nào trong chủ đề này. Hãy quay lại sau nhé!
+            </div>
+          )}
 
         </section>
 

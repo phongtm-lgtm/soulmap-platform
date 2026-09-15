@@ -22,8 +22,8 @@ public class AiReadingServiceImpl implements AiReadingService {
     }
 
     @Override
-    public AiReadingResponse getReading(Long id) {
-        AiReading reading = aiReadingRepository.findById(id)
+    public AiReadingResponse getReading(Long id, String userId) {
+        AiReading reading = aiReadingRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(ResourceNotFoundException::new);
         return toResponse(reading);
     }
@@ -59,8 +59,6 @@ public class AiReadingServiceImpl implements AiReadingService {
                 return;
             }
             CareerReadingResponse careerReading = objectMapper.readValue(reading.getContent(), CareerReadingResponse.class);
-            response.setCareerPath(careerReading.getCareerPath());
-            response.setGrowthDrivers(careerReading.getGrowthDrivers());
             response.setDeepReadingMarkdown(careerReading.getDeepReadingMarkdown());
             response.setContent(careerReading.getDeepReadingMarkdown());
         } catch (JsonProcessingException ignored) {

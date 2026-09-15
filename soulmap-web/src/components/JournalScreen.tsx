@@ -38,7 +38,10 @@ interface JournalEntry {
   mood?: string; // emoji
 }
 
-/** Fixed "today" — aligns with the design mock (9 Th7 2026) and the app clock. */
+/**
+ * PLACEHOLDER fixed "today" — aligns with the design mock (9 Th7 2026).
+ * TODO: replace with the real current date before launch (demo data only).
+ */
 const TODAY = { year: 2026, month: 6, day: 9 };
 
 const WEEKDAY_LABELS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -216,7 +219,7 @@ function EntryCard({ entry, isLast }: { entry: JournalEntry; isLast: boolean }) 
               {entry.mood && <span className="ml-0.5 text-sm leading-none">{entry.mood}</span>}
             </div>
 
-            <h4 className="mt-1 font-display text-[1.05rem] font-bold leading-snug text-[#22251F]">
+            <h4 className="mt-1 font-display text-[1.05rem] font-bold leading-snug text-[#214D3B]">
               {entry.title}
             </h4>
             <p className="mt-1 font-sans text-[0.85rem] leading-relaxed text-[#5F625E] line-clamp-3">
@@ -244,7 +247,7 @@ function EntryCard({ entry, isLast }: { entry: JournalEntry; isLast: boolean }) 
           <button
             type="button"
             aria-label="Tùy chọn nhật ký"
-            className="h-7 w-7 shrink-0 self-start rounded-full text-[#B4AC9C] transition-colors hover:bg-[#F1ECE1] hover:text-[#6A6E69]"
+            className="h-7 w-7 shrink-0 self-start rounded-full text-[#B4AC9C] transition-colors hover:bg-[#F1ECE1] hover:text-[#5E625F]"
           >
             <MoreHorizontal className="mx-auto h-4 w-4" />
           </button>
@@ -365,7 +368,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
 
   return (
     <div className="min-h-screen bg-[#F8F4EB]">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 pb-8 pt-24 lg:flex-row lg:px-6 lg:pt-28 xl:px-8 min-[1800px]:max-w-[1680px] min-[1800px]:gap-7">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5 px-4 pb-8 pt-24 lg:flex-row lg:px-6 lg:pt-28 xl:px-8 min-[1800px]:max-w-[1680px] min-[1800px]:gap-7">
         {/* ══════════════ LEFT SIDEBAR ══════════════ */}
         <aside className="w-full shrink-0 space-y-4 lg:sticky lg:top-28 lg:z-20 lg:max-h-[calc(100vh-8rem)] lg:w-[256px] lg:self-start lg:overflow-y-auto lg:pb-4 custom-scrollbar min-[1800px]:w-[280px]">
           {/* Calendar */}
@@ -380,7 +383,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                 type="button"
                 onClick={goToPrevMonth}
                 aria-label="Tháng trước"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-[#6A6E69] transition-colors hover:bg-[#F1ECE1]"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[#5E625F] transition-colors hover:bg-[#F1ECE1]"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -389,7 +392,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                 type="button"
                 onClick={goToNextMonth}
                 aria-label="Tháng sau"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-[#6A6E69] transition-colors hover:bg-[#F1ECE1]"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[#5E625F] transition-colors hover:bg-[#F1ECE1]"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -421,7 +424,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                     >
                       {cell.day}
                       {hasEntry && (
-                        <span className="absolute bottom-1 h-1 w-1 rounded-full bg-[#C9A446]" />
+                        <span className="absolute bottom-1 h-1 w-1 rounded-full bg-[#B68A2F]" />
                       )}
                     </span>
                   </div>
@@ -443,7 +446,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                     <stat.icon className="h-4 w-4" />
                   </span>
                   <span className="font-display text-[1.05rem] font-bold text-[#214D3B]">{stat.value}</span>
-                  <span className="font-sans text-[0.78rem] leading-snug text-[#6A6E69]">{stat.label}</span>
+                  <span className="font-sans text-[0.78rem] leading-snug text-[#5E625F]">{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -508,7 +511,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
         <main className="min-w-0 flex-1">
           {/* Header */}
           <div className="mb-4">
-            <h1 className="flex items-center gap-2 font-display text-[1.7rem] font-bold leading-tight text-[#22251F]">
+            <h1 className="flex items-center gap-2 font-display text-[1.7rem] font-bold leading-tight text-[#214D3B]">
               Nhật ký hành trình
               <NotebookPen className="h-5 w-5 text-[#B68A2F]" />
             </h1>
@@ -527,7 +530,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
               onChange={(e) => setDraft(e.target.value.slice(0, MAX_CHARS))}
               placeholder="Hãy viết tự do về suy nghĩ, cảm xúc, điều đã xảy ra hoặc điều bạn học được hôm nay..."
               rows={4}
-              className="w-full resize-none rounded-2xl border border-[#EAE1CF] bg-[#FDFBF5] px-4 py-3 font-sans text-[0.9rem] leading-relaxed text-[#3F423E] outline-none transition-colors placeholder:text-[#A69F90] focus:border-[#CFAE61] focus:bg-[#FFFDF8]"
+              className="w-full resize-none rounded-2xl border border-[#EAE1CF] bg-[#FDFBF5] px-4 py-3 font-sans text-[0.9rem] leading-relaxed text-[#3F423E] outline-none transition-colors placeholder:text-[#A69F90] focus:border-[#B68A2F] focus:bg-[#FFFDF8]"
             />
 
             {/* Mood picker */}
@@ -541,7 +544,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                     className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-[0.76rem] font-semibold transition-colors ${
                       selectedMood === mood.emoji
                         ? 'border-[#3E7A50] bg-[#EEF4EA] text-[#3E7A50]'
-                        : 'border-[#E8DFCF] bg-[#FFFDF8] text-[#6A6E69] hover:border-[#CFAE61]'
+                        : 'border-[#E8DFCF] bg-[#FFFDF8] text-[#5E625F] hover:border-[#B68A2F]'
                     }`}
                   >
                     <span className="text-base leading-none">{mood.emoji}</span>
@@ -559,7 +562,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                   className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-[0.78rem] font-semibold transition-colors ${
                     showMoodPicker || selectedMood
                       ? 'border-[#3E7A50] bg-[#EEF4EA] text-[#3E7A50]'
-                      : 'border-transparent text-[#6A6E69] hover:bg-[#F1ECE1]'
+                      : 'border-transparent text-[#5E625F] hover:bg-[#F1ECE1]'
                   }`}
                 >
                   {selectedMood ? <span className="text-base leading-none">{selectedMood}</span> : <Smile className="h-4 w-4" />}
@@ -567,7 +570,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                 </button>
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 rounded-full border border-transparent px-3 py-1.5 font-sans text-[0.78rem] font-semibold text-[#6A6E69] transition-colors hover:bg-[#F1ECE1]"
+                  className="flex items-center gap-1.5 rounded-full border border-transparent px-3 py-1.5 font-sans text-[0.78rem] font-semibold text-[#5E625F] transition-colors hover:bg-[#F1ECE1]"
                 >
                   <ImagePlus className="h-4 w-4" />
                   Thêm ảnh
@@ -581,7 +584,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="flex items-center gap-2 rounded-full bg-[#24533E] px-5 py-2.5 font-sans text-[0.82rem] font-bold text-white shadow-[0_12px_24px_-12px_rgba(33,77,59,0.6)] transition-all hover:-translate-y-0.5 hover:bg-[#1F4A37] active:translate-y-0"
+                  className="flex items-center gap-2 rounded-full bg-[#24533E] px-5 py-2.5 font-sans text-[0.82rem] font-bold text-white shadow-[0_12px_24px_-12px_rgba(33,77,59,0.6)] transition-all hover:-translate-y-0.5 hover:bg-[#214D3B] active:translate-y-0"
                 >
                   <NotebookPen className="h-4 w-4" />
                   Lưu nhật ký
@@ -593,7 +596,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
           {/* Recent entries */}
           <div className="mt-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-display text-[1.25rem] font-bold text-[#22251F]">Nhật ký gần đây</h2>
+              <h2 className="font-display text-[1.25rem] font-bold text-[#214D3B]">Nhật ký gần đây</h2>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9A927F]" />
@@ -605,7 +608,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                       setVisibleCount(3);
                     }}
                     placeholder="Tìm kiếm nhật ký..."
-                    className="h-10 w-[190px] rounded-full border border-[#E8DFCF] bg-[#FFFDF8] pl-9 pr-4 font-sans text-[0.8rem] text-[#4F514D] outline-none transition-colors placeholder:text-[#A69F90] focus:border-[#CFAE61]"
+                    className="h-10 w-[190px] rounded-full border border-[#E8DFCF] bg-[#FFFDF8] pl-9 pr-4 font-sans text-[0.8rem] text-[#4F514D] outline-none transition-colors placeholder:text-[#A69F90] focus:border-[#B68A2F]"
                   />
                 </div>
                 <div className="relative">
@@ -615,7 +618,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                       setTopicFilter(e.target.value);
                       setVisibleCount(3);
                     }}
-                    className="h-10 cursor-pointer appearance-none rounded-full border border-[#E8DFCF] bg-[#FFFDF8] pl-4 pr-9 font-sans text-[0.8rem] font-semibold text-[#4F514D] outline-none transition-colors focus:border-[#CFAE61]"
+                    className="h-10 cursor-pointer appearance-none rounded-full border border-[#E8DFCF] bg-[#FFFDF8] pl-4 pr-9 font-sans text-[0.8rem] font-semibold text-[#4F514D] outline-none transition-colors focus:border-[#B68A2F]"
                   >
                     <option value="Tất cả">Tất cả</option>
                     {COMMON_TOPICS.map((topic) => (
@@ -641,7 +644,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
               </ul>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#E1DACF] bg-[#FFFDF8]/70 px-6 py-12 text-center">
-                <p className="font-sans text-[0.9rem] text-[#6A6E69]">
+                <p className="font-sans text-[0.9rem] text-[#5E625F]">
                   Chưa tìm thấy dòng nhật ký nào phù hợp. Hãy thử từ khóa khác nhé.
                 </p>
               </div>
@@ -652,7 +655,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
                 <button
                   type="button"
                   onClick={() => setVisibleCount((c) => c + 3)}
-                  className="flex items-center gap-2 rounded-full border border-[#E8DFCF] bg-[#FFFDF8] px-5 py-2.5 font-sans text-[0.82rem] font-bold text-[#4F514D] shadow-sm transition-colors hover:border-[#CFAE61] hover:text-[#214D3B]"
+                  className="flex items-center gap-2 rounded-full border border-[#E8DFCF] bg-[#FFFDF8] px-5 py-2.5 font-sans text-[0.82rem] font-bold text-[#4F514D] shadow-sm transition-colors hover:border-[#B68A2F] hover:text-[#214D3B]"
                 >
                   Xem thêm nhật ký cũ
                   <ChevronDown className="h-4 w-4" />
@@ -703,7 +706,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
           {/* Linh Nhi prompts */}
           <div className="rounded-[1.5rem] border border-[#E8DFCF] bg-[#FFFDF8] p-5 shadow-[0_18px_45px_-34px_rgba(77,52,28,0.45)]">
             <div className="mb-1 flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#E8DFCF] bg-[#FAF6EE]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#E8DFCF] bg-[#F8F4EB]">
                 <img
                   src={APP_ASSETS.linhNhiMascot}
                   alt=""
@@ -737,7 +740,7 @@ export default function JournalScreen({ currentUser }: JournalScreenProps) {
             <button
               type="button"
               onClick={randomPrompt}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#24533E] px-3 py-2.5 font-sans text-[0.8rem] font-bold text-white shadow-[0_12px_24px_-14px_rgba(33,77,59,0.6)] transition-all hover:-translate-y-0.5 hover:bg-[#1F4A37]"
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#24533E] px-3 py-2.5 font-sans text-[0.8rem] font-bold text-white shadow-[0_12px_24px_-14px_rgba(33,77,59,0.6)] transition-all hover:-translate-y-0.5 hover:bg-[#214D3B]"
             >
               <Shuffle className="h-4 w-4" />
               Tạo câu hỏi ngẫu nhiên

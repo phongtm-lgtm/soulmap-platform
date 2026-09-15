@@ -95,8 +95,19 @@ export const careerJourneyContent: JourneyDetailContent = {
   ],
 };
 
+const LOVE_ACCENT = '#B95F75';
+
+export const loveJourneyContent: JourneyDetailContent = {
+  slug: 'love',
+  tagline:
+    'Chân dung người bạn đời bạn dễ gắn bó — có cả điểm đáng quý và điểm cần tỉnh táo trước khi đi đường dài.',
+  accentColor: LOVE_ACCENT,
+  sections: [],
+};
+
 const CONTENT_REGISTRY: Partial<Record<JourneySlug, JourneyDetailContent>> = {
   career: careerJourneyContent,
+  love: loveJourneyContent,
 };
 
 /**

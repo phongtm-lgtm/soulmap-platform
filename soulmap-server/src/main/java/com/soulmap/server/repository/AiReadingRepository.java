@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface AiReadingRepository extends JpaRepository<AiReading, Long> {
     Optional<AiReading> findTopByUserIdAndTypeAndChapterIdOrderByUpdatedAtDesc(String userId, String type, String chapterId);
+
+    Optional<AiReading> findTopByUserIdAndTypeOrderByUpdatedAtDesc(String userId, String type);
+
+    Optional<AiReading> findByIdAndUserId(Long id, String userId);
 }

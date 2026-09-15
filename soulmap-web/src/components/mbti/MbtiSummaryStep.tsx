@@ -44,7 +44,7 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.08fr_0.9fr]">
             <div className="flex flex-col">
               <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-[#D8E7D4] bg-[#F7FBF4] px-4 py-2 font-sans text-sm font-bold text-[#315F44]">
-                <Sparkles className="h-4 w-4 text-[#C8A15A]" />
+                <Sparkles className="h-4 w-4 text-[#B68A2F]" />
                 MBTI của bạn đã sẵn sàng!
               </div>
 
@@ -52,10 +52,10 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
                 <h1 className="mbti-summary-type font-display font-bold text-[#0E4A31]">
                   {mbtiType}
                 </h1>
-                <p className="mt-2 font-display text-3xl font-semibold text-[#244D39]">
+                <p className="mt-2 font-display text-3xl font-semibold text-[#214D3B]">
                   {getMbtiArchetypeLabel(mbtiType)}
                 </p>
-                <div className="mt-4 flex max-w-xs items-center gap-2 text-[#C8A15A]">
+                <div className="mt-4 flex max-w-xs items-center gap-2 text-[#B68A2F]">
                   <span className="h-px flex-1 bg-[#D7E2D1]" />
                   <Sparkles className="h-4 w-4" />
                   <span className="h-px flex-1 bg-[#D7E2D1]" />
@@ -68,7 +68,7 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
               </div>
 
               <div className="mt-8 rounded-[22px] border border-[#DFE5DB] bg-[#FFFCF8]/62 p-5 shadow-[0_12px_30px_rgba(33,77,59,0.04)]">
-                <h2 className="mb-4 font-display text-xl font-semibold text-[#244D39]">Đặc điểm nổi bật</h2>
+                <h2 className="mb-4 font-display text-xl font-semibold text-[#214D3B]">Đặc điểm nổi bật</h2>
                 <div className="space-y-4">
                   {axes.map((axis) => (
                     <div key={axis.leftLetter} className="grid grid-cols-[34px_1fr_34px] items-center gap-3">
@@ -100,7 +100,7 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
             <div className="relative flex flex-col justify-end gap-5 pt-3">
               <div className="relative flex min-h-[300px] items-end justify-center">
                 <div className="absolute bottom-8 h-64 w-64 rounded-full bg-[#EAF3E7]" />
-                <div className="absolute right-0 top-0 max-w-[270px] rounded-2xl border border-[#BFD8BD] bg-[#FFFCF8]/76 px-5 py-4 font-sans text-sm font-semibold leading-relaxed text-[#244D39] shadow-sm backdrop-blur-xl">
+                <div className="absolute right-0 top-0 max-w-[270px] rounded-2xl border border-[#BFD8BD] bg-[#FFFCF8]/76 px-5 py-4 font-sans text-sm font-semibold leading-relaxed text-[#214D3B] shadow-sm backdrop-blur-xl">
                   Tuyệt vời! Mình đã hiểu bạn hơn rồi. Giờ hãy cùng tạo SoulMap nhé! <span className="text-[#2F7351]">♥</span>
                 </div>
                 <img
@@ -111,8 +111,8 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
               </div>
 
               <div className="rounded-[22px] border border-[#DFE5DB] bg-[#FFFCF8]/68 p-5 shadow-[0_12px_30px_rgba(33,77,59,0.04)]">
-                <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-semibold text-[#244D39]">
-                  <Sparkles className="h-5 w-5 text-[#C8A15A]" />
+                <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-semibold text-[#214D3B]">
+                  <Sparkles className="h-5 w-5 text-[#B68A2F]" />
                   Điểm nổi bật của bạn
                 </h2>
                 <ul className="space-y-3">
@@ -135,9 +135,9 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
 
         <aside className="rounded-[28px] border border-[#D8DED3]/80 bg-[#FFFCF8]/82 p-5 text-center shadow-[0_22px_70px_rgba(33,77,59,0.08)] backdrop-blur-xl lg:p-6">
           <h2 className="flex items-center justify-center gap-2 font-display text-2xl font-semibold text-[#24533E]">
-            <Sparkles className="h-4 w-4 text-[#C8A15A]" />
+            <Sparkles className="h-4 w-4 text-[#B68A2F]" />
             Bước tiếp theo
-            <Sparkles className="h-4 w-4 text-[#C8A15A]" />
+            <Sparkles className="h-4 w-4 text-[#B68A2F]" />
           </h2>
           <p className="mt-2 font-sans text-sm font-medium text-[#677267]">Chỉ còn 1 bước nữa thôi!</p>
 
@@ -157,14 +157,14 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
 
             <div className="grid grid-cols-[48px_1fr] gap-4">
               <div className="flex flex-col items-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#E8DFCF] bg-[#FFFCF8] text-[#C8A15A] shadow-sm">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#E8DFCF] bg-[#FFFCF8] text-[#B68A2F] shadow-sm">
                   <Star className="h-5 w-5" />
                 </span>
                 <span className="h-8 border-l border-dashed border-[#C8D1C4]" />
               </div>
               <div className="pt-1.5">
                 <div className="font-sans text-base font-bold text-[#24533E]">Thông tin cá nhân</div>
-                <div className="mt-1 font-sans text-xs font-semibold text-[#C8A15A]">Họ tên và ngày sinh</div>
+                <div className="mt-1 font-sans text-xs font-semibold text-[#B68A2F]">Họ tên và ngày sinh</div>
               </div>
             </div>
 
@@ -188,21 +188,21 @@ export default function MbtiSummaryStep({ profile, onContinue, onRetake }: MbtiS
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E7F3E4] text-[#24533E]"><UserRound className="h-4 w-4" /></span>
                 <div>
                   <div className="font-sans text-sm font-bold text-[#24533E]">Bức tranh tổng quan về bạn</div>
-                  <p className="mt-0.5 font-sans text-xs leading-relaxed text-[#667167]">Kết nối MBTI và lá số để thấu hiểu bản thân từ nhiều góc nhìn.</p>
+                  <p className="mt-0.5 font-sans text-xs leading-relaxed text-[#5E625F]">Kết nối MBTI và lá số để thấu hiểu bản thân từ nhiều góc nhìn.</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E7F3E4] text-[#24533E]"><BookOpen className="h-4 w-4" /></span>
                 <div>
                   <div className="font-sans text-sm font-bold text-[#24533E]">Khám phá 4 hành trình</div>
-                  <p className="mt-0.5 font-sans text-xs leading-relaxed text-[#667167]">Hiểu sâu bản thân, sự nghiệp, tình yêu và cuộc đời</p>
+                  <p className="mt-0.5 font-sans text-xs leading-relaxed text-[#5E625F]">Hiểu sâu bản thân, sự nghiệp, tình yêu và cuộc đời</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E7F3E4] text-[#24533E]"><Bot className="h-4 w-4" /></span>
                 <div>
                   <div className="font-sans text-sm font-bold text-[#24533E]">AI Mentor cá nhân</div>
-                  <p className="mt-0.5 font-sans text-xs leading-relaxed text-[#667167]">Linh Nhi luôn đồng hành và thấu hiểu bạn</p>
+                  <p className="mt-0.5 font-sans text-xs leading-relaxed text-[#5E625F]">Linh Nhi luôn đồng hành và thấu hiểu bạn</p>
                 </div>
               </div>
             </div>

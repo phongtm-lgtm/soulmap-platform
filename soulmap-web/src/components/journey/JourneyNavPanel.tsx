@@ -33,7 +33,7 @@ export default function JourneyNavPanel({ sections, activeId, accentColor, onNav
                 onClick={() => onNavigate(section.id)}
                 aria-current={active ? 'true' : undefined}
                 className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left font-sans text-[0.86rem] font-bold transition-all ${
-                  active ? 'bg-[#F3EEE2] shadow-sm' : 'text-[#214D3B]/70 hover:bg-[#FAF6EE]'
+                  active ? 'bg-[#F3EEE2] shadow-sm' : 'text-[#214D3B]/70 hover:bg-[#F8F4EB]'
                 }`}
                 style={active ? { color: accentColor } : undefined}
               >

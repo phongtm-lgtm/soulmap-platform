@@ -1,0 +1,8 @@
+[Unit]
+Description=Back up 9router persistent data to S3
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/soulmap/bin/backup-9router.sh
